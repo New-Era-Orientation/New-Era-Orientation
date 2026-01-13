@@ -39,6 +39,9 @@ model User {
   chatConversations ChatConversation[]
   aiUsage           AIUsage[]
   
+  // Push Notifications
+  pushSubscriptions PushSubscription[]
+  
   // Analytics
   analytics         UserAnalytics?
   dailyStats        DailyStats[]
@@ -595,4 +598,28 @@ model DailyStats {
   
   @@unique([userId, date])
   @@map("daily_stats")
+}
+
+// ============================================
+// PUSH NOTIFICATIONS
+// ============================================
+
+model PushSubscription {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  endpoint    String
+  p256dh      String
+  auth        String
+  
+  // Notification preferences
+  preferences Json      @default("{}")
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  @@unique([userId, endpoint])
+  @@index([userId])
+  @@map("push_subscriptions")
 }

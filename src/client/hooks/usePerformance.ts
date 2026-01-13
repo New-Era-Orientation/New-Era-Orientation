@@ -254,3 +254,160 @@ export function useKeyboardShortcut(
         return () => document.removeEventListener("keydown", handleKeyDown);
     }, [key, callback, modifiers]);
 }
+
+/**
+ * Performance metrics interface
+ */
+export interface PerformanceMetrics {
+    LCP?: number;  // Largest Contentful Paint
+    FID?: number;  // First Input Delay
+    CLS?: number;  // Cumulative Layout Shift
+    TTFB?: number; // Time to First Byte
+    FCP?: number;  // First Contentful Paint
+}
+
+/**
+ * Hook for measuring Core Web Vitals
+ */
+export function useWebVitals(onMetrics?: (metrics: PerformanceMetrics) => void) {
+    const metricsRef = useRef<PerformanceMetrics>({});
+
+    useEffect(() => {
+        if (typeof window === "undefined" || !("PerformanceObserver" in window)) {
+            return;
+        }
+
+        const observers: PerformanceObserver[] = [];
+
+        // LCP Observer
+        try {
+            const lcpObserver = new PerformanceObserver((entryList) => {
+                const entries = entryList.getEntries();
+                const lastEntry = entries[entries.length - 1] as PerformanceEntry & { startTime: number };
+                metricsRef.current.LCP = lastEntry.startTime;
+            });
+            lcpObserver.observe({ type: "largest-contentful-paint", buffered: true });
+            observers.push(lcpObserver);
+        } catch {
+            // Not supported
+        }
+
+        // FID Observer
+        try {
+            const fidObserver = new PerformanceObserver((entryList) => {
+                const entries = entryList.getEntries();
+                const firstEntry = entries[0] as PerformanceEntry & { processingStart: number; startTime: number };
+                metricsRef.current.FID = firstEntry.processingStart - firstEntry.startTime;
+            });
+            fidObserver.observe({ type: "first-input", buffered: true });
+            observers.push(fidObserver);
+        } catch {
+            // Not supported
+        }
+
+        // CLS Observer
+        let clsValue = 0;
+        try {
+            const clsObserver = new PerformanceObserver((entryList) => {
+                for (const entry of entryList.getEntries()) {
+                    const layoutShift = entry as PerformanceEntry & { hadRecentInput: boolean; value: number };
+                    if (!layoutShift.hadRecentInput) {
+                        clsValue += layoutShift.value;
+                    }
+                }
+                metricsRef.current.CLS = clsValue;
+            });
+            clsObserver.observe({ type: "layout-shift", buffered: true });
+            observers.push(clsObserver);
+        } catch {
+            // Not supported
+        }
+
+        // FCP Observer
+        try {
+            const paintObserver = new PerformanceObserver((entryList) => {
+                for (const entry of entryList.getEntries()) {
+                    if (entry.name === "first-contentful-paint") {
+                        metricsRef.current.FCP = entry.startTime;
+                    }
+                }
+            });
+            paintObserver.observe({ type: "paint", buffered: true });
+            observers.push(paintObserver);
+        } catch {
+            // Not supported
+        }
+
+        // TTFB from Navigation Timing
+        const navEntry = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming;
+        if (navEntry) {
+            metricsRef.current.TTFB = navEntry.responseStart;
+        }
+
+        // Report on page hide
+        const reportMetrics = () => {
+            onMetrics?.(metricsRef.current);
+            if (process.env.NODE_ENV === "development") {
+                console.log("📊 Web Vitals:", metricsRef.current);
+            }
+        };
+
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === "hidden") {
+                reportMetrics();
+            }
+        };
+
+        window.addEventListener("visibilitychange", handleVisibilityChange);
+
+        return () => {
+            observers.forEach(o => o.disconnect());
+            window.removeEventListener("visibilitychange", handleVisibilityChange);
+        };
+    }, [onMetrics]);
+
+    return metricsRef.current;
+}
+
+/**
+ * Hook for throttling values
+ */
+export function useThrottle<T>(value: T, interval: number): T {
+    const [throttledValue, setThrottledValue] = useState(value);
+    const lastExecuted = useRef<number>(Date.now());
+
+    useEffect(() => {
+        const now = Date.now();
+        if (now - lastExecuted.current >= interval) {
+            lastExecuted.current = now;
+            setThrottledValue(value);
+        } else {
+            const timerId = setTimeout(() => {
+                lastExecuted.current = Date.now();
+                setThrottledValue(value);
+            }, interval);
+            return () => clearTimeout(timerId);
+        }
+    }, [value, interval]);
+
+    return throttledValue;
+}
+
+/**
+ * Hook for prefetching on hover
+ */
+export function usePrefetch(prefetchFn: () => void, delay = 100) {
+    const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+    const onMouseEnter = useCallback(() => {
+        timeoutRef.current = setTimeout(prefetchFn, delay);
+    }, [prefetchFn, delay]);
+
+    const onMouseLeave = useCallback(() => {
+        if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+        }
+    }, []);
+
+    return { onMouseEnter, onMouseLeave };
+}
