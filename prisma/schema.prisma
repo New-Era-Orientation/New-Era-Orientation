@@ -1,0 +1,557 @@
+// Prisma Schema for NEO-EDU Production
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ============================================
+// AUTHENTICATION & USER MANAGEMENT
+// ============================================
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  role          Role      @default(STUDENT)
+  
+  accounts      Account[]
+  sessions      Session[]
+  progress      UserProgress[]
+  examAttempts  ExamAttempt[]
+  bookmarks     Bookmark[]
+  
+  // Gamification
+  achievements  UserAchievement[]
+  streak        UserStreak?
+  notifications Notification[]
+  
+  // Flashcards
+  flashcardDecks   FlashcardDeck[]
+  flashcardReviews FlashcardReview[]
+  
+  // AI Chat
+  chatConversations ChatConversation[]
+  
+  // Analytics
+  analytics         UserAnalytics?
+  dailyStats        DailyStats[]
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  @@map("users")
+}
+
+enum Role {
+  STUDENT
+  TEACHER
+  ADMIN
+}
+
+model Account {
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@id([identifier, token])
+  @@map("verification_tokens")
+}
+
+// ============================================
+// STUDY CONTENT
+// ============================================
+
+model Subject {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  description String?
+  icon        String?
+  order       Int       @default(0)
+  
+  chapters    Chapter[]
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  @@map("subjects")
+}
+
+model Chapter {
+  id          String    @id @default(cuid())
+  subjectId   String
+  subject     Subject   @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  
+  name        String
+  slug        String
+  description String?
+  order       Int       @default(0)
+  
+  topics      Topic[]
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  @@unique([subjectId, slug])
+  @@map("chapters")
+}
+
+model Topic {
+  id          String    @id @default(cuid())
+  chapterId   String
+  chapter     Chapter   @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  
+  name        String
+  slug        String
+  content     String
+  videoUrl    String?
+  duration    Int?
+  order       Int       @default(0)
+  
+  progress    UserProgress[]
+  bookmarks   Bookmark[]
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  @@unique([chapterId, slug])
+  @@map("topics")
+}
+
+model UserProgress {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  topicId     String
+  topic       Topic     @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  
+  completed   Boolean   @default(false)
+  timeSpent   Int       @default(0)
+  lastAccess  DateTime  @default(now())
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  @@unique([userId, topicId])
+  @@map("user_progress")
+}
+
+model Bookmark {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  topicId     String
+  topic       Topic     @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  
+  note        String?
+  
+  createdAt   DateTime  @default(now())
+  
+  @@unique([userId, topicId])
+  @@map("bookmarks")
+}
+
+// ============================================
+// EXAM SYSTEM
+// ============================================
+
+model Exam {
+  id          String    @id @default(cuid())
+  title       String
+  slug        String    @unique
+  description String?
+  subject     String?
+  
+  year        Int
+  source      String
+  type        ExamType  @default(STANDARD)
+  duration    Int
+  
+  parts       Json?     // Store exam parts with questions
+  questions   ExamQuestion[]
+  attempts    ExamAttempt[]
+  
+  published   Boolean   @default(false)
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  @@map("exams")
+}
+
+enum ExamType {
+  STANDARD
+  HSG
+  MOCK
+}
+
+model Question {
+  id            String        @id @default(cuid())
+  content       String
+  type          QuestionType
+  track         QuestionTrack @default(COMMON)
+  
+  choices       String[]
+  correctAnswer String?
+  
+  subQuestions  SubQuestion[]
+  
+  exams         ExamQuestion[]
+  
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  
+  @@map("questions")
+}
+
+enum QuestionType {
+  MULTIPLE_CHOICE
+  TRUE_FALSE_GROUP
+}
+
+enum QuestionTrack {
+  COMMON
+  COMPUTER_SCIENCE
+  APPLIED_INFORMATICS
+}
+
+model SubQuestion {
+  id          String    @id @default(cuid())
+  questionId  String
+  question    Question  @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  
+  content     String
+  isCorrect   Boolean
+  order       Int       @default(0)
+  
+  @@map("sub_questions")
+}
+
+model ExamQuestion {
+  examId      String
+  exam        Exam      @relation(fields: [examId], references: [id], onDelete: Cascade)
+  
+  questionId  String
+  question    Question  @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  
+  partNumber  Int
+  order       Int
+  points      Float
+  
+  @@id([examId, questionId])
+  @@map("exam_questions")
+}
+
+model ExamAttempt {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  examId      String
+  exam        Exam      @relation(fields: [examId], references: [id], onDelete: Cascade)
+  
+  track       QuestionTrack
+  answers     Json
+  score       Float?
+  maxScore    Float     @default(10)
+  
+  startedAt   DateTime  @default(now())
+  completedAt DateTime?
+  timeSpent   Int?      // in minutes
+  
+  @@map("exam_attempts")
+}
+
+// ============================================
+// GAMIFICATION SYSTEM
+// ============================================
+
+model Achievement {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  description String
+  icon        String    // emoji or icon name
+  category    AchievementCategory
+  
+  // Requirements to unlock
+  requirement Json      // { type: "exams_completed", value: 10 }
+  points      Int       @default(10)
+  rarity      AchievementRarity @default(COMMON)
+  
+  // Secret achievements are hidden until unlocked
+  secret      Boolean   @default(false)
+  
+  users       UserAchievement[]
+  
+  createdAt   DateTime  @default(now())
+  
+  @@map("achievements")
+}
+
+enum AchievementCategory {
+  LEARNING     // Study-related achievements
+  EXAM         // Exam-related achievements
+  STREAK       // Consistency achievements
+  SOCIAL       // Community achievements
+  SPECIAL      // Special/event achievements
+}
+
+enum AchievementRarity {
+  COMMON
+  UNCOMMON
+  RARE
+  EPIC
+  LEGENDARY
+}
+
+model UserAchievement {
+  id            String      @id @default(cuid())
+  userId        String
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  achievementId String
+  achievement   Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+  
+  unlockedAt    DateTime    @default(now())
+  progress      Int         @default(100) // Progress percentage when unlocked
+  notified      Boolean     @default(false)
+  
+  @@unique([userId, achievementId])
+  @@map("user_achievements")
+}
+
+model UserStreak {
+  id            String    @id @default(cuid())
+  userId        String    @unique
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  currentStreak Int       @default(0)
+  longestStreak Int       @default(0)
+  lastActiveAt  DateTime  @default(now())
+  
+  // Track weekly activity (bit flags for each day)
+  weeklyActivity Int      @default(0)
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  @@map("user_streaks")
+}
+
+model Notification {
+  id          String           @id @default(cuid())
+  userId      String
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  type        NotificationType
+  title       String
+  message     String
+  link        String?
+  data        Json?
+  
+  read        Boolean          @default(false)
+  
+  createdAt   DateTime         @default(now())
+  
+  @@index([userId, read])
+  @@map("notifications")
+}
+
+enum NotificationType {
+  ACHIEVEMENT
+  STREAK
+  REMINDER
+  ANNOUNCEMENT
+  SOCIAL
+}
+
+// ============================================
+// FLASHCARD SYSTEM
+// ============================================
+
+model FlashcardDeck {
+  id          String      @id @default(cuid())
+  userId      String
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  name        String
+  description String?
+  isPublic    Boolean     @default(false)
+  
+  cards       Flashcard[]
+  
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  
+  @@map("flashcard_decks")
+}
+
+model Flashcard {
+  id          String        @id @default(cuid())
+  deckId      String
+  deck        FlashcardDeck @relation(fields: [deckId], references: [id], onDelete: Cascade)
+  
+  front       String        // Question/Term
+  back        String        // Answer/Definition
+  
+  // Spaced Repetition System (SRS)
+  reviews     FlashcardReview[]
+  
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  
+  @@map("flashcards")
+}
+
+model FlashcardReview {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  flashcardId String
+  flashcard   Flashcard @relation(fields: [flashcardId], references: [id], onDelete: Cascade)
+  
+  // SRS data
+  easeFactor  Float     @default(2.5)
+  interval    Int       @default(0)     // Days until next review
+  repetitions Int       @default(0)
+  nextReview  DateTime  @default(now())
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  @@unique([userId, flashcardId])
+  @@map("flashcard_reviews")
+}
+
+// ============================================
+// AI TUTOR SYSTEM
+// ============================================
+
+model ChatConversation {
+  id          String        @id @default(cuid())
+  userId      String
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  title       String?
+  context     String?       // Subject/topic context
+  
+  messages    ChatMessage[]
+  
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  
+  @@map("chat_conversations")
+}
+
+model ChatMessage {
+  id              String           @id @default(cuid())
+  conversationId  String
+  conversation    ChatConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  
+  role            MessageRole
+  content         String
+  
+  // For AI responses with code/explanations
+  metadata        Json?
+  
+  createdAt       DateTime         @default(now())
+  
+  @@map("chat_messages")
+}
+
+enum MessageRole {
+  USER
+  ASSISTANT
+  SYSTEM
+}
+
+// ============================================
+// ANALYTICS
+// ============================================
+
+model UserAnalytics {
+  id              String    @id @default(cuid())
+  userId          String    @unique
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Study stats
+  totalStudyTime  Int       @default(0)     // in minutes
+  topicsCompleted Int       @default(0)
+  
+  // Exam stats  
+  examsCompleted  Int       @default(0)
+  averageScore    Float     @default(0)
+  highestScore    Float     @default(0)
+  
+  // Flashcard stats
+  cardsReviewed   Int       @default(0)
+  cardsMastered   Int       @default(0)
+  
+  // Engagement
+  loginDays       Int       @default(0)
+  lastLoginAt     DateTime  @default(now())
+  
+  updatedAt       DateTime  @updatedAt
+  
+  @@map("user_analytics")
+}
+
+model DailyStats {
+  id              String    @id @default(cuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  date            DateTime  @db.Date
+  
+  studyTime       Int       @default(0)
+  topicsCompleted Int       @default(0)
+  examsCompleted  Int       @default(0)
+  cardsReviewed   Int       @default(0)
+  
+  @@unique([userId, date])
+  @@map("daily_stats")
+}

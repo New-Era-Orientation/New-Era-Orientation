@@ -1,0 +1,319 @@
+{
+  "title": "Đề thi chọn HSG Tỉnh Ninh Bình - Lần 1",
+  "slug": "hsg-ninh-binh-lan-1-2025",
+  "year": 2025,
+  "source": "Sở GD&ĐT Ninh Bình",
+  "type": "HSG",
+  "duration": 60,
+  "parts": [
+    {
+      "id": 1,
+      "title": "PHẦN I: TRẮC NGHIỆM (6.0 điểm)",
+      "questions": [
+        {
+          "id": "q1-1",
+          "num": 1,
+          "content": "Để chia sẻ một thư mục ở chế độ chỉ xem cho nhân viên, cần đặt quyền truy cập nào sau đây?",
+          "type": "MULTIPLE_CHOICE",
+          "track": "COMMON",
+          "choices": [
+            "A. Full Control."
+          ],
+          "subQuestions": null,
+          "correctAnswer": null
+        },
+        {
+          "id": "q1-2",
+          "num": 2,
+          "content": "Deep Blue – chiếc máy tính từng đánh bại kỳ thủ Garry Kasparov – thuộc loại trí tuệ nhân tạo nào?",
+          "type": "MULTIPLE_CHOICE",
+          "track": "COMMON",
+          "choices": [
+            "A. AI siêu việt."
+          ],
+          "subQuestions": null,
+          "correctAnswer": null
+        },
+        {
+          "id": "q1-3",
+          "num": 3,
+          "content": "Để thiết lập một mạng LAN trong lớp học gồm 24 máy tính. Đảm bảo rằng tất cả máy tính có thể chia sẻ dữ liệu nội bộ và truy cập Internet cùng lúc. Lớp hiện có các thiết bị sau:",
+          "type": "MULTIPLE_CHOICE",
+          "track": "COMMON",
+          "choices": [],
+          "subQuestions": null,
+          "correctAnswer": null
+        },
+        {
+          "id": "q1-4",
+          "num": 4,
+          "content": "Thuật ngữ \"Trí tuệ nhân tạo\" (Artificial Intelligence - AI) đề cập đến điều gì?",
+          "type": "MULTIPLE_CHOICE",
+          "track": "COMMON",
+          "choices": [],
+          "subQuestions": null,
+          "correctAnswer": null
+        },
+        {
+          "id": "q1-5",
+          "num": 5,
+          "content": "Trong mạng máy tính, thiết bị nào thường được dùng để kết nối nhiều máy tính trong cùng một mạng LAN?",
+          "type": "MULTIPLE_CHOICE",
+          "track": "COMMON",
+          "choices": [
+            "A. Router."
+          ],
+          "subQuestions": null,
+          "correctAnswer": null
+        },
+        {
+          "id": "q1-6",
+          "num": 6,
+          "content": "Khai báo tiêu đề nào sau đây viết đúng cú pháp HTML?",
+          "type": "MULTIPLE_CHOICE",
+          "track": "COMMON",
+          "choices": [],
+          "subQuestions": null,
+          "correctAnswer": null
+        },
+        {
+          "id": "q1-7",
+          "num": 7,
+          "content": "Phần nào của văn bản HTML dưới đây chứa nội dung hiển thị chính trên trình duyệt?",
+          "type": "MULTIPLE_CHOICE",
+          "track": "COMMON",
+          "choices": [],
+          "subQuestions": null,
+          "correctAnswer": null
+        },
+        {
+          "id": "q1-8",
+          "num": 8,
+          "content": "Phương án nào dưới đây là đặc trưng cơ bản nhất để phân biệt AI với các chương trình máy tính thông thường là gì?",
+          "type": "MULTIPLE_CHOICE",
+          "track": "COMMON",
+          "choices": [],
+          "subQuestions": null,
+          "correctAnswer": null
+        },
+        {
+          "id": "q1-9",
+          "num": 9,
+          "content": "Lĩnh vực nào sau đây không phải là một ứng dụng điển hình của Trí tuệ nhân tạo?",
+          "type": "MULTIPLE_CHOICE",
+          "track": "COMMON",
+          "choices": [
+            "A. Trợ lý ảo (Siri, Google Assistant)."
+          ],
+          "subQuestions": null,
+          "correctAnswer": null
+        },
+        {
+          "id": "q1-10",
+          "num": 10,
+          "content": "Tên tệp HTML nào sau đây là đúng cú pháp?",
+          "type": "MULTIPLE_CHOICE",
+          "track": "COMMON",
+          "choices": [
+            "A. pages/webdautien.html"
+          ],
+          "subQuestions": null,
+          "correctAnswer": null
+        },
+        {
+          "id": "q1-11",
+          "num": 11,
+          "content": "Trong một hệ thống mạng, Router đảm nhiệm vai trò gì? Hãy chọn phát biểu đúng.",
+          "type": "MULTIPLE_CHOICE",
+          "track": "COMMON",
+          "choices": [],
+          "subQuestions": null,
+          "correctAnswer": null
+        },
+        {
+          "id": "q1-12",
+          "num": 12,
+          "content": "Hãy sắp xếp các bước sau để kết nối máy tính với Switch nhằm truy cập Internet? Cắm một đầu dây cáp vào cổng LAN trên máy tính. Chuẩn bị một dây cáp mạng có hai đầu RJ45. Khởi động trình duyệt web. Cắm đầu dây cáp còn lại vào cổng LAN trên Switch.",
+          "type": "MULTIPLE_CHOICE",
+          "track": "COMMON",
+          "choices": [
+            "A. 1 -> 3 -> 2 -> 4."
+          ],
+          "subQuestions": null,
+          "correctAnswer": null
+        },
+        {
+          "id": "q1-13",
+          "num": 13,
+          "content": "Đặc điểm nổi bật của AI tạo sinh là gì?",
+          "type": "MULTIPLE_CHOICE",
+          "track": "COMMON",
+          "choices": [],
+          "subQuestions": null,
+          "correctAnswer": null
+        },
+        {
+          "id": "q1-14",
+          "num": 14,
+          "content": "Phương án nào dưới đây là cấu trúc của cặp thẻ bao ngoài cùng một tệp HTML?",
+          "type": "MULTIPLE_CHOICE",
+          "track": "COMMON",
+          "choices": [
+            "A. <body>... </body>"
+          ],
+          "subQuestions": null,
+          "correctAnswer": null
+        },
+        {
+          "id": "q1-15",
+          "num": 15,
+          "content": "Một địa chỉ MAC gồm 6 byte. Mỗi byte được biểu diễn bằng 2 ký tự hexa. Vậy số lượng địa chỉ MAC khác nhau có thể được tạo ra tối đa là bao nhiêu?",
+          "type": "MULTIPLE_CHOICE",
+          "track": "COMMON",
+          "choices": [],
+          "subQuestions": null,
+          "correctAnswer": null
+        },
+        {
+          "id": "q1-16",
+          "num": 16,
+          "content": "Khi sử dụng trợ lý ảo AI trong học tập, hoạt động nào dưới đây được xem là phù hợp và mang lại hiệu quả cao nhất?",
+          "type": "MULTIPLE_CHOICE",
+          "track": "COMMON",
+          "choices": [],
+          "subQuestions": null,
+          "correctAnswer": null
+        },
+        {
+          "id": "q1-17",
+          "num": 17,
+          "content": "Thiết bị nào sau đây dùng để chuyển đổi tín hiệu số thành tín hiệu tương tự và ngược lại, cho phép kết nối Internet qua đường dây điện thoại hoặc cáp?",
+          "type": "MULTIPLE_CHOICE",
+          "track": "COMMON",
+          "choices": [],
+          "subQuestions": null,
+          "correctAnswer": null
+        },
+        {
+          "id": "q1-18",
+          "num": 18,
+          "content": "Hành vi nào sau đây được xem là vi phạm đạo đức trong môi trường số?",
+          "type": "MULTIPLE_CHOICE",
+          "track": "COMMON",
+          "choices": [],
+          "subQuestions": null,
+          "correctAnswer": null
+        },
+        {
+          "id": "q1-19",
+          "num": 19,
+          "content": "Bạn An nhận được một tin nhắn từ một tài khoản giả mạo bạn thân, yêu cầu cung cấp mật khẩu tài khoản mạng xã hội với lý do \"đang bị khốn\". Để đảm bảo an toàn, bạn An nên làm gì?",
+          "type": "MULTIPLE_CHOICE",
+          "track": "COMMON",
+          "choices": [],
+          "subQuestions": null,
+          "correctAnswer": null
+        },
+        {
+          "id": "q1-20",
+          "num": 20,
+          "content": "Giao tiếp trong không gian mạng không có ưu điểm nào sau đây?",
+          "type": "MULTIPLE_CHOICE",
+          "track": "COMMON",
+          "choices": [],
+          "subQuestions": null,
+          "correctAnswer": null
+        },
+        {
+          "id": "q1-21",
+          "num": 21,
+          "content": "Điểm khác biệt cơ bản giữa router và switch trong mạng máy tính là gì?",
+          "type": "MULTIPLE_CHOICE",
+          "track": "COMMON",
+          "choices": [],
+          "subQuestions": null,
+          "correctAnswer": null
+        },
+        {
+          "id": "q1-22",
+          "num": 22,
+          "content": "Thẻ HTML nào dưới đây được sử dụng để định nghĩa tiêu đề của một trang web và tiêu đề này thường xuất hiện ở thanh tiêu đề của trình duyệt?",
+          "type": "MULTIPLE_CHOICE",
+          "track": "COMMON",
+          "choices": [],
+          "subQuestions": null,
+          "correctAnswer": null
+        },
+        {
+          "id": "q1-23",
+          "num": 23,
+          "content": "Trong các khai báo cấu trúc văn bản HTML, khai báo nào là đúng cú pháp?",
+          "type": "MULTIPLE_CHOICE",
+          "track": "COMMON",
+          "choices": [],
+          "subQuestions": null,
+          "correctAnswer": null
+        },
+        {
+          "id": "q1-24",
+          "num": 24,
+          "content": "Hoạt động nào sau đây không phải là giao tiếp trong không gian mạng?",
+          "type": "MULTIPLE_CHOICE",
+          "track": "COMMON",
+          "choices": [
+            "A. Nhắn tin qua mạng xã hội."
+          ],
+          "subQuestions": null,
+          "correctAnswer": null
+        },
+        {
+          "id": "q1-1",
+          "num": 1,
+          "content": "Hà sử dụng ứng dụng giao đồ ăn của công ty X. Ứng dụng này tích hợp AI để phân tích vị trí, thời gian, thói quen đặt món, quãng đường giao hàng và chọn tài xế phù hợp. Ngoài ra, hệ thống còn có chatbot hỗ trợ theo dõi đơn hàng, thay đổi địa chỉ nhận và cập nhật vị trí tài xế theo thời gian thực. Hà đưa ra các nhận định sau:",
+          "type": "MULTIPLE_CHOICE",
+          "track": "COMMON",
+          "choices": [],
+          "subQuestions": null,
+          "correctAnswer": null
+        },
+        {
+          "id": "q1-2",
+          "num": 2,
+          "content": "Xét một mô hình nhà 3 tầng với các thiết bị kết nối Internet phân bổ ở mỗi tầng như mô tả sau: Tầng 1: 01 tivi thông minh, 01 camera an ninh. Tầng 2: 01 máy laptop, 01 tivi thông minh. Tầng 3: 01 máy tính bàn. Ngoài ra có 04 điện thoại di động và 01 máy tính bảng. Khi phân tích cách thức hệ thống mạng hoạt động, một nhóm học sinh đã đưa ra các nhận định sau:\na) Các thiết bị trong nhà chỉ có thể kết nối Internet bằng dây mạng LAN, không thể kết nối không dây.\nb) Các thiết bị trên khi truy cập Internet thường sử dụng giao thức FTP để truyền và nhận dữ liệu.\nc) Để các thiết bị kết nối ổn định nhất, cần đặt WAP ở vị trí cao nhất trong nhà.\nd) Khi một học sinh gửi email cho giáo viên hoặc truy cập một trang web học tập, các ứng dụng sẽ sử dụng các giao thức tầng ứng dụng như SMTP hoặc HTTP hoặc HTTPS, vốn hoạt động dựa trên nền tảng bộ giao thức TCP/IP.",
+          "type": "MULTIPLE_CHOICE",
+          "track": "COMMON",
+          "choices": [],
+          "subQuestions": null,
+          "correctAnswer": null
+        },
+        {
+          "id": "q1-3",
+          "num": 3,
+          "content": "Trong một buổi học về chủ đề: \"Đạo đức, pháp luật và văn hóa trong môi trường số\", Hùng đưa ra một số nhận định liên quan đến hành vi và trách nhiệm của cá nhân khi tham gia không gian mạng như sau:",
+          "type": "MULTIPLE_CHOICE",
+          "track": "COMMON",
+          "choices": [
+            "C. Hội nghị trực tuyến và gọi điện thoại video là các hình thức giao tiếp trong không gian mạng."
+          ],
+          "subQuestions": null,
+          "correctAnswer": null
+        },
+        {
+          "id": "q1-4",
+          "num": 4,
+          "content": "Xét tệp \"index.html\" có nội dung: <!DOCTYPE html> <html> <head> <meta charset=\"utf-8\"> <title>Trang web của Minh</title> </head> <body> <p>Trang web đầu tiên</p> </body> </html> Khi tìm hiểu cấu trúc và hiển thị của trang web, Quân nêu ra các nhận định sau đây:\na) Tệp \"index.html\" sử dụng phiên bản HTML5.\nb) Nội dung \"Trang web đầu tiên\" được đặt trong phần thân (body) của trang web.\nc) Khi mở tệp \"index.html\" bằng trình duyệt web, màn hình cửa sổ trình duyệt web không hiển thị nội dung \"Trang web đầu tiên\" do tập \"index.html\" có lỗi cú pháp.\nd) Nếu thẻ <title> đặt sai vị trí, trình duyệt Google Chrome mới nhất sẽ không hiển thị \"Trang web của Minh\" làm tiêu đề tab. --HẾT-- SỞ GIÁO DỤC VÀ ĐÀO TẠO \nNINH BÌNH\nĐỀ THI CHÍNH THỨC\n(Đề có 04 trang) KỲ THI TỐT THỬ NGHIỆP THPT NĂM 2025\n(Đợt 1)\nMÔN: TIN HỌC\nThời gian làm bài: 50 phút, không kể thời gian phát đề Mã đề thi: 0503",
+          "type": "MULTIPLE_CHOICE",
+          "track": "COMMON",
+          "choices": [],
+          "subQuestions": null,
+          "correctAnswer": null
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "PHẦN II: CÂU HỎI ĐÚNG SAI (4.0 điểm)",
+      "questions": []
+    }
+  ]
+}

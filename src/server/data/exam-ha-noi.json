@@ -1,0 +1,300 @@
+{
+    "title": "Đề thi TN THPT môn Tin học - Sở GD&ĐT Hà Nội 2025",
+    "slug": "tn-thpt-ha-noi-2025",
+    "year": 2025,
+    "source": "Sở GD&ĐT Hà Nội",
+    "type": "STANDARD",
+    "duration": 50,
+    "parts": [
+        {
+            "id": 1,
+            "title": "PHẦN I. TRẮC NGHIỆM NHIỀU LỰA CHỌN",
+            "questions": [
+                {
+                    "id": "hn-2025-q01",
+                    "num": 1,
+                    "content": "Trong Python, để khai báo một biến có giá trị là số nguyên 10, ta sử dụng cú pháp nào sau đây?",
+                    "type": "MULTIPLE_CHOICE",
+                    "track": "COMMON",
+                    "choices": ["int x = 10", "x := 10", "x = 10", "var x = 10"],
+                    "correctAnswer": "C"
+                },
+                {
+                    "id": "hn-2025-q02",
+                    "num": 2,
+                    "content": "Hàm nào trong Python được sử dụng để nhập dữ liệu từ bàn phím?",
+                    "type": "MULTIPLE_CHOICE",
+                    "track": "COMMON",
+                    "choices": ["scanf()", "input()", "read()", "get()"],
+                    "correctAnswer": "B"
+                },
+                {
+                    "id": "hn-2025-q03",
+                    "num": 3,
+                    "content": "Kết quả của biểu thức 17 // 5 trong Python là:",
+                    "type": "MULTIPLE_CHOICE",
+                    "track": "COMMON",
+                    "choices": ["3.4", "3", "2", "4"],
+                    "correctAnswer": "B"
+                },
+                {
+                    "id": "hn-2025-q04",
+                    "num": 4,
+                    "content": "Trong Python, toán tử nào được sử dụng để tính phần dư của phép chia?",
+                    "type": "MULTIPLE_CHOICE",
+                    "track": "COMMON",
+                    "choices": ["/", "//", "%", "**"],
+                    "correctAnswer": "C"
+                },
+                {
+                    "id": "hn-2025-q05",
+                    "num": 5,
+                    "content": "Cấu trúc dữ liệu nào trong Python cho phép lưu trữ các phần tử có thứ tự và có thể thay đổi?",
+                    "type": "MULTIPLE_CHOICE",
+                    "track": "COMMON",
+                    "choices": ["tuple", "set", "list", "frozenset"],
+                    "correctAnswer": "C"
+                },
+                {
+                    "id": "hn-2025-q06",
+                    "num": 6,
+                    "content": "Trong Python, để thêm một phần tử vào cuối danh sách, ta sử dụng phương thức nào?",
+                    "type": "MULTIPLE_CHOICE",
+                    "track": "COMMON",
+                    "choices": ["add()", "insert()", "append()", "extend()"],
+                    "correctAnswer": "C"
+                },
+                {
+                    "id": "hn-2025-q07",
+                    "num": 7,
+                    "content": "Cho đoạn code: for i in range(1, 10, 2): print(i). Kết quả in ra là:",
+                    "type": "MULTIPLE_CHOICE",
+                    "track": "COMMON",
+                    "choices": ["1 2 3 4 5 6 7 8 9", "1 3 5 7 9", "2 4 6 8", "0 2 4 6 8"],
+                    "correctAnswer": "B"
+                },
+                {
+                    "id": "hn-2025-q08",
+                    "num": 8,
+                    "content": "Lệnh nào sau đây dùng để thoát khỏi vòng lặp trong Python?",
+                    "type": "MULTIPLE_CHOICE",
+                    "track": "COMMON",
+                    "choices": ["exit", "stop", "break", "return"],
+                    "correctAnswer": "C"
+                },
+                {
+                    "id": "hn-2025-q09",
+                    "num": 9,
+                    "content": "Để định nghĩa một hàm trong Python, ta sử dụng từ khóa nào?",
+                    "type": "MULTIPLE_CHOICE",
+                    "track": "COMMON",
+                    "choices": ["function", "def", "func", "define"],
+                    "correctAnswer": "B"
+                },
+                {
+                    "id": "hn-2025-q10",
+                    "num": 10,
+                    "content": "Trong Python, kiểu dữ liệu Boolean có các giá trị nào?",
+                    "type": "MULTIPLE_CHOICE",
+                    "track": "COMMON",
+                    "choices": ["0 và 1", "yes và no", "True và False", "true và false"],
+                    "correctAnswer": "C"
+                },
+                {
+                    "id": "hn-2025-q11",
+                    "num": 11,
+                    "content": "Hàm len() trong Python dùng để:",
+                    "type": "MULTIPLE_CHOICE",
+                    "track": "COMMON",
+                    "choices": ["Tính tổng các phần tử", "Đếm số phần tử", "Tìm phần tử lớn nhất", "Sắp xếp danh sách"],
+                    "correctAnswer": "B"
+                },
+                {
+                    "id": "hn-2025-q12",
+                    "num": 12,
+                    "content": "Cho s = 'Hello World'. Kết quả của s[0:5] là:",
+                    "type": "MULTIPLE_CHOICE",
+                    "track": "COMMON",
+                    "choices": ["Hello", "Hello ", "ello", "ello "],
+                    "correctAnswer": "A"
+                },
+                {
+                    "id": "hn-2025-q13",
+                    "num": 13,
+                    "content": "Trong Python, toán tử and trả về True khi:",
+                    "type": "MULTIPLE_CHOICE",
+                    "track": "COMMON",
+                    "choices": ["Ít nhất một vế đúng", "Cả hai vế đều đúng", "Cả hai vế đều sai", "Hai vế khác nhau"],
+                    "correctAnswer": "B"
+                },
+                {
+                    "id": "hn-2025-q14",
+                    "num": 14,
+                    "content": "Để mở file 'data.txt' để đọc trong Python, ta sử dụng lệnh:",
+                    "type": "MULTIPLE_CHOICE",
+                    "track": "COMMON",
+                    "choices": ["open('data.txt', 'w')", "open('data.txt', 'r')", "open('data.txt', 'a')", "read('data.txt')"],
+                    "correctAnswer": "B"
+                },
+                {
+                    "id": "hn-2025-q15",
+                    "num": 15,
+                    "content": "Trong lập trình, thuật toán là:",
+                    "type": "MULTIPLE_CHOICE",
+                    "track": "COMMON",
+                    "choices": ["Một ngôn ngữ lập trình", "Tập hợp các bước để giải quyết vấn đề", "Một phần mềm máy tính", "Một loại dữ liệu"],
+                    "correctAnswer": "B"
+                },
+                {
+                    "id": "hn-2025-q16",
+                    "num": 16,
+                    "content": "Độ phức tạp thời gian của thuật toán tìm kiếm tuần tự là:",
+                    "type": "MULTIPLE_CHOICE",
+                    "track": "COMMON",
+                    "choices": ["O(1)", "O(log n)", "O(n)", "O(n²)"],
+                    "correctAnswer": "C"
+                },
+                {
+                    "id": "hn-2025-q17",
+                    "num": 17,
+                    "content": "Thuật toán sắp xếp nổi bọt (Bubble Sort) có độ phức tạp trung bình là:",
+                    "type": "MULTIPLE_CHOICE",
+                    "track": "COMMON",
+                    "choices": ["O(n)", "O(n log n)", "O(n²)", "O(2^n)"],
+                    "correctAnswer": "C"
+                },
+                {
+                    "id": "hn-2025-q18",
+                    "num": 18,
+                    "content": "Trong Python, lệnh nào sau đây in ra màn hình?",
+                    "type": "MULTIPLE_CHOICE",
+                    "track": "COMMON",
+                    "choices": ["echo()", "write()", "print()", "output()"],
+                    "correctAnswer": "C"
+                }
+            ]
+        },
+        {
+            "id": 2,
+            "title": "PHẦN II. TRẮC NGHIỆM ĐÚNG/SAI",
+            "questions": [
+                {
+                    "id": "hn-2025-q19",
+                    "num": 19,
+                    "content": "Cho đoạn chương trình Python sau:\n\ndef tinh_tong(n):\n    tong = 0\n    for i in range(1, n + 1):\n        if i % 2 == 0:\n            tong = tong + i\n    return tong\n\nkq = tinh_tong(10)\nprint(kq)",
+                    "type": "TRUE_FALSE_GROUP",
+                    "track": "COMMON",
+                    "subQuestions": [
+                        {
+                            "id": "hn-2025-q19a",
+                            "content": "Chương trình trên tính tổng các số lẻ từ 1 đến n.",
+                            "isCorrect": false
+                        },
+                        {
+                            "id": "hn-2025-q19b",
+                            "content": "Kết quả in ra màn hình là 30.",
+                            "isCorrect": true
+                        },
+                        {
+                            "id": "hn-2025-q19c",
+                            "content": "Hàm tinh_tong có một tham số đầu vào.",
+                            "isCorrect": true
+                        },
+                        {
+                            "id": "hn-2025-q19d",
+                            "content": "Nếu gọi tinh_tong(5), kết quả trả về là 6.",
+                            "isCorrect": true
+                        }
+                    ]
+                },
+                {
+                    "id": "hn-2025-q20",
+                    "num": 20,
+                    "content": "Cho đoạn chương trình Python sau:\n\nds = [3, 1, 4, 1, 5, 9, 2, 6]\nds.sort()\nprint(ds[0], ds[-1])",
+                    "type": "TRUE_FALSE_GROUP",
+                    "track": "COMMON",
+                    "subQuestions": [
+                        {
+                            "id": "hn-2025-q20a",
+                            "content": "Phương thức sort() sắp xếp danh sách theo thứ tự giảm dần.",
+                            "isCorrect": false
+                        },
+                        {
+                            "id": "hn-2025-q20b",
+                            "content": "Sau khi sắp xếp, ds[0] có giá trị là 1.",
+                            "isCorrect": true
+                        },
+                        {
+                            "id": "hn-2025-q20c",
+                            "content": "ds[-1] là cú pháp truy cập phần tử cuối cùng của danh sách.",
+                            "isCorrect": true
+                        },
+                        {
+                            "id": "hn-2025-q20d",
+                            "content": "Kết quả in ra màn hình là '1 9'.",
+                            "isCorrect": true
+                        }
+                    ]
+                },
+                {
+                    "id": "hn-2025-q21",
+                    "num": 21,
+                    "content": "Về cấu trúc điều khiển trong Python:",
+                    "type": "TRUE_FALSE_GROUP",
+                    "track": "COMMON",
+                    "subQuestions": [
+                        {
+                            "id": "hn-2025-q21a",
+                            "content": "Câu lệnh if có thể không có phần else.",
+                            "isCorrect": true
+                        },
+                        {
+                            "id": "hn-2025-q21b",
+                            "content": "Vòng lặp while luôn thực hiện ít nhất một lần.",
+                            "isCorrect": false
+                        },
+                        {
+                            "id": "hn-2025-q21c",
+                            "content": "Lệnh continue dùng để thoát khỏi vòng lặp.",
+                            "isCorrect": false
+                        },
+                        {
+                            "id": "hn-2025-q21d",
+                            "content": "Python sử dụng thụt lề (indentation) để xác định khối lệnh.",
+                            "isCorrect": true
+                        }
+                    ]
+                },
+                {
+                    "id": "hn-2025-q22",
+                    "num": 22,
+                    "content": "Cho đoạn chương trình Python sau:\n\ndef dem_ky_tu(s, c):\n    count = 0\n    for char in s:\n        if char == c:\n            count += 1\n    return count\n\nkq = dem_ky_tu('programming', 'g')\nprint(kq)",
+                    "type": "TRUE_FALSE_GROUP",
+                    "track": "COMMON",
+                    "subQuestions": [
+                        {
+                            "id": "hn-2025-q22a",
+                            "content": "Hàm dem_ky_tu đếm số lần xuất hiện của ký tự c trong chuỗi s.",
+                            "isCorrect": true
+                        },
+                        {
+                            "id": "hn-2025-q22b",
+                            "content": "Kết quả in ra màn hình là 2.",
+                            "isCorrect": true
+                        },
+                        {
+                            "id": "hn-2025-q22c",
+                            "content": "Nếu gọi dem_ky_tu('hello', 'x'), kết quả trả về là -1.",
+                            "isCorrect": false
+                        },
+                        {
+                            "id": "hn-2025-q22d",
+                            "content": "Hàm này có độ phức tạp thời gian O(n) với n là độ dài chuỗi.",
+                            "isCorrect": true
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
