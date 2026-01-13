@@ -1,9 +1,10 @@
 'use client';
 
 import { useSession } from 'next-auth/react';
-import { redirect } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useEffect } from 'react';
 import {
   LayoutDashboard,
   FileText,
@@ -32,6 +33,16 @@ export default function AdminLayout({
 }) {
   const { data: session, status } = useSession();
   const pathname = usePathname();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (status === 'authenticated' && session?.user?.role !== 'ADMIN') {
+      router.replace('/dashboard');
+    }
+    if (status === 'unauthenticated') {
+      router.replace('/auth/login');
+    }
+  }, [status, session, router]);
 
   if (status === 'loading') {
     return (
@@ -42,7 +53,14 @@ export default function AdminLayout({
   }
 
   if (!session?.user || session.user.role !== 'ADMIN') {
-    redirect('/dashboard');
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4" />
+          <p className="text-gray-600 dark:text-gray-400">Đang chuyển hướng...</p>
+        </div>
+      </div>
+    );
   }
 
   return (

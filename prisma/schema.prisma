@@ -37,6 +37,7 @@ model User {
   
   // AI Chat
   chatConversations ChatConversation[]
+  aiUsage           AIUsage[]
   
   // Analytics
   analytics         UserAnalytics?
@@ -117,6 +118,24 @@ model EmailVerificationToken {
 
   @@unique([email, token])
   @@map("email_verification_tokens")
+}
+
+// AI Usage Tracking
+model AIUsage {
+  id        String   @id @default(cuid())
+  userId    String
+  provider  String   // gemini, openai
+  model     String   // gemini-1.5-flash, gpt-4o-mini
+  feature   String   // chat, question_generation, recommendations
+  tokens    Int      // estimated tokens used
+  cost      Float    @default(0) // estimated cost in USD
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt])
+  @@map("ai_usage")
 }
 
 // ============================================

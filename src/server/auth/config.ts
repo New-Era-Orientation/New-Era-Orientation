@@ -71,11 +71,23 @@ export const authConfig: NextAuthConfig = {
         }),
     ],
     callbacks: {
-        async jwt({ token, user }) {
+        async jwt({ token, user, trigger }) {
             if (user) {
                 token.id = user.id;
                 token.role = (user as { role?: string }).role;
             }
+            
+            // Refresh role from database on every request to catch role changes
+            if (token.id) {
+                const dbUser = await db.user.findUnique({
+                    where: { id: token.id as string },
+                    select: { role: true }
+                });
+                if (dbUser) {
+                    token.role = dbUser.role;
+                }
+            }
+            
             return token;
         },
         async session({ session, token }) {

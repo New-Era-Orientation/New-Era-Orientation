@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/server/auth";
 import { db } from "@/server/db";
+import { getAIService, type ChatMessage } from "@/server/services/ai-service";
 
 // GET - Get conversation with messages
 export async function GET(
@@ -89,8 +90,26 @@ export async function POST(
             },
         });
 
-        // Generate AI response (simulated for now, can integrate with OpenAI/Anthropic later)
-        const aiResponse = await generateAIResponse(content, conversation.context, conversation.messages);
+        // Build messages for AI
+        const aiMessages: ChatMessage[] = [
+            ...conversation.messages.map(m => ({
+                role: m.role === "USER" ? "user" as const : "assistant" as const,
+                content: m.content,
+            })),
+            { role: "user" as const, content },
+        ];
+
+        // Generate AI response using real AI service
+        let aiResponse: { content: string; model?: string; tokensUsed?: number };
+        
+        try {
+            const aiService = getAIService();
+            aiResponse = await aiService.chat(aiMessages, conversation.context || undefined);
+        } catch (error) {
+            console.error("AI service error, using fallback:", error);
+            // Fallback to simulated response if AI service fails
+            aiResponse = await generateFallbackResponse(content, conversation.context, conversation.messages);
+        }
 
         // Save AI response
         const assistantMessage = await db.chatMessage.create({
@@ -98,7 +117,10 @@ export async function POST(
                 conversationId,
                 role: "ASSISTANT",
                 content: aiResponse.content,
-                metadata: aiResponse.metadata,
+                metadata: { 
+                    model: aiResponse.model,
+                    tokensUsed: aiResponse.tokensUsed,
+                },
             },
         });
 
@@ -151,17 +173,17 @@ export async function DELETE(
     }
 }
 
-// AI Response Generator (simulated - can be replaced with actual AI API)
+// Fallback Response Generator (when AI service is unavailable)
 interface Message {
     role: string;
     content: string;
 }
 
-async function generateAIResponse(
+async function generateFallbackResponse(
     userMessage: string,
     context: string | null,
     previousMessages: Message[]
-): Promise<{ content: string; metadata?: object }> {
+): Promise<{ content: string; model?: string; tokensUsed?: number }> {
     // Build context from previous messages
     const contextString = previousMessages
         .map((m) => `${m.role}: ${m.content}`)
@@ -186,7 +208,7 @@ ${context ? `Trong ngữ cảnh ${context}:` : ""}
 3. **Các điểm cần lưu ý**: Hãy chú ý đến các chi tiết quan trọng khi học.
 
 Bạn có câu hỏi cụ thể nào về phần này không?`,
-            metadata: { type: "explanation" },
+            model: "fallback",
         };
     }
 
@@ -207,7 +229,7 @@ Bạn có câu hỏi cụ thể nào về phần này không?`,
 - Giải quyết vấn đề phức tạp
 
 Hãy cho tôi biết khi bạn hoàn thành, tôi sẽ kiểm tra và góp ý!`,
-            metadata: { type: "exercise" },
+            model: "fallback",
         };
     }
 
@@ -228,7 +250,7 @@ ${context ? `Chủ đề: ${context}` : ""}
 • Liên hệ với kiến thức đã học
 
 Bạn muốn tôi giải thích chi tiết phần nào?`,
-            metadata: { type: "summary" },
+            model: "fallback",
         };
     }
 
@@ -252,7 +274,7 @@ Bạn muốn tôi giải thích chi tiết phần nào?`,
    - Tập trung vào điểm yếu
 
 Bạn cần gợi ý cụ thể hơn về phần nào?`,
-            metadata: { type: "tips" },
+            model: "fallback",
         };
     }
 
@@ -269,7 +291,9 @@ Tôi là AI Tutor, sẵn sàng hỗ trợ bạn học tập. Tôi có thể giú
 
 ${context ? `\nHiện tại chúng ta đang thảo luận về: **${context}**` : ""}
 
+⚠️ *Lưu ý: AI service chưa được cấu hình. Vui lòng thêm GOOGLE_AI_API_KEY hoặc OPENAI_API_KEY để sử dụng đầy đủ tính năng.*
+
 Bạn muốn tôi hỗ trợ gì?`,
-        metadata: { type: "default", context: contextString.slice(0, 500) },
+        model: "fallback",
     };
 }
