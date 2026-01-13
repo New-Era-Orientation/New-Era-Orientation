@@ -22,8 +22,9 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const search = searchParams.get("search") || "";
     const published = searchParams.get("published");
-    const limit = parseInt(searchParams.get("limit") || "20");
-    const offset = parseInt(searchParams.get("offset") || "0");
+    const page = parseInt(searchParams.get("page") || "1");
+    const limit = parseInt(searchParams.get("limit") || "10");
+    const offset = (page - 1) * limit;
 
     try {
         const whereClause: Record<string, unknown> = {};
@@ -35,7 +36,7 @@ export async function GET(request: NextRequest) {
             ];
         }
 
-        if (published !== null && published !== undefined) {
+        if (published !== null && published !== undefined && published !== "") {
             whereClause.published = published === "true";
         }
 
@@ -46,6 +47,7 @@ export async function GET(request: NextRequest) {
                     id: true,
                     title: true,
                     slug: true,
+                    description: true,
                     subject: true,
                     year: true,
                     source: true,
@@ -67,6 +69,9 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({
             exams,
             total,
+            page,
+            limit,
+            totalPages: Math.ceil(total / limit),
             hasMore: offset + limit < total,
         });
     } catch (error) {
