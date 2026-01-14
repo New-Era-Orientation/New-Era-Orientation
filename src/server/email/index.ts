@@ -1,3 +1,4 @@
+import React from 'react';
 import { Resend } from 'resend';
 import { VerificationEmail } from './templates/VerificationEmail';
 import { PasswordResetEmail } from './templates/PasswordResetEmail';
@@ -134,6 +135,48 @@ export async function sendWelcomeEmail(
     return { 
       success: false, 
       error: error instanceof Error ? error.message : 'Unknown error' 
+    };
+  }
+}
+
+/**
+ * Generic email sending function for custom emails
+ */
+export async function sendEmail(options: {
+  to: string;
+  subject: string;
+  html?: string;
+  react?: React.ReactElement;
+}): Promise<EmailResult> {
+  if (!isEmailConfigured()) {
+    console.warn('Email service not configured. Skipping email.');
+    console.log(`[DEV] Would send email to ${options.to}: ${options.subject}`);
+    return { success: true };
+  }
+
+  try {
+    // Build send options based on what's provided
+    const sendOptions = {
+      from: FROM_EMAIL,
+      to: options.to,
+      subject: options.subject,
+      ...(options.react ? { react: options.react } : {}),
+      ...(options.html && !options.react ? { html: options.html } : {}),
+    } as any;
+
+    const { error } = await resend!.emails.send(sendOptions);
+
+    if (error) {
+      console.error('Failed to send email:', error);
+      return { success: false, error: error.message };
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error('Email sending error:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error',
     };
   }
 }
