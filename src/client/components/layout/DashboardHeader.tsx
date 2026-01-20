@@ -53,8 +53,8 @@ export function DashboardHeader() {
                                 href={item.href}
                                 className={cn(
                                     "flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors",
-                                    isActive 
-                                        ? "bg-primary/10 text-primary" 
+                                    isActive
+                                        ? "bg-primary/10 text-primary"
                                         : "text-muted-foreground hover:text-foreground hover:bg-secondary"
                                 )}
                                 aria-current={isActive ? "page" : undefined}
@@ -169,7 +169,7 @@ export function DashboardHeader() {
                         ) : (
                             <Link
                                 href="/auth/login"
-                                className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+                                className="whitespace-nowrap shrink-0 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
                             >
                                 Đăng nhập
                             </Link>
@@ -190,9 +190,9 @@ export function DashboardHeader() {
 
             {/* Mobile Navigation */}
             {mobileMenuOpen && (
-                <nav 
+                <nav
                     className="md:hidden border-t border-border bg-secondary px-4 py-3 space-y-1"
-                    role="navigation" 
+                    role="navigation"
                     aria-label="Mobile navigation"
                 >
                     {navItems.map((item) => {
@@ -204,8 +204,8 @@ export function DashboardHeader() {
                                 onClick={() => setMobileMenuOpen(false)}
                                 className={cn(
                                     "flex items-center gap-3 rounded-lg px-4 py-3 text-base font-medium transition-colors",
-                                    isActive 
-                                        ? "bg-primary/10 text-primary" 
+                                    isActive
+                                        ? "bg-primary/10 text-primary"
                                         : "text-muted-foreground hover:text-foreground hover:bg-background"
                                 )}
                                 aria-current={isActive ? "page" : undefined}
