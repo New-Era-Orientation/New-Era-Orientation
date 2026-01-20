@@ -3,6 +3,8 @@ import { auth } from '@/server/auth';
 import { db } from '@/server/db';
 import { getAIService } from '@/server/services/ai-service';
 
+export const dynamic = 'force-dynamic';
+
 // GET - Get personalized study recommendations
 export async function GET(request: NextRequest) {
   try {
@@ -16,7 +18,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Gather user's learning data
-    const [examAttempts, studyProgress, flashcardProgress] = await Promise.all([
+    const [examAttempts, studyProgress] = await Promise.all([
       // Recent exam attempts
       db.examAttempt.findMany({
         where: { userId: session.user.id },
@@ -28,7 +30,7 @@ export async function GET(request: NextRequest) {
           },
         },
       }),
-      
+
       // Study progress
       db.userProgress.findMany({
         where: { userId: session.user.id },
@@ -38,27 +40,17 @@ export async function GET(request: NextRequest) {
           },
         },
       }),
-      
-      // Flashcard progress - get reviews with SRS data
-      db.flashcardReview.findMany({
-        where: { userId: session.user.id },
-        select: {
-          easeFactor: true,
-          interval: true,
-          repetitions: true,
-        },
-      }),
     ]);
 
     // Analyze performance
-    const analysis = analyzeUserPerformance(examAttempts, studyProgress, flashcardProgress);
+    const analysis = analyzeUserPerformance(examAttempts, studyProgress);
 
     // If user has enough data, use AI for personalized recommendations
     if (analysis.totalAttempts >= 3) {
       try {
         const aiService = getAIService();
         const prompt = buildRecommendationPrompt(analysis);
-        
+
         const response = await aiService.chat([
           { role: 'user', content: prompt }
         ]);
@@ -103,20 +95,18 @@ interface UserAnalysis {
   studyStreak: number;
   topicsCompleted: number;
   topicsInProgress: number;
-  flashcardMastery: number;
   recentScores: number[];
   trend: 'improving' | 'stable' | 'declining';
 }
 
 function analyzeUserPerformance(
   examAttempts: Array<{ score: number | null; exam: { title: string; subject: string | null } | null }>,
-  studyProgress: Array<{ completed: boolean; topic: { name: string; slug: string } | null }>,
-  flashcardReviews: Array<{ easeFactor: number; interval: number; repetitions: number }>
+  studyProgress: Array<{ completed: boolean; topic: { name: string; slug: string } | null }>
 ): UserAnalysis {
   // Calculate average score
   const scores = examAttempts.filter(a => a.score !== null).map(a => a.score as number);
-  const averageScore = scores.length > 0 
-    ? scores.reduce((a, b) => a + b, 0) / scores.length 
+  const averageScore = scores.length > 0
+    ? scores.reduce((a, b) => a + b, 0) / scores.length
     : 0;
 
   // Analyze subjects performance
@@ -147,21 +137,15 @@ function analyzeUserPerformance(
   const topicsCompleted = studyProgress.filter(p => p.completed).length;
   const topicsInProgress = studyProgress.filter(p => !p.completed).length;
 
-  // Flashcard mastery - using reviews data directly
-  const masteredCards = flashcardReviews.filter(r => r.interval >= 21).length;
-  const flashcardMastery = flashcardReviews.length > 0 
-    ? (masteredCards / flashcardReviews.length) * 100 
-    : 0;
-
   // Score trend (last 5 vs previous 5)
   const recentScores = scores.slice(0, 5);
   const previousScores = scores.slice(5, 10);
-  
+
   let trend: 'improving' | 'stable' | 'declining' = 'stable';
   if (recentScores.length >= 3 && previousScores.length >= 3) {
     const recentAvg = recentScores.reduce((a, b) => a + b, 0) / recentScores.length;
     const previousAvg = previousScores.reduce((a, b) => a + b, 0) / previousScores.length;
-    
+
     if (recentAvg - previousAvg > 5) trend = 'improving';
     else if (previousAvg - recentAvg > 5) trend = 'declining';
   }
@@ -174,7 +158,6 @@ function analyzeUserPerformance(
     studyStreak: 0, // Would need activity data
     topicsCompleted,
     topicsInProgress,
-    flashcardMastery: Math.round(flashcardMastery),
     recentScores,
     trend,
   };
@@ -191,7 +174,6 @@ DỮ LIỆU HỌC SINH:
 - Môn yếu: ${analysis.weakSubjects.join(', ') || 'Chưa xác định'}
 - Topics hoàn thành: ${analysis.topicsCompleted}
 - Topics đang học: ${analysis.topicsInProgress}
-- Flashcard mastery: ${analysis.flashcardMastery}%
 
 HÃY ĐƯA RA 5 GỢI Ý HỌC TẬP CÁ NHÂN HÓA.
 
@@ -202,7 +184,7 @@ FORMAT (JSON):
     "priority": "high|medium|low",
     "title": "Tiêu đề ngắn gọn",
     "description": "Mô tả chi tiết",
-    "actionUrl": "/study hoặc /exam hoặc /flashcards",
+    "actionUrl": "/study hoặc /exam",
     "estimatedTime": "30 phút"
   }
 ]
@@ -214,7 +196,7 @@ function parseRecommendations(content: string): unknown[] {
   try {
     const jsonMatch = content.match(/\[[\s\S]*\]/);
     if (!jsonMatch) return [];
-    
+
     return JSON.parse(jsonMatch[0]);
   } catch {
     return [];
@@ -269,17 +251,7 @@ function generateRuleBasedRecommendations(analysis: UserAnalysis): Recommendatio
     });
   }
 
-  // Flashcard reminder
-  if (analysis.flashcardMastery < 50) {
-    recommendations.push({
-      type: 'review',
-      priority: 'medium',
-      title: 'Ôn tập Flashcard',
-      description: 'Flashcard giúp ghi nhớ lâu dài. Hãy dành thời gian ôn tập mỗi ngày.',
-      actionUrl: '/flashcards',
-      estimatedTime: '15 phút',
-    });
-  }
+
 
   // Topics in progress
   if (analysis.topicsInProgress > 0) {

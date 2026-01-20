@@ -59,8 +59,7 @@ export async function POST(request: NextRequest) {
                 const digestData = await generateDigestData(user.id, weekStart, now);
                 
                 // Skip if no activity
-                if (digestData.stats.examsCompleted === 0 && 
-                    digestData.stats.flashcardsReviewed === 0) {
+                if (digestData.stats.examsCompleted === 0) {
                     results.skipped++;
                     continue;
                 }
@@ -116,14 +115,6 @@ async function generateDigestData(userId: string, weekStart: Date, weekEnd: Date
         orderBy: { score: "desc" },
     });
 
-    // Get flashcard reviews
-    const flashcardReviews = await db.flashcardReview.count({
-        where: {
-            userId,
-            createdAt: { gte: weekStart, lte: weekEnd },
-        },
-    });
-
     // Get streak
     const streak = await db.userStreak.findUnique({
         where: { userId },
@@ -157,7 +148,6 @@ async function generateDigestData(userId: string, weekStart: Date, weekEnd: Date
                 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length * 10) / 10 
                 : 0,
             studyTime: totalTime,
-            flashcardsReviewed: flashcardReviews,
             streakDays: streak?.currentStreak || 0,
         },
         topScores: attempts.slice(0, 3).map(a => ({

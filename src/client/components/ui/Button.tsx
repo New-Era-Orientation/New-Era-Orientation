@@ -1,5 +1,4 @@
-"use client";
-
+import { Slot } from "@radix-ui/react-slot";
 import { cn } from "@/client/lib/utils";
 import { ButtonHTMLAttributes, forwardRef } from "react";
 import { Loader2 } from "lucide-react";
@@ -15,17 +14,22 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 export { buttonVariants };
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-    ({ className, variant = "default", size = "default", loading, children, disabled, ...props }, ref) => {
+    ({ className, variant = "default", size = "default", loading, asChild = false, children, disabled, ...props }, ref) => {
+        const Comp = asChild ? Slot : "button";
         return (
-            <button
+            <Comp
                 ref={ref}
                 disabled={disabled || loading}
                 className={buttonVariants({ variant, size, className })}
                 {...props}
             >
-                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {children}
-            </button>
+                {asChild ? children : (
+                    <>
+                        {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        {children}
+                    </>
+                )}
+            </Comp>
         );
     }
 );

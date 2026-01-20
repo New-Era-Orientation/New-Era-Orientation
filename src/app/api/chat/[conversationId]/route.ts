@@ -260,7 +260,7 @@ Bạn muốn tôi giải thích chi tiết phần nào?`,
 
 1. **Phương pháp học hiệu quả:**
    - Chia nhỏ thời gian học (25-30 phút/phiên)
-   - Ôn tập định kỳ với flashcard
+   - Ôn tập định kỳ
    - Ghi chép bằng sơ đồ tư duy
 
 2. **Kỹ thuật ghi nhớ:**

@@ -45,7 +45,6 @@ export function WelcomeEmail({ userName, loginUrl }: WelcomeEmailProps) {
               </Heading>
               <Text style={featureItem}>📝 Làm đề thi thử từ các tỉnh thành</Text>
               <Text style={featureItem}>📚 Học lý thuyết với nội dung được biên soạn kỹ lưỡng</Text>
-              <Text style={featureItem}>🃏 Ôn tập với Flashcards thông minh</Text>
               <Text style={featureItem}>🤖 Hỏi đáp với AI Tutor 24/7</Text>
               <Text style={featureItem}>🏆 Chinh phục thành tựu và leo rank</Text>
             </Section>

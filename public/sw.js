@@ -45,6 +45,11 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
+  // Skip non-GET requests (POST, PUT, etc. cannot be cached)
+  if (request.method !== "GET") {
+    return;
+  }
+
   // API requests - network only with timeout
   if (url.pathname.startsWith("/api/")) {
     event.respondWith(

@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { db } from "@/server/db";
 import { auth } from "@/server/auth";
 
+export const dynamic = "force-dynamic";
+
 // Achievement requirement checker
 async function checkAchievementRequirement(
     userId: string,
@@ -147,7 +149,7 @@ export async function GET() {
             }
         });
 
-        const results = [];
+        const results: any[] = [];
 
         for (const achievement of achievements) {
             const requirement = achievement.requirement as { type: string; value: number };

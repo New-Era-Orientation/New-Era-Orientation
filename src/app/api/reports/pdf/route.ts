@@ -56,13 +56,6 @@ export async function GET(request: NextRequest) {
             orderBy: { completedAt: "desc" },
         });
 
-        const flashcardReviews = await db.flashcardReview.count({
-            where: {
-                userId: session.user.id,
-                createdAt: { gte: startDate, lte: now },
-            },
-        });
-
         const streak = await db.userStreak.findUnique({
             where: { userId: session.user.id },
         });
@@ -135,7 +128,6 @@ export async function GET(request: NextRequest) {
                         highestScore,
                         lowestScore,
                         totalStudyTime: totalTime,
-                        flashcardsReviewed: flashcardReviews,
                         currentStreak: streak?.currentStreak || 0,
                         longestStreak: streak?.longestStreak || 0,
                         achievementsUnlocked: achievements.length,
@@ -178,7 +170,6 @@ export async function GET(request: NextRequest) {
                 highestScore,
                 lowestScore,
                 totalStudyTime: totalTime,
-                flashcardsReviewed: flashcardReviews,
                 currentStreak: streak?.currentStreak || 0,
                 achievementsUnlocked: achievements.length,
             },
@@ -265,7 +256,6 @@ function generateReportHTML(data: {
         highestScore: number;
         lowestScore: number;
         totalStudyTime: number;
-        flashcardsReviewed: number;
         currentStreak: number;
         achievementsUnlocked: number;
     };

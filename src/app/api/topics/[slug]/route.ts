@@ -46,7 +46,7 @@ export async function GET(request: Request, { params }: RouteParams) {
         }
 
         // Get user progress if authenticated
-        let userProgress = null;
+        let userProgress: any = null;
         if (session?.user?.id) {
             userProgress = await db.userProgress.findUnique({
                 where: {

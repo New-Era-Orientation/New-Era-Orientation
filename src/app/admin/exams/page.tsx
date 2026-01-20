@@ -2,14 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { 
-  Plus, 
-  Search, 
-  Filter, 
-  MoreVertical, 
-  Edit, 
-  Trash2, 
-  Eye, 
+import {
+  Plus,
+  Search,
+  Filter,
+  MoreVertical,
+  Edit,
+  Trash2,
+  Eye,
   Copy,
   CheckCircle,
   XCircle,
@@ -61,14 +61,22 @@ export default function AdminExamsPage() {
     totalPages: 0,
   });
   const [actionMenu, setActionMenu] = useState<string | null>(null);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   useEffect(() => {
     fetchExams();
+
+    // Auto-refresh every 30 seconds
+    const interval = setInterval(() => {
+      fetchExams(true); // silent refresh
+    }, 30000);
+
+    return () => clearInterval(interval);
   }, [pagination.page, filter, search]);
 
-  const fetchExams = async () => {
+  const fetchExams = async (silent = false) => {
     try {
-      setLoading(true);
+      if (!silent) setLoading(true);
       const params = new URLSearchParams({
         page: String(pagination.page),
         limit: String(pagination.limit),
@@ -78,7 +86,7 @@ export default function AdminExamsPage() {
 
       const res = await fetch(`/api/admin/exams?${params}`);
       if (!res.ok) throw new Error('Failed to fetch exams');
-      
+
       const data = await res.json();
       setExams(data.exams);
       setPagination(prev => ({
@@ -86,10 +94,11 @@ export default function AdminExamsPage() {
         total: data.total,
         totalPages: data.totalPages,
       }));
+      setLastUpdated(new Date());
     } catch (error) {
       console.error('Error fetching exams:', error);
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   };
 
@@ -102,7 +111,7 @@ export default function AdminExamsPage() {
       });
 
       if (!res.ok) throw new Error('Failed to delete exam');
-      
+
       setExams(exams.filter(e => e.id !== examId));
       setActionMenu(null);
     } catch (error) {
@@ -120,8 +129,8 @@ export default function AdminExamsPage() {
       });
 
       if (!res.ok) throw new Error('Failed to update exam');
-      
-      setExams(exams.map(e => 
+
+      setExams(exams.map(e =>
         e.id === examId ? { ...e, published: !currentStatus } : e
       ));
       setActionMenu(null);
@@ -137,7 +146,7 @@ export default function AdminExamsPage() {
       });
 
       if (!res.ok) throw new Error('Failed to duplicate exam');
-      
+
       fetchExams();
       setActionMenu(null);
     } catch (error) {
@@ -161,6 +170,81 @@ export default function AdminExamsPage() {
     }
   };
 
+  // AI Modal State
+  const [showAIModal, setShowAIModal] = useState(false);
+  const [aiMode, setAiMode] = useState<'generate' | 'scan'>('generate');
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generatedContent, setGeneratedContent] = useState('');
+
+  // Generation Params
+  const [genParams, setGenParams] = useState({
+    topic: '',
+    total: 10,
+    single: 6,
+    multi: 4,
+    difficulty: 'thông hiểu'
+  });
+
+  // Import Params
+  const [importFile, setImportFile] = useState<File | null>(null);
+
+  const handleGenerate = async () => {
+    try {
+      setIsGenerating(true);
+      const res = await fetch('/api/admin/exams/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          topic: genParams.topic,
+          totalQuestions: genParams.total,
+          singleChoice: genParams.single,
+          multiChoice: genParams.multi,
+          difficulty: genParams.difficulty
+        })
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Generation failed');
+
+      setGeneratedContent(data.content);
+    } catch (error) {
+      console.error(error);
+      alert('Tạo đề thất bại: ' + (error as Error).message);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const handleScan = async () => {
+    if (!importFile) return;
+
+    try {
+      setIsGenerating(true);
+      const formData = new FormData();
+      formData.append('file', importFile);
+
+      const res = await fetch('/api/admin/exams/import-scan', {
+        method: 'POST',
+        body: formData
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Scan failed');
+
+      setGeneratedContent(data.content);
+    } catch (error) {
+      console.error(error);
+      alert('Quét đề thất bại: ' + (error as Error).message);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(generatedContent);
+    alert('Đã sao chép vào bộ nhớ tạm!');
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
       <div className="max-w-7xl mx-auto">
@@ -176,13 +260,181 @@ export default function AdminExamsPage() {
               Quản lý đề thi
             </h1>
           </div>
-          <Link href="/admin/exams/new">
-            <Button className="gap-2">
-              <Plus className="w-4 h-4" />
-              Thêm đề thi
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              className="gap-2"
+              onClick={() => setShowAIModal(true)}
+            >
+              <div className="w-4 h-4 text-purple-600">✨</div>
+              Tạo đề bằng AI
             </Button>
-          </Link>
+            <Link href="/admin/exams/new">
+              <Button className="gap-2">
+                <Plus className="w-4 h-4" />
+                Thêm đề thi
+              </Button>
+            </Link>
+          </div>
         </div>
+
+        {/* AI Modal */}
+        {showAIModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+              <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                  <span className="text-2xl">✨</span> Tạo đề thi thông minh
+                </h2>
+                <button
+                  onClick={() => setShowAIModal(false)}
+                  className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                >
+                  <XCircle className="w-6 h-6" />
+                </button>
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-6">
+                <div className="flex gap-4 mb-6">
+                  <button
+                    onClick={() => setAiMode('generate')}
+                    className={`flex-1 py-3 px-4 rounded-lg border-2 font-medium transition ${aiMode === 'generate'
+                        ? 'border-blue-600 bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400'
+                        : 'border-gray-200 dark:border-gray-700 hover:border-blue-300'
+                      }`}
+                  >
+                    📝 Tạo mới từ chủ đề
+                  </button>
+                  <button
+                    onClick={() => setAiMode('scan')}
+                    className={`flex-1 py-3 px-4 rounded-lg border-2 font-medium transition ${aiMode === 'scan'
+                        ? 'border-purple-600 bg-purple-50 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400'
+                        : 'border-gray-200 dark:border-gray-700 hover:border-purple-300'
+                      }`}
+                  >
+                    📂 Import từ Word/PDF
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  {/* Left Panel: Inputs */}
+                  <div className="space-y-4">
+                    {aiMode === 'generate' ? (
+                      <>
+                        <div>
+                          <label className="block text-sm font-medium mb-1">Chủ đề / Nội dung</label>
+                          <Input
+                            value={genParams.topic}
+                            onChange={(e) => setGenParams({ ...genParams, topic: e.target.value })}
+                            placeholder="Ví dụ: Lịch sử Việt Nam thế kỷ 20..."
+                          />
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-sm font-medium mb-1">Tổng số câu</label>
+                            <Input
+                              type="number"
+                              value={genParams.total}
+                              onChange={(e) => setGenParams({ ...genParams, total: Number(e.target.value) })}
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium mb-1">Độ khó</label>
+                            <select
+                              className="w-full h-10 px-3 rounded-md border border-gray-300 dark:border-gray-600 bg-transparent"
+                              value={genParams.difficulty}
+                              onChange={(e) => setGenParams({ ...genParams, difficulty: e.target.value })}
+                            >
+                              <option value="nhận biết">Nhận biết</option>
+                              <option value="thông hiểu">Thông hiểu</option>
+                              <option value="vận dụng">Vận dụng</option>
+                              <option value="vận dụng cao">Vận dụng cao</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-sm font-medium mb-1">Số câu 1 đáp án</label>
+                            <Input
+                              type="number"
+                              value={genParams.single}
+                              onChange={(e) => setGenParams({ ...genParams, single: Number(e.target.value) })}
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium mb-1">Số câu Đ/S</label>
+                            <Input
+                              type="number"
+                              value={genParams.multi}
+                              onChange={(e) => setGenParams({ ...genParams, multi: Number(e.target.value) })}
+                            />
+                          </div>
+                        </div>
+                        <Button
+                          className="w-full mt-2"
+                          onClick={handleGenerate}
+                          disabled={isGenerating || !genParams.topic}
+                        >
+                          {isGenerating ? 'Đang tạo...' : '🚀 Tạo đề thi'}
+                        </Button>
+                      </>
+                    ) : (
+                      <>
+                        <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-8 text-center bg-gray-50 dark:bg-gray-800/50">
+                          <input
+                            type="file"
+                            id="file-upload"
+                            className="hidden"
+                            accept=".pdf,.docx,.doc,.jpg,.png"
+                            onChange={(e) => setImportFile(e.target.files?.[0] || null)}
+                          />
+                          <label htmlFor="file-upload" className="cursor-pointer block">
+                            <div className="bg-blue-100 dark:bg-blue-900/30 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                              <FileText className="w-8 h-8 text-blue-600" />
+                            </div>
+                            <p className="font-medium text-lg mb-1">
+                              {importFile ? importFile.name : 'Chọn file Word, PDF hoặc Ảnh'}
+                            </p>
+                            <p className="text-sm text-gray-500">
+                              Hỗ trợ scan nội dung tự động
+                            </p>
+                          </label>
+                        </div>
+                        <Button
+                          className="w-full mt-4 bg-purple-600 hover:bg-purple-700"
+                          onClick={handleScan}
+                          disabled={isGenerating || !importFile}
+                        >
+                          {isGenerating ? 'Đang phân tích...' : '🤖 Quét & Tạo đề'}
+                        </Button>
+                      </>
+                    )}
+
+                    <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg text-sm text-blue-800 dark:text-blue-300">
+                      <strong>💡 Lưu ý:</strong> AI sẽ tạo đề theo định dạng chuẩn Plain Text. Bạn có thể chỉnh sửa kết quả bên phải trước khi lưu.
+                    </div>
+                  </div>
+
+                  {/* Right Panel: Output */}
+                  <div className="flex flex-col h-full min-h-[400px]">
+                    <div className="flex justify-between items-center mb-2">
+                      <label className="block text-sm font-medium">Kết quả generated</label>
+                      <Button variant="ghost" size="sm" onClick={copyToClipboard} disabled={!generatedContent}>
+                        <Copy className="w-4 h-4 mr-1" /> Copy
+                      </Button>
+                    </div>
+                    <textarea
+                      className="flex-1 w-full p-4 rounded-lg border border-gray-300 dark:border-gray-600 font-mono text-sm leading-relaxed bg-gray-50 dark:bg-gray-900 resize-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Nội dung đề thi sẽ xuất hiện ở đây..."
+                      value={generatedContent}
+                      onChange={(e) => setGeneratedContent(e.target.value)}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Filters */}
         <Card className="mb-6">
@@ -203,31 +455,28 @@ export default function AdminExamsPage() {
               <div className="flex gap-2">
                 <button
                   onClick={() => setFilter('all')}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
-                    filter === 'all'
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition ${filter === 'all'
                       ? 'bg-blue-600 text-white'
                       : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                  }`}
+                    }`}
                 >
                   Tất cả
                 </button>
                 <button
                   onClick={() => setFilter('published')}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
-                    filter === 'published'
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition ${filter === 'published'
                       ? 'bg-green-600 text-white'
                       : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                  }`}
+                    }`}
                 >
                   Đã xuất bản
                 </button>
                 <button
                   onClick={() => setFilter('draft')}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
-                    filter === 'draft'
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition ${filter === 'draft'
                       ? 'bg-yellow-600 text-white'
                       : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                  }`}
+                    }`}
                 >
                   Bản nháp
                 </button>
@@ -341,7 +590,7 @@ export default function AdminExamsPage() {
                             >
                               <MoreVertical className="w-4 h-4 text-gray-500" />
                             </button>
-                            
+
                             {actionMenu === exam.id && (
                               <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-10">
                                 <Link
@@ -418,11 +667,10 @@ export default function AdminExamsPage() {
                     <button
                       key={page}
                       onClick={() => setPagination(p => ({ ...p, page }))}
-                      className={`px-3 py-1 rounded-lg ${
-                        page === pagination.page
+                      className={`px-3 py-1 rounded-lg ${page === pagination.page
                           ? 'bg-blue-600 text-white'
                           : 'border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700'
-                      }`}
+                        }`}
                     >
                       {page}
                     </button>

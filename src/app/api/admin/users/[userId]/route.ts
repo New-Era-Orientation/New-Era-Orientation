@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/server/auth";
 import { db } from "@/server/db";
 
+export const dynamic = "force-dynamic";
+
 // GET - Get user details
 export async function GET(
     request: NextRequest,
@@ -9,7 +11,7 @@ export async function GET(
 ) {
     const session = await auth();
     const { userId } = await params;
-    
+
     if (!session?.user?.id) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -32,7 +34,6 @@ export async function GET(
                         examAttempts: true,
                         progress: true,
                         achievements: true,
-                        flashcardDecks: true,
                     },
                 },
                 examAttempts: {
@@ -70,7 +71,7 @@ export async function PUT(
 ) {
     const session = await auth();
     const { userId } = await params;
-    
+
     if (!session?.user?.id) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -118,7 +119,7 @@ export async function DELETE(
 ) {
     const session = await auth();
     const { userId } = await params;
-    
+
     if (!session?.user?.id) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

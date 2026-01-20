@@ -45,8 +45,28 @@ export async function GET() {
             return acc + (curr.timeSpent || 0);
         }, 0);
 
-        // Calculate streak (consecutive days with activity)
-        const streak = calculateStreak(examAttempts.map(a => a.startedAt));
+        // Get streak from UserStreak table (updated when completing topics/exams)
+        const userStreak = await db.userStreak.findUnique({
+            where: { userId },
+        });
+
+        // Validate streak - check if lastActiveAt is within 1 day
+        let streak = 0;
+        if (userStreak) {
+            const lastActive = new Date(userStreak.lastActiveAt);
+            lastActive.setHours(0, 0, 0, 0);
+            
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            const diffDays = Math.floor((today.getTime() - lastActive.getTime()) / (1000 * 60 * 60 * 24));
+            
+            // Streak is valid if active today or yesterday
+            if (diffDays <= 1) {
+                streak = userStreak.currentStreak;
+            }
+            // If more than 1 day gap, streak is broken (will be reset on next activity)
+        }
 
         return NextResponse.json({
             examsCompleted,
@@ -62,32 +82,4 @@ export async function GET() {
             { status: 500 }
         );
     }
-}
-
-function calculateStreak(dates: Date[]): number {
-    if (dates.length === 0) return 0;
-
-    const sortedDates = dates
-        .map(d => new Date(d).toDateString())
-        .filter((date, index, self) => self.indexOf(date) === index)
-        .sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
-
-    let streak = 0;
-    let currentDate = new Date();
-    currentDate.setHours(0, 0, 0, 0);
-
-    for (const dateStr of sortedDates) {
-        const date = new Date(dateStr);
-        date.setHours(0, 0, 0, 0);
-        
-        const diffDays = Math.floor((currentDate.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
-        
-        if (diffDays === streak) {
-            streak++;
-        } else if (diffDays > streak) {
-            break;
-        }
-    }
-
-    return streak;
 }

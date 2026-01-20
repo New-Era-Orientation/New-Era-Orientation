@@ -56,3 +56,5 @@ __pycache__/
 
 # shared data (personal configs)
 .shared/
+
+certificates

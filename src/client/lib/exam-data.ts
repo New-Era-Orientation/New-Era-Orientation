@@ -58,13 +58,16 @@ export interface ExamSubmitRequest {
 }
 
 export interface ExamSubmitResponse {
-    attemptId: string;
-    score: number;
-    maxScore: number;
-    correctCount: number;
-    totalQuestions: number;
-    percentage: number;
-    passed: boolean;
+    success: boolean;
+    data?: {
+        attemptId: string;
+        score: number;
+        maxScore: number;
+        percentage: number;
+        results: Record<string, unknown>;
+        timeSpent: number;
+    };
+    error?: string;
 }
 
 // ============ API FUNCTIONS ============

@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/server/auth';
 import { db } from '@/server/db';
 
+export const dynamic = 'force-dynamic';
+
 interface Part {
   name: string;
   order: number;
@@ -91,7 +93,7 @@ export async function GET(request: NextRequest) {
       });
 
       const csvContent = rows.join('\n');
-      
+
       return new NextResponse(csvContent, {
         headers: {
           'Content-Type': 'text/csv; charset=utf-8',

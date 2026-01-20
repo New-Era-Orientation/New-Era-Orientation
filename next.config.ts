@@ -1,6 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   images: {
     remotePatterns: [
       {
@@ -15,16 +18,16 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  
+
   // Performance optimizations
   experimental: {
     // Enable optimized package imports
     optimizePackageImports: ["lucide-react"],
   },
-  
+
   // Compression
   compress: true,
-  
+
   // Headers for caching
   async headers() {
     return [

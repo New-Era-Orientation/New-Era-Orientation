@@ -21,7 +21,6 @@ interface WeeklyDigestProps {
         examsCompleted: number;
         avgScore: number;
         studyTime: number;
-        flashcardsReviewed: number;
         streakDays: number;
     };
     topScores: {

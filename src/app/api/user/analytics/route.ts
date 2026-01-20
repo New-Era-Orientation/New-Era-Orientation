@@ -2,9 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/server/auth";
 import { db } from "@/server/db";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(request: NextRequest) {
     const session = await auth();
-    
+
     if (!session?.user?.id) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -15,7 +17,7 @@ export async function GET(request: NextRequest) {
     // Calculate date range
     const now = new Date();
     let startDate: Date;
-    
+
     switch (range) {
         case "week":
             startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
@@ -55,33 +57,33 @@ export async function GET(request: NextRequest) {
         const avgScore = scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : 0;
         const bestScore = scores.length > 0 ? Math.max(...scores) : 0;
         const worstScore = scores.length > 0 ? Math.min(...scores) : 0;
-        const passRate = scores.length > 0 
-            ? Math.round((scores.filter(s => s >= 5).length / scores.length) * 100) 
+        const passRate = scores.length > 0
+            ? Math.round((scores.filter(s => s >= 5).length / scores.length) * 100)
             : 0;
-        
+
         // Calculate total time in hours
         const totalTimeMinutes = attempts.reduce((sum, a) => sum + (a.timeSpent || 0), 0);
         const totalTime = Math.round(totalTimeMinutes / 60 * 10) / 10;
 
         // Calculate weekly progress
         const weekDays = ["CN", "T2", "T3", "T4", "T5", "T6", "T7"];
-        const weeklyProgress = [];
-        
+        const weeklyProgress: any[] = [];
+
         for (let i = 6; i >= 0; i--) {
             const date = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
             const dayStart = new Date(date.setHours(0, 0, 0, 0));
             const dayEnd = new Date(date.setHours(23, 59, 59, 999));
-            
+
             const dayAttempts = attempts.filter(a => {
                 const attemptDate = new Date(a.completedAt!);
                 return attemptDate >= dayStart && attemptDate <= dayEnd;
             });
-            
+
             const dayScores = dayAttempts.filter(a => a.score !== null).map(a => a.score as number);
-            const avgDayScore = dayScores.length > 0 
-                ? dayScores.reduce((a, b) => a + b, 0) / dayScores.length 
+            const avgDayScore = dayScores.length > 0
+                ? dayScores.reduce((a, b) => a + b, 0) / dayScores.length
                 : 0;
-            
+
             weeklyProgress.push({
                 day: weekDays[new Date(date).getDay()],
                 exams: dayAttempts.length,
@@ -91,7 +93,7 @@ export async function GET(request: NextRequest) {
 
         // Calculate subject breakdown
         const subjectMap = new Map<string, { exams: number; totalScore: number }>();
-        
+
         for (const attempt of attempts) {
             const subject = attempt.exam.subject || "Khác";
             const existing = subjectMap.get(subject) || { exams: 0, totalScore: 0 };
@@ -100,7 +102,7 @@ export async function GET(request: NextRequest) {
                 totalScore: existing.totalScore + (attempt.score || 0),
             });
         }
-        
+
         const subjectBreakdown = Array.from(subjectMap.entries()).map(([subject, data]) => ({
             subject,
             exams: data.exams,
@@ -127,12 +129,12 @@ export async function GET(request: NextRequest) {
         const activeDays = new Set(
             allAttempts.map(a => a.completedAt?.toISOString().split("T")[0])
         );
-        
+
         // Calculate current streak
         let currentStreak = 0;
         const today = new Date().toISOString().split("T")[0];
         let checkDate = today;
-        
+
         while (activeDays.has(checkDate)) {
             currentStreak++;
             const prevDate = new Date(checkDate);
@@ -144,7 +146,7 @@ export async function GET(request: NextRequest) {
         let longestStreak = currentStreak;
         let tempStreak = 0;
         const sortedDays = Array.from(activeDays).filter((d): d is string => d !== undefined).sort();
-        
+
         for (let i = 0; i < sortedDays.length; i++) {
             if (i === 0) {
                 tempStreak = 1;
@@ -152,7 +154,7 @@ export async function GET(request: NextRequest) {
                 const prevDay = new Date(sortedDays[i - 1]!);
                 const currDay = new Date(sortedDays[i]!);
                 const diffDays = (currDay.getTime() - prevDay.getTime()) / (24 * 60 * 60 * 1000);
-                
+
                 if (diffDays === 1) {
                     tempStreak++;
                 } else {

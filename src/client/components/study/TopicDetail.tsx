@@ -3,10 +3,11 @@
 import { Card } from "@/client/components/ui/Card";
 import { Badge } from "@/client/components/ui/Badge";
 import { Button } from "@/client/components/ui/Button";
-import { Play, BookOpen, Download, CheckCircle, Clock, Bookmark, ArrowRight, ArrowLeft } from "lucide-react";
-import { useState } from "react";
+import { Play, BookOpen, Download, CheckCircle, Clock, Bookmark, ArrowRight, ArrowLeft, Loader2, FileText, AlertCircle } from "lucide-react";
+import { useState, useCallback } from "react";
 import ReactMarkdown from "react-markdown";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 
 interface Chapter {
     id: string;
@@ -14,22 +15,45 @@ interface Chapter {
     slug: string;
     content?: string;
     duration?: number | null;
+    pdfUrl?: string | null;
+    exercises?: Exercise[] | null;
+}
+
+interface Exercise {
+    id: string;
+    question: string;
+    options: string[];
+    correctAnswer: number;
+    explanation?: string;
 }
 
 interface Topic {
     id: string;
     name: string;
+    slug: string;
     chapters: { id: string; name: string; slug: string }[];
+}
+
+interface UserProgress {
+    completed: boolean;
+    timeSpent: number;
+    lastAccess: string;
 }
 
 interface TopicDetailProps {
     topic: Topic;
     chapter: Chapter;
+    userProgress?: UserProgress | null;
 }
 
-export function TopicDetail({ topic, chapter }: TopicDetailProps) {
+export function TopicDetail({ topic, chapter, userProgress }: TopicDetailProps) {
+    const { data: session } = useSession();
     const [playbackSpeed, setPlaybackSpeed] = useState("1x");
     const [isBookmarked, setIsBookmarked] = useState(false);
+    const [isCompleted, setIsCompleted] = useState(userProgress?.completed ?? false);
+    const [isMarkingComplete, setIsMarkingComplete] = useState(false);
+    const [showExercises, setShowExercises] = useState(false);
+    const [notification, setNotification] = useState<{ type: "success" | "error"; message: string } | null>(null);
 
     const speeds = ["0.5x", "1x", "1.5x", "2x"];
 
@@ -38,12 +62,102 @@ export function TopicDetail({ topic, chapter }: TopicDetailProps) {
     const prevChapter = currentIndex > 0 ? topic.chapters[currentIndex - 1] : null;
     const nextChapter = currentIndex < topic.chapters.length - 1 ? topic.chapters[currentIndex + 1] : null;
 
+    // Handle mark complete
+    const handleMarkComplete = useCallback(async () => {
+        if (!session?.user) {
+            setNotification({ type: "error", message: "Vui lòng đăng nhập để đánh dấu hoàn thành" });
+            setTimeout(() => setNotification(null), 3000);
+            return;
+        }
+
+        setIsMarkingComplete(true);
+        try {
+            const method = isCompleted ? "DELETE" : "POST";
+            const response = await fetch(`/api/topics/${topic.slug}/complete`, {
+                method,
+                headers: { "Content-Type": "application/json" },
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                setIsCompleted(!isCompleted);
+                setNotification({
+                    type: "success",
+                    message: isCompleted ? "Đã bỏ đánh dấu hoàn thành" : "Đã hoàn thành bài học!",
+                });
+            } else {
+                throw new Error(data.error || "Có lỗi xảy ra");
+            }
+        } catch (error) {
+            console.error("Error marking complete:", error);
+            setNotification({
+                type: "error",
+                message: "Không thể đánh dấu. Vui lòng thử lại.",
+            });
+        } finally {
+            setIsMarkingComplete(false);
+            setTimeout(() => setNotification(null), 3000);
+        }
+    }, [session, isCompleted, topic.slug]);
+
+    // Handle download PDF
+    const handleDownloadPDF = useCallback(async () => {
+        if (chapter.pdfUrl) {
+            window.open(chapter.pdfUrl, "_blank");
+        } else {
+            // Generate PDF on-the-fly (mock for now)
+            setNotification({
+                type: "error",
+                message: "PDF chưa có sẵn. Tính năng đang được phát triển.",
+            });
+            setTimeout(() => setNotification(null), 3000);
+        }
+    }, [chapter.pdfUrl]);
+
+    // Handle practice exercises
+    const handlePractice = useCallback(() => {
+        if (chapter.exercises && chapter.exercises.length > 0) {
+            setShowExercises(true);
+        } else {
+            setNotification({
+                type: "error",
+                message: "Chưa có bài tập cho bài học này.",
+            });
+            setTimeout(() => setNotification(null), 3000);
+        }
+    }, [chapter.exercises]);
+
     return (
         <div className="p-6 lg:p-10">
+            {/* Notification Toast */}
+            {notification && (
+                <div className={`fixed top-4 right-4 z-50 flex items-center gap-2 px-4 py-3 rounded-lg shadow-lg animate-in fade-in slide-in-from-top-2 ${
+                    notification.type === "success" 
+                        ? "bg-green-500 text-white" 
+                        : "bg-destructive text-destructive-foreground"
+                }`}>
+                    {notification.type === "success" ? (
+                        <CheckCircle className="h-5 w-5" />
+                    ) : (
+                        <AlertCircle className="h-5 w-5" />
+                    )}
+                    <span>{notification.message}</span>
+                </div>
+            )}
+
             {/* Breadcrumb */}
             <nav aria-label="Breadcrumb" className="mb-8">
                 <p className="mb-2 text-sm text-muted-foreground">{topic.name}</p>
-                <h1 className="text-4xl font-bold text-foreground">{chapter.name}</h1>
+                <div className="flex items-center gap-3">
+                    <h1 className="text-4xl font-bold text-foreground">{chapter.name}</h1>
+                    {isCompleted && (
+                        <Badge variant="success" className="flex items-center gap-1">
+                            <CheckCircle className="h-3 w-3" />
+                            Đã hoàn thành
+                        </Badge>
+                    )}
+                </div>
 
                 {/* Progress indicator */}
                 <div className="mt-4 flex flex-wrap items-center gap-4">
@@ -154,18 +268,91 @@ export function TopicDetail({ topic, chapter }: TopicDetailProps) {
                     <Card className="p-6">
                         <h2 className="mb-4 text-lg font-bold text-foreground">Tài nguyên</h2>
                         <div className="space-y-3">
-                            <Button variant="ghost" className="w-full justify-start">
+                            <Button 
+                                variant="ghost" 
+                                className="w-full justify-start"
+                                onClick={handleDownloadPDF}
+                            >
                                 <Download className="h-4 w-4" aria-hidden="true" />
                                 Tải PDF
+                                {chapter.pdfUrl && (
+                                    <Badge variant="success" className="ml-auto text-xs">Có sẵn</Badge>
+                                )}
                             </Button>
-                            <Button variant="ghost" className="w-full justify-start">
+                            <Button 
+                                variant="ghost" 
+                                className="w-full justify-start"
+                                onClick={handlePractice}
+                            >
                                 <BookOpen className="h-4 w-4" aria-hidden="true" />
                                 Bài tập thực hành
+                                {chapter.exercises && chapter.exercises.length > 0 && (
+                                    <Badge variant="info" className="ml-auto text-xs">
+                                        {chapter.exercises.length} câu
+                                    </Badge>
+                                )}
                             </Button>
+                        </div>
+                    </Card>
+
+                    {/* Completion Status */}
+                    <Card className="p-6">
+                        <h2 className="mb-4 text-lg font-bold text-foreground">Tiến độ</h2>
+                        <div className="space-y-3">
+                            <div className="flex items-center justify-between text-sm">
+                                <span className="text-muted-foreground">Trạng thái:</span>
+                                <Badge variant={isCompleted ? "success" : "default"}>
+                                    {isCompleted ? "Đã hoàn thành" : "Chưa hoàn thành"}
+                                </Badge>
+                            </div>
+                            {userProgress?.timeSpent && userProgress.timeSpent > 0 && (
+                                <div className="flex items-center justify-between text-sm">
+                                    <span className="text-muted-foreground">Thời gian học:</span>
+                                    <span className="font-medium">{Math.round(userProgress.timeSpent / 60)} phút</span>
+                                </div>
+                            )}
                         </div>
                     </Card>
                 </div>
             </div>
+
+            {/* Exercises Modal */}
+            {showExercises && chapter.exercises && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+                    <Card className="w-full max-w-2xl max-h-[80vh] overflow-y-auto m-4 p-6">
+                        <div className="flex items-center justify-between mb-6">
+                            <h2 className="text-2xl font-bold">Bài tập thực hành</h2>
+                            <Button variant="ghost" size="sm" onClick={() => setShowExercises(false)}>
+                                ✕
+                            </Button>
+                        </div>
+                        <div className="space-y-6">
+                            {chapter.exercises.map((exercise, index) => (
+                                <div key={exercise.id} className="p-4 rounded-lg bg-muted/50">
+                                    <p className="font-medium mb-3">
+                                        Câu {index + 1}: {exercise.question}
+                                    </p>
+                                    <div className="space-y-2">
+                                        {exercise.options.map((option, optIndex) => (
+                                            <button
+                                                key={optIndex}
+                                                className="w-full text-left p-3 rounded-lg border border-border hover:bg-muted transition-colors"
+                                            >
+                                                {String.fromCharCode(65 + optIndex)}. {option}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                        <div className="mt-6 flex justify-end">
+                            <Button onClick={() => setShowExercises(false)}>
+                                Đóng
+                            </Button>
+                        </div>
+                    </Card>
+                </div>
+            )}
 
             {/* Navigation */}
             <div className="mt-8 flex flex-col sm:flex-row gap-4">
@@ -204,9 +391,28 @@ export function TopicDetail({ topic, chapter }: TopicDetailProps) {
 
             {/* Completion */}
             <div className="mt-6 text-center">
-                <Button size="lg">
-                    <CheckCircle className="h-5 w-5" />
-                    Đánh dấu hoàn thành
+                <Button 
+                    size="lg"
+                    variant={isCompleted ? "secondary" : "default"}
+                    onClick={handleMarkComplete}
+                    disabled={isMarkingComplete}
+                >
+                    {isMarkingComplete ? (
+                        <>
+                            <Loader2 className="h-5 w-5 animate-spin" />
+                            Đang xử lý...
+                        </>
+                    ) : isCompleted ? (
+                        <>
+                            <CheckCircle className="h-5 w-5 text-green-500" />
+                            Đã hoàn thành ✓
+                        </>
+                    ) : (
+                        <>
+                            <CheckCircle className="h-5 w-5" />
+                            Đánh dấu hoàn thành
+                        </>
+                    )}
                 </Button>
             </div>
         </div>

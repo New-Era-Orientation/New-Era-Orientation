@@ -71,21 +71,6 @@ export async function GET(request: NextRequest) {
             },
         });
 
-        // Get flashcard reviews
-        const flashcardReviews = await db.flashcardReview.findMany({
-            where: {
-                userId: session.user.id,
-                createdAt: { gte: startDate },
-            },
-            include: {
-                flashcard: {
-                    include: {
-                        deck: true,
-                    },
-                },
-            },
-        });
-
         // Calculate topic mastery
         const topicMastery = calculateTopicMastery(studyProgress);
 
@@ -93,7 +78,7 @@ export async function GET(request: NextRequest) {
         const weaknesses = identifyWeaknesses(attempts);
 
         // Calculate study patterns
-        const studyPatterns = analyzeStudyPatterns(attempts, studyProgress, flashcardReviews);
+        const studyPatterns = analyzeStudyPatterns(attempts, studyProgress);
 
         // Calculate progress trends
         const progressTrends = calculateProgressTrends(attempts, range);
@@ -205,7 +190,7 @@ function identifyWeaknesses(attempts: any[]) {
 }
 
 // Analyze study patterns
-function analyzeStudyPatterns(attempts: any[], progress: any[], flashcards: any[]) {
+function analyzeStudyPatterns(attempts: any[], progress: any[]) {
     // Calculate total study time
     const totalStudyTime = attempts.reduce((sum, a) => sum + (a.timeSpent || 0), 0);
 
@@ -246,7 +231,6 @@ function analyzeStudyPatterns(attempts: any[], progress: any[], flashcards: any[
         averageSessionLength: attempts.length > 0 
             ? Math.round(totalStudyTime / attempts.length) 
             : 0,
-        flashcardsReviewed: flashcards.length,
     };
 }
 

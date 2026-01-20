@@ -124,6 +124,9 @@ export async function POST(request: Request, { params }: RouteParams) {
             },
         });
 
+        // Update user streak
+        await updateUserStreak(session.user.id);
+
         return NextResponse.json({
             success: true,
             data: {
@@ -141,5 +144,61 @@ export async function POST(request: Request, { params }: RouteParams) {
             { success: false, error: "Failed to submit exam" },
             { status: 500 }
         );
+    }
+}
+
+// Helper: Update user streak when completing an exam
+async function updateUserStreak(userId: string) {
+    try {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const streak = await db.userStreak.findUnique({
+            where: { userId },
+        });
+
+        if (!streak) {
+            // Create new streak
+            await db.userStreak.create({
+                data: {
+                    userId,
+                    currentStreak: 1,
+                    longestStreak: 1,
+                    lastActiveAt: today,
+                },
+            });
+            return;
+        }
+
+        const lastActive = new Date(streak.lastActiveAt);
+        lastActive.setHours(0, 0, 0, 0);
+
+        const diffDays = Math.floor((today.getTime() - lastActive.getTime()) / (1000 * 60 * 60 * 24));
+
+        if (diffDays === 0) {
+            // Already active today, no update needed
+            return;
+        } else if (diffDays === 1) {
+            // Consecutive day, increase streak
+            await db.userStreak.update({
+                where: { userId },
+                data: {
+                    currentStreak: streak.currentStreak + 1,
+                    longestStreak: Math.max(streak.longestStreak, streak.currentStreak + 1),
+                    lastActiveAt: today,
+                },
+            });
+        } else {
+            // Streak broken, reset to 1
+            await db.userStreak.update({
+                where: { userId },
+                data: {
+                    currentStreak: 1,
+                    lastActiveAt: today,
+                },
+            });
+        }
+    } catch (error) {
+        console.error("Error updating streak:", error);
     }
 }

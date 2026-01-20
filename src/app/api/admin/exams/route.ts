@@ -2,10 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/server/auth";
 import { db } from "@/server/db";
 
+export const dynamic = "force-dynamic";
+
 // GET - List all exams for admin
 export async function GET(request: NextRequest) {
     const session = await auth();
-    
+
     if (!session?.user?.id) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -86,7 +88,7 @@ export async function GET(request: NextRequest) {
 // POST - Create new exam
 export async function POST(request: NextRequest) {
     const session = await auth();
-    
+
     if (!session?.user?.id) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

@@ -94,18 +94,19 @@ export function ActivityList() {
                                     href={activity.href}
                                     className="group flex items-center justify-between rounded-xl border border-transparent p-3 transition-all duration-200 hover:border-border hover:bg-secondary/50"
                                 >
-                                    <div className="flex items-start gap-4">
+                                    <div className="flex items-start gap-4" suppressHydrationWarning>
                                         <div
                                             className={cn("rounded-xl p-2.5 transition-colors", typeConfig.color)}
                                             aria-hidden="true"
+                                            suppressHydrationWarning
                                         >
                                             <activity.icon className="h-5 w-5" />
                                         </div>
-                                        <div>
+                                        <div suppressHydrationWarning>
                                             <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors">
                                                 {activity.title}
                                             </h3>
-                                            <div className="mt-1 flex items-center gap-3 text-sm text-muted-foreground">
+                                            <div className="mt-1 flex items-center gap-3 text-sm text-muted-foreground" suppressHydrationWarning>
                                                 <span className="flex items-center gap-1">
                                                     <Clock className="h-3.5 w-3.5" aria-hidden="true" />
                                                     <time>{activity.time}</time>
@@ -121,6 +122,7 @@ export function ActivityList() {
                                         <div
                                             className={cn("rounded-lg border px-3 py-1.5", getScoreColor(activity.score))}
                                             aria-label={`Điểm: ${activity.score} trên 10`}
+                                            suppressHydrationWarning
                                         >
                                             <span className="font-bold">{activity.score}</span>
                                             <span className="text-sm opacity-70">/10</span>

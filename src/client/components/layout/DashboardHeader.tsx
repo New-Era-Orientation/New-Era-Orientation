@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Search, Bell, Home, BookOpen, FileText, Zap, Settings as SettingsIcon, Menu, X, LogOut, BarChart3, Trophy, History, Layers } from "lucide-react";
+import { Search, Bell, Home, BookOpen, FileText, Settings as SettingsIcon, Menu, X, LogOut, Trophy, Layers } from "lucide-react";
 import { ThemeToggle } from "@/client/components/ui/ThemeToggle";
 import { useState } from "react";
 import { useSession, signOut } from "next-auth/react";
@@ -27,8 +27,8 @@ export function DashboardHeader() {
         { href: "/dashboard", label: "Trang chủ", icon: Home },
         { href: "/study", label: "Học tập", icon: BookOpen },
         { href: "/exam", label: "Thi thử", icon: FileText },
-        { href: "/flashcards", label: "Flashcards", icon: Layers },
-        { href: "/chat", label: "AI Tutor", icon: Zap },
+        { href: "/simulation", label: "Luyện tập", icon: Layers },
+        // { href: "/chat", label: "AI Tutor", icon: Zap }, // Tạm ẩn AI Tutor
         { href: "/leaderboard", label: "Xếp hạng", icon: Trophy },
     ];
 
@@ -84,13 +84,14 @@ export function DashboardHeader() {
                     <ThemeToggle />
 
                     {/* Notifications */}
-                    <button
-                        className="relative rounded-lg p-2 text-muted-foreground transition-colors hover:text-foreground hover:bg-secondary cursor-pointer"
+                    <Link
+                        href="/notifications"
+                        className="relative rounded-lg p-2 text-muted-foreground transition-colors hover:text-foreground hover:bg-secondary"
                         aria-label="Thông báo"
                     >
                         <Bell className="h-5 w-5" aria-hidden="true" />
-                        <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-red-500" aria-label="Có thông báo mới" />
-                    </button>
+                        {/* Badge sẽ hiển thị khi có thông báo chưa đọc */}
+                    </Link>
 
                     {/* Settings - Hidden on mobile */}
                     <Link

@@ -59,23 +59,32 @@ export default function AdminContentPage() {
   const [search, setSearch] = useState('');
   const [expandedSubjects, setExpandedSubjects] = useState<Set<string>>(new Set());
   const [expandedChapters, setExpandedChapters] = useState<Set<string>>(new Set());
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   useEffect(() => {
     fetchContent();
+    
+    // Auto-refresh every 30 seconds
+    const interval = setInterval(() => {
+      fetchContent(true); // silent refresh
+    }, 30000);
+    
+    return () => clearInterval(interval);
   }, []);
 
-  const fetchContent = async () => {
+  const fetchContent = async (silent = false) => {
     try {
-      setLoading(true);
+      if (!silent) setLoading(true);
       const res = await fetch('/api/admin/content');
       if (!res.ok) throw new Error('Failed to fetch content');
       
       const data = await res.json();
       setSubjects(data.subjects);
+      setLastUpdated(new Date());
     } catch (error) {
       console.error('Error fetching content:', error);
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   };
 

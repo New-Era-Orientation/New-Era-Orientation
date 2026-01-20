@@ -14,6 +14,7 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
     ({ className, variant = "default", interactive = false, hover = false, glow = false, ...props }, ref) => (
         <div
             ref={ref}
+            suppressHydrationWarning
             className={cn(
                 "rounded-xl border bg-card text-card-foreground shadow-sm transition-all duration-200",
                 variant === "glass" && "bg-card/80 backdrop-blur-xl border-border shadow-md",
@@ -34,6 +35,7 @@ const CardHeader = React.forwardRef<
 >(({ className, ...props }, ref) => (
     <div
         ref={ref}
+        suppressHydrationWarning
         className={cn("flex flex-col space-y-1.5 p-6", className)}
         {...props}
     />
@@ -71,7 +73,7 @@ const CardContent = React.forwardRef<
     HTMLDivElement,
     React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
-    <div ref={ref} className={cn("p-6 pt-0", className)} {...props} />
+    <div ref={ref} suppressHydrationWarning className={cn("p-6 pt-0", className)} {...props} />
 ));
 CardContent.displayName = "CardContent";
 
@@ -81,6 +83,7 @@ const CardFooter = React.forwardRef<
 >(({ className, ...props }, ref) => (
     <div
         ref={ref}
+        suppressHydrationWarning
         className={cn("flex items-center p-6 pt-0", className)}
         {...props}
     />

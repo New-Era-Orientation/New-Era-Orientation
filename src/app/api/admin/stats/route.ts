@@ -2,10 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/server/auth";
 import { db } from "@/server/db";
 
+export const dynamic = "force-dynamic";
+
 // GET - Dashboard stats
 export async function GET() {
     const session = await auth();
-    
+
     if (!session?.user?.id) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

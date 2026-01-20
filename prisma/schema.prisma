@@ -4,7 +4,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 // ============================================
@@ -19,6 +21,8 @@ model User {
   image         String?
   password      String?
   role          Role      @default(STUDENT)
+  bio           String?
+  settings      Json?
   
   accounts      Account[]
   sessions      Session[]
@@ -30,10 +34,6 @@ model User {
   achievements  UserAchievement[]
   streak        UserStreak?
   notifications Notification[]
-  
-  // Flashcards
-  flashcardDecks   FlashcardDeck[]
-  flashcardReviews FlashcardReview[]
   
   // AI Chat
   chatConversations ChatConversation[]
@@ -450,65 +450,6 @@ enum NotificationType {
   REMINDER
   ANNOUNCEMENT
   SOCIAL
-}
-
-// ============================================
-// FLASHCARD SYSTEM
-// ============================================
-
-model FlashcardDeck {
-  id          String      @id @default(cuid())
-  userId      String
-  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  name        String
-  description String?
-  isPublic    Boolean     @default(false)
-  
-  cards       Flashcard[]
-  
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  
-  @@map("flashcard_decks")
-}
-
-model Flashcard {
-  id          String        @id @default(cuid())
-  deckId      String
-  deck        FlashcardDeck @relation(fields: [deckId], references: [id], onDelete: Cascade)
-  
-  front       String        // Question/Term
-  back        String        // Answer/Definition
-  
-  // Spaced Repetition System (SRS)
-  reviews     FlashcardReview[]
-  
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  
-  @@map("flashcards")
-}
-
-model FlashcardReview {
-  id          String    @id @default(cuid())
-  userId      String
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  flashcardId String
-  flashcard   Flashcard @relation(fields: [flashcardId], references: [id], onDelete: Cascade)
-  
-  // SRS data
-  easeFactor  Float     @default(2.5)
-  interval    Int       @default(0)     // Days until next review
-  repetitions Int       @default(0)
-  nextReview  DateTime  @default(now())
-  
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  
-  @@unique([userId, flashcardId])
-  @@map("flashcard_reviews")
 }
 
 // ============================================

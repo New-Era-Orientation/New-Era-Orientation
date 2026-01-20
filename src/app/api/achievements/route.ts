@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { db } from "@/server/db";
 import { auth } from "@/server/auth";
 
+export const dynamic = "force-dynamic";
+
 // GET /api/achievements - Lấy danh sách achievements
 export async function GET() {
     try {
@@ -32,7 +34,7 @@ export async function GET() {
         });
 
         // Transform response
-        const data = achievements.map(achievement => ({
+        const data = achievements.map((achievement: any) => ({
             id: achievement.id,
             name: achievement.name,
             slug: achievement.slug,
@@ -48,7 +50,7 @@ export async function GET() {
         }));
 
         // Get user stats
-        let userStats = null;
+        let userStats: any = null;
         if (userId) {
             const [totalPoints, unlockedCount, streak] = await Promise.all([
                 db.userAchievement.aggregate({
@@ -64,7 +66,7 @@ export async function GET() {
                 where: { userId },
                 include: { achievement: { select: { points: true } } }
             });
-            const points = userAchievements.reduce((sum, ua) => sum + ua.achievement.points, 0);
+            const points = userAchievements.reduce((sum: number, ua: any) => sum + ua.achievement.points, 0);
 
             userStats = {
                 totalPoints: points,

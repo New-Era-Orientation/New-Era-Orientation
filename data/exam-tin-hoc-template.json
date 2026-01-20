@@ -1,0 +1,350 @@
+{
+  "exam": {
+    "id": "exam_thpt_tin_2025_template",
+    "title": "Đề thi THPT Quốc gia môn Tin học 2025 - [Nguồn]",
+    "slug": "thpt-tin-hoc-2025-template",
+    "description": "Đề thi thử THPT Quốc gia môn Tin học năm 2025",
+    "subject": "Tin học",
+    "year": 2025,
+    "source": "Template",
+    "type": "STANDARD",
+    "duration": 50,
+    "published": true,
+    "parts": [
+      {
+        "id": 1,
+        "name": "Phần I: Trắc nghiệm nhiều lựa chọn",
+        "description": "Thí sinh trả lời từ câu 1 đến câu 24. Mỗi câu hỏi thí sinh chỉ chọn một phương án đúng.",
+        "type": "MULTIPLE_CHOICE",
+        "track": "COMMON",
+        "required": true,
+        "questionCount": 24,
+        "pointsPerQuestion": 0.25,
+        "totalPoints": 6
+      },
+      {
+        "id": 2,
+        "name": "Phần II: Trắc nghiệm đúng sai",
+        "description": "Thí sinh trả lời từ câu 1 đến câu 4 (hoặc câu 5-6 thay câu 3-4). Trong mỗi ý a), b), c), d) ở mỗi câu, thí sinh chọn đúng hoặc sai.",
+        "type": "TRUE_FALSE_GROUP",
+        "totalPoints": 4,
+        "subParts": [
+          {
+            "id": "2A",
+            "name": "A. Phần chung cho tất cả thí sinh",
+            "description": "Câu 1 và câu 2 - BẮT BUỘC",
+            "track": "COMMON",
+            "required": true,
+            "questionCount": 2,
+            "pointsPerQuestion": 1.0
+          },
+          {
+            "id": "2B",
+            "name": "B. Phần riêng (chọn 1 trong 2)",
+            "description": "Thí sinh chỉ chọn MỘT trong hai định hướng sau",
+            "required": true,
+            "selectOne": true,
+            "options": [
+              {
+                "id": "2B1",
+                "name": "Định hướng Khoa học máy tính",
+                "description": "Câu 3 và câu 4",
+                "track": "COMPUTER_SCIENCE",
+                "questionCount": 2,
+                "pointsPerQuestion": 1.0
+              },
+              {
+                "id": "2B2",
+                "name": "Định hướng Tin học ứng dụng",
+                "description": "Câu 5 và câu 6",
+                "track": "APPLIED_INFORMATICS",
+                "questionCount": 2,
+                "pointsPerQuestion": 1.0
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "questions": {
+    "part1": [
+      {
+        "id": "q01",
+        "order": 1,
+        "content": "Câu 1: [Nội dung câu hỏi]",
+        "type": "MULTIPLE_CHOICE",
+        "track": "COMMON",
+        "choices": [
+          "A. [Đáp án A]",
+          "B. [Đáp án B]",
+          "C. [Đáp án C]",
+          "D. [Đáp án D]"
+        ],
+        "correctAnswer": "A",
+        "points": 0.25
+      },
+      {
+        "id": "q02",
+        "order": 2,
+        "content": "Câu 2: [Nội dung câu hỏi]",
+        "type": "MULTIPLE_CHOICE",
+        "track": "COMMON",
+        "choices": [
+          "A. [Đáp án A]",
+          "B. [Đáp án B]",
+          "C. [Đáp án C]",
+          "D. [Đáp án D]"
+        ],
+        "correctAnswer": "B",
+        "points": 0.25
+      }
+    ],
+    "part2_common": [
+      {
+        "id": "tf01",
+        "order": 1,
+        "content": "Câu 1 (Đúng/Sai - Chung): [Nội dung bài toán/tình huống]",
+        "type": "TRUE_FALSE_GROUP",
+        "track": "COMMON",
+        "points": 1.0,
+        "subQuestions": [
+          {
+            "id": "tf01_a",
+            "label": "a)",
+            "content": "[Mệnh đề a]",
+            "isCorrect": true
+          },
+          {
+            "id": "tf01_b",
+            "label": "b)",
+            "content": "[Mệnh đề b]",
+            "isCorrect": false
+          },
+          {
+            "id": "tf01_c",
+            "label": "c)",
+            "content": "[Mệnh đề c]",
+            "isCorrect": true
+          },
+          {
+            "id": "tf01_d",
+            "label": "d)",
+            "content": "[Mệnh đề d]",
+            "isCorrect": false
+          }
+        ]
+      },
+      {
+        "id": "tf02",
+        "order": 2,
+        "content": "Câu 2 (Đúng/Sai - Chung): [Nội dung bài toán/tình huống]",
+        "type": "TRUE_FALSE_GROUP",
+        "track": "COMMON",
+        "points": 1.0,
+        "subQuestions": [
+          {
+            "id": "tf02_a",
+            "label": "a)",
+            "content": "[Mệnh đề a]",
+            "isCorrect": true
+          },
+          {
+            "id": "tf02_b",
+            "label": "b)",
+            "content": "[Mệnh đề b]",
+            "isCorrect": true
+          },
+          {
+            "id": "tf02_c",
+            "label": "c)",
+            "content": "[Mệnh đề c]",
+            "isCorrect": false
+          },
+          {
+            "id": "tf02_d",
+            "label": "d)",
+            "content": "[Mệnh đề d]",
+            "isCorrect": true
+          }
+        ]
+      }
+    ],
+    "part2_computer_science": [
+      {
+        "id": "tf03_cs",
+        "order": 3,
+        "content": "Câu 3 (Đúng/Sai - KHMT): [Nội dung về thuật toán/cấu trúc dữ liệu]",
+        "type": "TRUE_FALSE_GROUP",
+        "track": "COMPUTER_SCIENCE",
+        "points": 1.0,
+        "subQuestions": [
+          {
+            "id": "tf03_cs_a",
+            "label": "a)",
+            "content": "[Mệnh đề a về KHMT]",
+            "isCorrect": true
+          },
+          {
+            "id": "tf03_cs_b",
+            "label": "b)",
+            "content": "[Mệnh đề b về KHMT]",
+            "isCorrect": false
+          },
+          {
+            "id": "tf03_cs_c",
+            "label": "c)",
+            "content": "[Mệnh đề c về KHMT]",
+            "isCorrect": true
+          },
+          {
+            "id": "tf03_cs_d",
+            "label": "d)",
+            "content": "[Mệnh đề d về KHMT]",
+            "isCorrect": false
+          }
+        ]
+      },
+      {
+        "id": "tf04_cs",
+        "order": 4,
+        "content": "Câu 4 (Đúng/Sai - KHMT): [Nội dung về lập trình/thuật toán]",
+        "type": "TRUE_FALSE_GROUP",
+        "track": "COMPUTER_SCIENCE",
+        "points": 1.0,
+        "subQuestions": [
+          {
+            "id": "tf04_cs_a",
+            "label": "a)",
+            "content": "[Mệnh đề a về KHMT]",
+            "isCorrect": false
+          },
+          {
+            "id": "tf04_cs_b",
+            "label": "b)",
+            "content": "[Mệnh đề b về KHMT]",
+            "isCorrect": true
+          },
+          {
+            "id": "tf04_cs_c",
+            "label": "c)",
+            "content": "[Mệnh đề c về KHMT]",
+            "isCorrect": true
+          },
+          {
+            "id": "tf04_cs_d",
+            "label": "d)",
+            "content": "[Mệnh đề d về KHMT]",
+            "isCorrect": true
+          }
+        ]
+      }
+    ],
+    "part2_applied_informatics": [
+      {
+        "id": "tf05_ai",
+        "order": 5,
+        "content": "Câu 5 (Đúng/Sai - THUD): [Nội dung về ứng dụng CNTT]",
+        "type": "TRUE_FALSE_GROUP",
+        "track": "APPLIED_INFORMATICS",
+        "points": 1.0,
+        "subQuestions": [
+          {
+            "id": "tf05_ai_a",
+            "label": "a)",
+            "content": "[Mệnh đề a về THUD]",
+            "isCorrect": true
+          },
+          {
+            "id": "tf05_ai_b",
+            "label": "b)",
+            "content": "[Mệnh đề b về THUD]",
+            "isCorrect": true
+          },
+          {
+            "id": "tf05_ai_c",
+            "label": "c)",
+            "content": "[Mệnh đề c về THUD]",
+            "isCorrect": false
+          },
+          {
+            "id": "tf05_ai_d",
+            "label": "d)",
+            "content": "[Mệnh đề d về THUD]",
+            "isCorrect": true
+          }
+        ]
+      },
+      {
+        "id": "tf06_ai",
+        "order": 6,
+        "content": "Câu 6 (Đúng/Sai - THUD): [Nội dung về công cụ/phần mềm]",
+        "type": "TRUE_FALSE_GROUP",
+        "track": "APPLIED_INFORMATICS",
+        "points": 1.0,
+        "subQuestions": [
+          {
+            "id": "tf06_ai_a",
+            "label": "a)",
+            "content": "[Mệnh đề a về THUD]",
+            "isCorrect": false
+          },
+          {
+            "id": "tf06_ai_b",
+            "label": "b)",
+            "content": "[Mệnh đề b về THUD]",
+            "isCorrect": false
+          },
+          {
+            "id": "tf06_ai_c",
+            "label": "c)",
+            "content": "[Mệnh đề c về THUD]",
+            "isCorrect": true
+          },
+          {
+            "id": "tf06_ai_d",
+            "label": "d)",
+            "content": "[Mệnh đề d về THUD]",
+            "isCorrect": true
+          }
+        ]
+      }
+    ]
+  },
+  "_meta": {
+    "totalPoints": 10,
+    "breakdown": {
+      "part1_multiple_choice": "24 câu × 0.25 điểm = 6 điểm",
+      "part2_common": "2 câu × 1 điểm = 2 điểm (Câu 1, 2 - BẮT BUỘC)",
+      "part2_specialized": "2 câu × 1 điểm = 2 điểm (Câu 3-4 HOẶC Câu 5-6)"
+    },
+    "trackSelection": {
+      "description": "Thí sinh CHỈ CHỌN 1 trong 2 định hướng ở Phần II.B",
+      "options": [
+        {
+          "track": "COMPUTER_SCIENCE",
+          "name": "Khoa học máy tính",
+          "questions": "Câu 3 và Câu 4"
+        },
+        {
+          "track": "APPLIED_INFORMATICS", 
+          "name": "Tin học ứng dụng",
+          "questions": "Câu 5 và Câu 6"
+        }
+      ]
+    },
+    "examFlow": {
+      "step1": "Thí sinh làm Phần I: 24 câu trắc nghiệm (tất cả)",
+      "step2": "Thí sinh làm Phần II.A: Câu 1, 2 Đúng/Sai (tất cả)",
+      "step3": "Thí sinh CHỌN 1 định hướng:",
+      "step3a": "→ KHMT: làm Câu 3, 4",
+      "step3b": "→ THUD: làm Câu 5, 6"
+    },
+    "instructions": {
+      "step1": "Thay thế [Nội dung] bằng nội dung thực tế của đề thi",
+      "step2": "Cập nhật correctAnswer cho câu trắc nghiệm (A/B/C/D)",
+      "step3": "Cập nhật isCorrect (true/false) cho câu Đúng/Sai",
+      "step4": "Chạy script: npx tsx scripts/convert-exam-json.ts data/exam-tin-hoc-template.json"
+    }
+  }
+}

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import {
   ArrowLeft,
@@ -13,10 +14,15 @@ import {
   ChevronUp,
   Check,
   X,
+  FileText,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/client/components/ui/Card';
 import { Button } from '@/client/components/ui/Button';
 import { Input } from '@/client/components/ui/Input';
+
+const QuickExamCreator = dynamic(() => import('@/client/components/admin/QuickExamCreator'), {
+  loading: () => <div className="p-8 text-center text-gray-500">Đang tải công cụ nhập nhanh...</div>
+});
 
 interface Question {
   id: string;
@@ -45,7 +51,8 @@ export default function NewExamPage() {
   const router = useRouter();
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState<'info' | 'questions'>('info');
-  
+  const [showQuickCreator, setShowQuickCreator] = useState(false);
+
   // Exam info
   const [examData, setExamData] = useState({
     title: '',
@@ -69,6 +76,21 @@ export default function NewExamPage() {
     },
   ]);
 
+  const handleQuickImport = (importedQuestions: Question[]) => {
+    if (parts.length > 0) {
+      // Add to the first part
+      const firstPart = parts[0];
+      const newQuestions = importedQuestions.map(q => ({ ...q, id: Date.now().toString() + Math.random() }));
+
+      setParts(parts.map(p =>
+        p.id === firstPart.id
+          ? { ...p, questions: [...p.questions, ...newQuestions] }
+          : p
+      ));
+    }
+    setShowQuickCreator(false);
+  };
+
   const addPart = () => {
     const newPart: ExamPart = {
       id: Date.now().toString(),
@@ -86,13 +108,13 @@ export default function NewExamPage() {
   };
 
   const togglePartExpand = (partId: string) => {
-    setParts(parts.map(p => 
+    setParts(parts.map(p =>
       p.id === partId ? { ...p, expanded: !p.expanded } : p
     ));
   };
 
   const updatePart = (partId: string, updates: Partial<ExamPart>) => {
-    setParts(parts.map(p => 
+    setParts(parts.map(p =>
       p.id === partId ? { ...p, ...updates } : p
     ));
   };
@@ -112,30 +134,30 @@ export default function NewExamPage() {
       ] : undefined,
     };
 
-    setParts(parts.map(p => 
-      p.id === partId 
+    setParts(parts.map(p =>
+      p.id === partId
         ? { ...p, questions: [...p.questions, newQuestion] }
         : p
     ));
   };
 
   const removeQuestion = (partId: string, questionId: string) => {
-    setParts(parts.map(p => 
-      p.id === partId 
+    setParts(parts.map(p =>
+      p.id === partId
         ? { ...p, questions: p.questions.filter(q => q.id !== questionId) }
         : p
     ));
   };
 
   const updateQuestion = (partId: string, questionId: string, updates: Partial<Question>) => {
-    setParts(parts.map(p => 
-      p.id === partId 
-        ? { 
-            ...p, 
-            questions: p.questions.map(q => 
-              q.id === questionId ? { ...q, ...updates } : q
-            )
-          }
+    setParts(parts.map(p =>
+      p.id === partId
+        ? {
+          ...p,
+          questions: p.questions.map(q =>
+            q.id === questionId ? { ...q, ...updates } : q
+          )
+        }
         : p
     ));
   };
@@ -179,6 +201,12 @@ export default function NewExamPage() {
 
   const totalQuestions = parts.reduce((sum, p) => sum + p.questions.length, 0);
 
+  if (showQuickCreator) {
+    // Lazy load logic if needed, but for now direct import
+    const QuickExamCreator = require('@/client/components/admin/QuickExamCreator').default;
+    return <QuickExamCreator onImport={handleQuickImport} onCancel={() => setShowQuickCreator(false)} />;
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header */}
@@ -204,6 +232,14 @@ export default function NewExamPage() {
             <div className="flex items-center gap-3">
               <Button
                 variant="outline"
+                className="gap-2 text-purple-600 border-purple-200 hover:bg-purple-50 dark:hover:bg-purple-900/20"
+                onClick={() => setShowQuickCreator(true)}
+              >
+                <FileText className="w-4 h-4" />
+                Nhập nhanh (Azota Style)
+              </Button>
+              <Button
+                variant="outline"
                 onClick={() => handleSave(false)}
                 disabled={saving}
               >
@@ -224,21 +260,19 @@ export default function NewExamPage() {
           <div className="flex gap-6 mt-4 border-b border-gray-200 dark:border-gray-700 -mb-px">
             <button
               onClick={() => setActiveTab('info')}
-              className={`pb-3 px-1 text-sm font-medium border-b-2 transition ${
-                activeTab === 'info'
-                  ? 'text-blue-600 border-blue-600'
-                  : 'text-gray-500 border-transparent hover:text-gray-700'
-              }`}
+              className={`pb-3 px-1 text-sm font-medium border-b-2 transition ${activeTab === 'info'
+                ? 'text-blue-600 border-blue-600'
+                : 'text-gray-500 border-transparent hover:text-gray-700'
+                }`}
             >
               Thông tin cơ bản
             </button>
             <button
               onClick={() => setActiveTab('questions')}
-              className={`pb-3 px-1 text-sm font-medium border-b-2 transition ${
-                activeTab === 'questions'
-                  ? 'text-blue-600 border-blue-600'
-                  : 'text-gray-500 border-transparent hover:text-gray-700'
-              }`}
+              className={`pb-3 px-1 text-sm font-medium border-b-2 transition ${activeTab === 'questions'
+                ? 'text-blue-600 border-blue-600'
+                : 'text-gray-500 border-transparent hover:text-gray-700'
+                }`}
             >
               Câu hỏi ({totalQuestions})
             </button>
@@ -423,14 +457,13 @@ export default function NewExamPage() {
                             {question.choices.map((choice, cIndex) => (
                               <div key={cIndex} className="flex items-center gap-2">
                                 <button
-                                  onClick={() => updateQuestion(part.id, question.id, { 
-                                    correctAnswer: String.fromCharCode(65 + cIndex) 
+                                  onClick={() => updateQuestion(part.id, question.id, {
+                                    correctAnswer: String.fromCharCode(65 + cIndex)
                                   })}
-                                  className={`flex-shrink-0 w-8 h-8 rounded-full border-2 flex items-center justify-center text-sm font-medium transition ${
-                                    question.correctAnswer === String.fromCharCode(65 + cIndex)
-                                      ? 'bg-green-500 border-green-500 text-white'
-                                      : 'border-gray-300 dark:border-gray-600 text-gray-500 hover:border-green-500'
-                                  }`}
+                                  className={`flex-shrink-0 w-8 h-8 rounded-full border-2 flex items-center justify-center text-sm font-medium transition ${question.correctAnswer === String.fromCharCode(65 + cIndex)
+                                    ? 'bg-green-500 border-green-500 text-white'
+                                    : 'border-gray-300 dark:border-gray-600 text-gray-500 hover:border-green-500'
+                                    }`}
                                 >
                                   {String.fromCharCode(65 + cIndex)}
                                 </button>
@@ -471,11 +504,10 @@ export default function NewExamPage() {
                                     newSubs[sIndex] = { ...newSubs[sIndex], isCorrect: !newSubs[sIndex].isCorrect };
                                     updateQuestion(part.id, question.id, { subQuestions: newSubs });
                                   }}
-                                  className={`px-3 py-1.5 rounded-lg text-sm font-medium transition ${
-                                    sub.isCorrect
-                                      ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                                      : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
-                                  }`}
+                                  className={`px-3 py-1.5 rounded-lg text-sm font-medium transition ${sub.isCorrect
+                                    ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                                    : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                                    }`}
                                 >
                                   {sub.isCorrect ? 'Đúng' : 'Sai'}
                                 </button>

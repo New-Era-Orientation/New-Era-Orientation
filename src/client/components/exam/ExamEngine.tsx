@@ -68,15 +68,40 @@ export function ExamEngine({ exam }: ExamEngineProps) {
         const timeSpent = Math.floor((Date.now() - startTime) / 1000);
 
         try {
-            const result = await submitExam(exam.slug, {
+            const response = await submitExam(exam.slug, {
                 answers,
                 timeSpent,
             });
 
+            // API returns { success: true, data: {...} } so we need to extract data
+            const result = (response as any).data || response;
+
+            // Calculate correctCount and totalQuestions if not provided
+            let correctCount = result.correctCount;
+            let totalQuestions = result.totalQuestions;
+            
+            if (correctCount === undefined || totalQuestions === undefined) {
+                totalQuestions = allQuestions.length;
+                correctCount = 0;
+                for (const q of allQuestions) {
+                    if (q.correctAnswer && answers[q.id] === q.correctAnswer) {
+                        correctCount++;
+                    }
+                }
+            }
+
+            const percentage = result.percentage ?? Math.round((correctCount / totalQuestions) * 100);
+            const passed = result.passed ?? percentage >= 50;
+
             // Store result in sessionStorage for result page
             sessionStorage.setItem(`exam-result-${exam.slug}`, JSON.stringify({
-                ...result,
-                timeSpent,
+                score: result.score ?? correctCount,
+                maxScore: result.maxScore ?? totalQuestions,
+                correctCount,
+                totalQuestions,
+                percentage,
+                passed,
+                timeSpent: result.timeSpent ?? timeSpent,
                 answers,
             }));
 

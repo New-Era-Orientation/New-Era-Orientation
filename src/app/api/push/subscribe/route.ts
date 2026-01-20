@@ -42,7 +42,6 @@ export async function POST(req: NextRequest) {
                     studyReminders: true,
                     achievements: true,
                     examNotifications: true,
-                    flashcardReminders: true,
                     streakWarnings: true,
                     leaderboardUpdates: false,
                 },

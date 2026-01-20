@@ -66,7 +66,7 @@ class GeminiClient {
     });
 
     const lastMessage = messages[messages.length - 1];
-    const prompt = context 
+    const prompt = context
       ? `[Ngữ cảnh: ${context}]\n\n${SYSTEM_PROMPT}\n\nHọc sinh: ${lastMessage.content}`
       : `${SYSTEM_PROMPT}\n\nHọc sinh: ${lastMessage.content}`;
 
@@ -98,7 +98,7 @@ class GeminiClient {
     });
 
     const lastMessage = messages[messages.length - 1];
-    const prompt = context 
+    const prompt = context
       ? `[Ngữ cảnh: ${context}]\n\n${SYSTEM_PROMPT}\n\nHọc sinh: ${lastMessage.content}`
       : `${SYSTEM_PROMPT}\n\nHọc sinh: ${lastMessage.content}`;
 
@@ -131,7 +131,7 @@ class OpenAIClient {
   async chat(messages: ChatMessage[], context?: string): Promise<AIResponse> {
     const client = this.getClient();
 
-    const systemMessage = context 
+    const systemMessage = context
       ? `${SYSTEM_PROMPT}\n\nNgữ cảnh hiện tại: ${context}`
       : SYSTEM_PROMPT;
 
@@ -158,7 +158,7 @@ class OpenAIClient {
   async *streamChat(messages: ChatMessage[], context?: string): AsyncGenerator<string> {
     const client = this.getClient();
 
-    const systemMessage = context 
+    const systemMessage = context
       ? `${SYSTEM_PROMPT}\n\nNgữ cảnh hiện tại: ${context}`
       : SYSTEM_PROMPT;
 
@@ -194,10 +194,10 @@ export class AIService {
   constructor() {
     this.gemini = new GeminiClient();
     this.openai = new OpenAIClient();
-    
+
     // Default to Gemini (free tier) if available, else OpenAI
-    this.preferredProvider = process.env.GOOGLE_AI_API_KEY || process.env.GEMINI_API_KEY 
-      ? 'gemini' 
+    this.preferredProvider = process.env.GOOGLE_AI_API_KEY || process.env.GEMINI_API_KEY
+      ? 'gemini'
       : 'openai';
   }
 
@@ -213,7 +213,7 @@ export class AIService {
     } catch (error) {
       // Fallback to other provider
       console.error(`${selectedProvider} failed, trying fallback:`, error);
-      
+
       try {
         if (selectedProvider === 'gemini') {
           return await this.openai.chat(messages, context);
@@ -251,6 +251,142 @@ export class AIService {
       providers.push('openai');
     }
     return providers;
+  }
+
+  async generateExam(
+    topic: string,
+    total: number,
+    singleChoice: number,
+    multiChoice: number,
+    difficulty: string
+  ): Promise<string> {
+    const prompt = `
+Tạo đề thi theo ĐÚNG CẤU TRÚC sau:
+
+==============================
+YÊU CẦU TẠO ĐỀ
+==============================
+- Tổng số câu: ${total}
+- Bao gồm:
+  - ${singleChoice} câu trắc nghiệm 1 đáp án
+  - ${multiChoice} câu trắc nghiệm đúng/sai nhiều mệnh đề
+- Chủ đề: ${topic}
+- Mức độ: ${difficulty}
+
+==============================
+QUY TẮC CHUNG (BẮT BUỘC)
+==============================
+1. Văn bản thuần (plain text)
+2. Không markdown, không bảng, không emoji
+3. Không lời giải, không chú thích ngoài đề
+4. Giữ đúng xuống dòng, không thụt đầu dòng
+5. Đánh số câu tăng dần: Câu 1, Câu 2, ...
+6. Dấu "*" ở Đầu DÒNG là ký hiệu DUY NHẤT cho đáp án ĐÚNG
+7. Không có "*" nghĩa là SAI
+8. Cuối đề PHẢI có block "ĐÁP ÁN"
+
+==============================
+LOẠI 1: TRẮC NGHIỆM 1 ĐÁP ÁN
+==============================
+ĐỊNH DẠNG BẮT BUỘC:
+Câu <số>. <Nội dung câu hỏi>
+A. <Đáp án>
+*B. <Đáp án> 
+C. <Đáp án>
+D. <Đáp án>
+
+==============================
+LOẠI 2: TRẮC NGHIỆM ĐÚNG / SAI NHIỀU MỆNH ĐỀ
+==============================
+ĐỊNH DẠNG BẮT BUỘC:
+Câu <số>. <Nội dung chung của câu hỏi>
+*a) <Mệnh đề> 
+b) <Mệnh đề>
+*c) <Mệnh đề> 
+d) <Mệnh đề>
+
+==============================
+TỔNG HỢP ĐÁP ÁN (BẮT BUỘC)
+==============================
+Đặt CUỐI ĐỀ theo định dạng:
+ĐÁP ÁN:
+Câu 1: <đáp án>
+Câu 2: <đáp án>
+`;
+
+    // Try Gemini first for long context tasks
+    try {
+      if (this.preferredProvider === 'gemini') {
+        const response = await this.gemini.chat([{ role: 'user', content: prompt }]);
+        return response.content;
+      } else {
+        const response = await this.openai.chat([{ role: 'user', content: prompt }]);
+        return response.content;
+      }
+    } catch (error) {
+      console.error('Error in generateExam:', error);
+      throw error;
+    }
+  }
+
+  async scanExam(fileBase64: string, mimeType: string): Promise<string> {
+    const prompt = `
+Analyze this exam document and extract the questions into a standard plain text format.
+
+OUTPUT FORMAT REQUIREMENTS:
+1. Pure plain text, no markdown.
+2. Format:
+Câu 1. Question content...
+A. Option A
+*B. Option B (Correct answer marked with *)
+C. Option C
+D. Option D
+
+If you cannot detect the correct answer, strictly omit the '*' mark.
+Maintain the original order and content exactly.
+`;
+
+    if (this.preferredProvider === 'gemini') {
+      // Gemini supports inline data for images/PDFs (if utilizing specific models or converting PDF -> Image/Text first)
+      // For 'gemini-1.5-flash', we can send image/pdf data.
+      const client = this.gemini['getClient'](); // Access private method hack or make public
+      const model = client.getGenerativeModel({ model: 'gemini-1.5-flash' });
+
+      const result = await model.generateContent([
+        prompt,
+        {
+          inlineData: {
+            data: fileBase64,
+            mimeType: mimeType
+          }
+        }
+      ]);
+
+      return result.response.text();
+    } else {
+      // OpenAI Fallback
+
+      // Check if image
+      if (mimeType.startsWith('image/')) {
+        const client = this.openai['getClient']();
+        const response = await client.chat.completions.create({
+          model: 'gpt-4o',
+          messages: [
+            {
+              role: 'user',
+              content: [
+                { type: 'text', text: prompt },
+                { type: 'image_url', image_url: { url: `data:${mimeType};base64,${fileBase64}` } }
+              ]
+            }
+          ],
+          max_tokens: 4096,
+        });
+        return response.choices[0].message.content || '';
+      } else {
+        throw new Error("Scanning PDF/Word files requires a Gemini API Key (GOOGLE_AI_API_KEY). OpenAI only supports image scanning.");
+      }
+    }
   }
 }
 

@@ -49,14 +49,22 @@ export default function AdminUsersPage() {
     const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
     const [showEditModal, setShowEditModal] = useState(false);
     const [updating, setUpdating] = useState(false);
+    const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
     const limit = 20;
 
     useEffect(() => {
         fetchUsers();
+        
+        // Auto-refresh every 30 seconds
+        const interval = setInterval(() => {
+            fetchUsers(true); // silent refresh
+        }, 30000);
+        
+        return () => clearInterval(interval);
     }, [page, roleFilter]);
 
-    const fetchUsers = async () => {
-        setLoading(true);
+    const fetchUsers = async (silent = false) => {
+        if (!silent) setLoading(true);
         try {
             const params = new URLSearchParams({
                 limit: limit.toString(),
@@ -71,11 +79,12 @@ export default function AdminUsersPage() {
                 setUsers(data.users);
                 setTotal(data.total);
                 setHasMore(data.hasMore);
+                setLastUpdated(new Date());
             }
         } catch (error) {
             console.error("Error fetching users:", error);
         } finally {
-            setLoading(false);
+            if (!silent) setLoading(false);
         }
     };
 

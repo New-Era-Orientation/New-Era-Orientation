@@ -124,13 +124,11 @@ async function getUserMetrics(startDate: Date) {
 }
 
 async function getContentMetrics() {
-    const [exams, subjects, chapters, topics, flashcardDecks, flashcards] = await Promise.all([
+    const [exams, subjects, chapters, topics] = await Promise.all([
         db.exam.count(),
         db.subject.count(),
         db.chapter.count(),
         db.topic.count(),
-        db.flashcardDeck.count(),
-        db.flashcard.count(),
     ]);
 
     const questionsCount = await db.question.count();
@@ -141,20 +139,15 @@ async function getContentMetrics() {
         subjects,
         chapters,
         topics,
-        flashcardDecks,
-        flashcards,
     };
 }
 
 async function getEngagementMetrics(startDate: Date) {
-    const [examAttempts, chatMessages, flashcardReviews] = await Promise.all([
+    const [examAttempts, chatMessages] = await Promise.all([
         db.examAttempt.count({
             where: { completedAt: { gte: startDate } },
         }),
         db.chatMessage.count({
-            where: { createdAt: { gte: startDate } },
-        }),
-        db.flashcardReview.count({
             where: { createdAt: { gte: startDate } },
         }),
     ]);
@@ -193,7 +186,6 @@ async function getEngagementMetrics(startDate: Date) {
     return {
         examAttempts,
         chatMessages,
-        flashcardReviews,
         avgAttemptsPerUser: avgAttempts,
         dailyActiveUsers,
     };

@@ -182,7 +182,6 @@ export type NotificationType =
     | "study_reminder"
     | "achievement_unlocked"
     | "exam_available"
-    | "flashcard_due"
     | "streak_warning"
     | "leaderboard_update";
 
@@ -216,13 +215,6 @@ export const NotificationTemplates: Record<NotificationType, (data: Record<strin
         title: "📝 Đề thi mới",
         body: `Đề thi "${data.examName}" đã sẵn sàng!`,
         url: `/exam/${data.examSlug}`,
-    }),
-    
-    flashcard_due: (data) => ({
-        type: "flashcard_due",
-        title: "🃏 Thẻ cần ôn tập",
-        body: `${data.count} thẻ đang chờ bạn ôn tập!`,
-        url: "/flashcards",
     }),
     
     streak_warning: (data) => ({

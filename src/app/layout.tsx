@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Open_Sans, Poppins } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import { ThemeProvider } from "@/client/contexts/ThemeContext";
 import { SessionProvider } from "@/client/contexts/SessionProvider";
@@ -7,18 +7,56 @@ import { UserProvider } from "@/client/contexts/UserContext";
 import { PWARegistration } from "@/client/components/pwa/PWARegistration";
 import { MobileBottomNav } from "@/client/components/layout/MobileBottomNav";
 
-const openSans = Open_Sans({
-    subsets: ["latin", "vietnamese"],
+// Use system fonts as fallback to avoid Turbopack font loading issues
+const fontSans = localFont({
+    src: [
+        {
+            path: "../fonts/Inter-Regular.woff2",
+            weight: "400",
+            style: "normal",
+        },
+        {
+            path: "../fonts/Inter-Medium.woff2",
+            weight: "500",
+            style: "normal",
+        },
+        {
+            path: "../fonts/Inter-SemiBold.woff2",
+            weight: "600",
+            style: "normal",
+        },
+        {
+            path: "../fonts/Inter-Bold.woff2",
+            weight: "700",
+            style: "normal",
+        },
+    ],
     variable: "--font-sans",
-    weight: ["300", "400", "500", "600", "700"],
     display: "swap",
+    fallback: ["system-ui", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"],
 });
 
-const poppins = Poppins({
-    subsets: ["latin"],
+const fontDisplay = localFont({
+    src: [
+        {
+            path: "../fonts/Inter-Medium.woff2",
+            weight: "500",
+            style: "normal",
+        },
+        {
+            path: "../fonts/Inter-SemiBold.woff2",
+            weight: "600",
+            style: "normal",
+        },
+        {
+            path: "../fonts/Inter-Bold.woff2",
+            weight: "700",
+            style: "normal",
+        },
+    ],
     variable: "--font-display",
-    weight: ["400", "500", "600", "700"],
     display: "swap",
+    fallback: ["system-ui", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"],
 });
 
 export const viewport: Viewport = {
@@ -63,7 +101,7 @@ export default function RootLayout({
                 <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
                 <meta name="apple-mobile-web-app-capable" content="yes" />
             </head>
-            <body className={`${openSans.variable} ${poppins.variable} font-sans antialiased bg-background text-foreground`} suppressHydrationWarning>
+            <body className={`${fontSans.variable} ${fontDisplay.variable} font-sans antialiased bg-background text-foreground`} suppressHydrationWarning>
                 <SessionProvider>
                     <ThemeProvider>
                         <UserProvider>

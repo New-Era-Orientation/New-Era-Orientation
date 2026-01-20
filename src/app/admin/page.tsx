@@ -21,6 +21,7 @@ import {
     Plus,
     ChevronRight,
     Activity,
+    RefreshCw,
 } from "lucide-react";
 
 interface AdminStats {
@@ -55,10 +56,20 @@ export default function AdminDashboard() {
     const [error, setError] = useState<string | null>(null);
     const [canBecomeAdmin, setCanBecomeAdmin] = useState(false);
     const [promoting, setPromoting] = useState(false);
+    const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
     useEffect(() => {
         checkAdminAndFetch();
-    }, []);
+
+        // Auto-refresh every 30 seconds
+        const interval = setInterval(() => {
+            if (!canBecomeAdmin) {
+                fetchStats(true); // silent refresh
+            }
+        }, 30000);
+
+        return () => clearInterval(interval);
+    }, [canBecomeAdmin]);
 
     const checkAdminAndFetch = async () => {
         try {
@@ -76,7 +87,7 @@ export default function AdminDashboard() {
                     return;
                 }
             }
-            
+
             // Fetch stats if user is admin
             await fetchStats();
         } catch (err) {
@@ -91,7 +102,7 @@ export default function AdminDashboard() {
         try {
             const res = await fetch("/api/admin/promote", { method: "POST" });
             const data = await res.json();
-            
+
             if (res.ok) {
                 setCanBecomeAdmin(false);
                 await fetchStats();
@@ -110,7 +121,7 @@ export default function AdminDashboard() {
         }
     };
 
-    const fetchStats = async () => {
+    const fetchStats = async (silent = false) => {
         try {
             const res = await fetch("/api/admin/stats");
             if (res.status === 403) {
@@ -119,14 +130,23 @@ export default function AdminDashboard() {
             }
             if (res.ok) {
                 setStats(await res.json());
-            } else {
+                setLastUpdated(new Date());
+            } else if (!silent) {
                 setError("Failed to load stats");
             }
         } catch (err) {
-            setError("Failed to load stats");
+            if (!silent) {
+                setError("Failed to load stats");
+            }
         } finally {
             setLoading(false);
         }
+    };
+
+    // Manual refresh handler
+    const handleRefresh = async () => {
+        setLoading(true);
+        await fetchStats();
     };
 
     const formatDate = (date: string) => {
@@ -147,42 +167,42 @@ export default function AdminDashboard() {
         href?: string;
         suffix?: string;
     }> = [
-        {
-            label: "Tổng người dùng",
-            value: stats?.overview.totalUsers || 0,
-            icon: Users,
-            color: "blue",
-            href: "/admin/users",
-        },
-        {
-            label: "Đề thi",
-            value: stats?.overview.totalExams || 0,
-            icon: FileText,
-            color: "green",
-            href: "/admin/exams",
-        },
-        {
-            label: "Lượt làm bài",
-            value: stats?.overview.totalAttempts || 0,
-            icon: Activity,
-            color: "purple",
-            href: "/admin/attempts",
-        },
-        {
-            label: "Chủ đề học tập",
-            value: stats?.overview.totalTopics || 0,
-            icon: BookOpen,
-            color: "orange",
-            href: "/admin/content",
-        },
-        {
-            label: "Điểm TB",
-            value: stats?.overview.averageScore?.toFixed(1) || 0,
-            icon: TrendingUp,
-            color: "cyan",
-            suffix: "/10",
-        },
-    ];
+            {
+                label: "Tổng người dùng",
+                value: stats?.overview.totalUsers || 0,
+                icon: Users,
+                color: "blue",
+                href: "/admin/users",
+            },
+            {
+                label: "Đề thi",
+                value: stats?.overview.totalExams || 0,
+                icon: FileText,
+                color: "green",
+                href: "/admin/exams",
+            },
+            {
+                label: "Lượt làm bài",
+                value: stats?.overview.totalAttempts || 0,
+                icon: Activity,
+                color: "purple",
+                href: "/admin/attempts",
+            },
+            {
+                label: "Chủ đề học tập",
+                value: stats?.overview.totalTopics || 0,
+                icon: BookOpen,
+                color: "orange",
+                href: "/admin/content",
+            },
+            {
+                label: "Điểm TB",
+                value: stats?.overview.averageScore?.toFixed(1) || 0,
+                icon: TrendingUp,
+                color: "cyan",
+                suffix: "/10",
+            },
+        ];
 
     const getColorClasses = (color: string) => {
         const colors: Record<string, { bg: string; text: string; icon: string }> = {
@@ -235,8 +255,8 @@ export default function AdminDashboard() {
                                 {error}
                             </div>
                         )}
-                        <Button 
-                            onClick={promoteToAdmin} 
+                        <Button
+                            onClick={promoteToAdmin}
                             disabled={promoting}
                             className="w-full"
                         >
@@ -258,7 +278,7 @@ export default function AdminDashboard() {
                     <CardContent className="p-8 text-center">
                         <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
                         <p className="text-gray-500">{error}</p>
-                        <Button onClick={fetchStats} className="mt-4">
+                        <Button onClick={() => fetchStats()} className="mt-4">
                             Thử lại
                         </Button>
                     </CardContent>
@@ -279,10 +299,26 @@ export default function AdminDashboard() {
                             </div>
                             <div>
                                 <h1 className="text-2xl font-bold">Admin Dashboard</h1>
-                                <p className="text-white/70">Quản lý hệ thống NEO-EDU</p>
+                                <p className="text-white/70">
+                                    Quản lý hệ thống NEO-EDU
+                                    {lastUpdated && (
+                                        <span className="ml-2 text-xs">
+                                            • Cập nhật: {lastUpdated.toLocaleTimeString("vi-VN")}
+                                        </span>
+                                    )}
+                                </p>
                             </div>
                         </div>
                         <div className="flex gap-2">
+                            <Button
+                                variant="outline"
+                                className="border-white/20 text-white hover:bg-white/10"
+                                onClick={handleRefresh}
+                                disabled={loading}
+                            >
+                                <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+                                Làm mới
+                            </Button>
                             <Link href="/admin/settings">
                                 <Button variant="outline" className="border-white/20 text-white hover:bg-white/10">
                                     <Settings className="h-4 w-4 mr-2" />
@@ -299,67 +335,66 @@ export default function AdminDashboard() {
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
                     {loading
                         ? Array.from({ length: 6 }).map((_, i) => (
-                              <Card key={i}>
-                                  <CardContent className="p-4">
-                                      <Skeleton className="h-10 w-10 rounded-lg mb-3" />
-                                      <Skeleton className="h-6 w-16 mb-1" />
-                                      <Skeleton className="h-4 w-20" />
-                                  </CardContent>
-                              </Card>
-                          ))
+                            <Card key={i}>
+                                <CardContent className="p-4">
+                                    <Skeleton className="h-10 w-10 rounded-lg mb-3" />
+                                    <Skeleton className="h-6 w-16 mb-1" />
+                                    <Skeleton className="h-4 w-20" />
+                                </CardContent>
+                            </Card>
+                        ))
                         : statCards.map((stat) => {
-                              const colors = getColorClasses(stat.color);
-                              return (
-                                  <Card
-                                      key={stat.label}
-                                      className={`hover:shadow-lg transition-shadow ${
-                                          stat.href ? "cursor-pointer" : ""
-                                      }`}
-                                  >
-                                      {stat.href ? (
-                                          <Link href={stat.href}>
-                                              <CardContent className="p-4">
-                                                  <div
-                                                      className={`w-10 h-10 rounded-lg ${colors.bg} flex items-center justify-center mb-3`}
-                                                  >
-                                                      <stat.icon className={`h-5 w-5 ${colors.icon}`} />
-                                                  </div>
-                                                  <p className={`text-2xl font-bold ${colors.text}`}>
-                                                      {stat.value}
-                                                      {stat.suffix && (
-                                                          <span className="text-sm font-normal text-gray-400">
-                                                              {stat.suffix}
-                                                          </span>
-                                                      )}
-                                                  </p>
-                                                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                                                      {stat.label}
-                                                  </p>
-                                              </CardContent>
-                                          </Link>
-                                      ) : (
-                                          <CardContent className="p-4">
-                                              <div
-                                                  className={`w-10 h-10 rounded-lg ${colors.bg} flex items-center justify-center mb-3`}
-                                              >
-                                                  <stat.icon className={`h-5 w-5 ${colors.icon}`} />
-                                              </div>
-                                              <p className={`text-2xl font-bold ${colors.text}`}>
-                                                  {stat.value}
-                                                  {stat.suffix && (
-                                                      <span className="text-sm font-normal text-gray-400">
-                                                          {stat.suffix}
-                                                      </span>
-                                                  )}
-                                              </p>
-                                              <p className="text-sm text-gray-500 dark:text-gray-400">
-                                                  {stat.label}
-                                              </p>
-                                          </CardContent>
-                                      )}
-                                  </Card>
-                              );
-                          })}
+                            const colors = getColorClasses(stat.color);
+                            return (
+                                <Card
+                                    key={stat.label}
+                                    className={`hover:shadow-lg transition-shadow ${stat.href ? "cursor-pointer" : ""
+                                        }`}
+                                >
+                                    {stat.href ? (
+                                        <Link href={stat.href}>
+                                            <CardContent className="p-4">
+                                                <div
+                                                    className={`w-10 h-10 rounded-lg ${colors.bg} flex items-center justify-center mb-3`}
+                                                >
+                                                    <stat.icon className={`h-5 w-5 ${colors.icon}`} />
+                                                </div>
+                                                <p className={`text-2xl font-bold ${colors.text}`}>
+                                                    {stat.value}
+                                                    {stat.suffix && (
+                                                        <span className="text-sm font-normal text-gray-400">
+                                                            {stat.suffix}
+                                                        </span>
+                                                    )}
+                                                </p>
+                                                <p className="text-sm text-gray-500 dark:text-gray-400">
+                                                    {stat.label}
+                                                </p>
+                                            </CardContent>
+                                        </Link>
+                                    ) : (
+                                        <CardContent className="p-4">
+                                            <div
+                                                className={`w-10 h-10 rounded-lg ${colors.bg} flex items-center justify-center mb-3`}
+                                            >
+                                                <stat.icon className={`h-5 w-5 ${colors.icon}`} />
+                                            </div>
+                                            <p className={`text-2xl font-bold ${colors.text}`}>
+                                                {stat.value}
+                                                {stat.suffix && (
+                                                    <span className="text-sm font-normal text-gray-400">
+                                                        {stat.suffix}
+                                                    </span>
+                                                )}
+                                            </p>
+                                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                                                {stat.label}
+                                            </p>
+                                        </CardContent>
+                                    )}
+                                </Card>
+                            );
+                        })}
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -422,8 +457,8 @@ export default function AdminDashboard() {
                                                         user.role === "ADMIN"
                                                             ? "error"
                                                             : user.role === "TEACHER"
-                                                            ? "primary"
-                                                            : "default"
+                                                                ? "primary"
+                                                                : "default"
                                                     }
                                                 >
                                                     {user.role}
@@ -475,11 +510,10 @@ export default function AdminDashboard() {
                                         >
                                             <div className="flex items-center gap-3">
                                                 <div
-                                                    className={`w-10 h-10 rounded flex items-center justify-center ${
-                                                        attempt.completedAt
+                                                    className={`w-10 h-10 rounded flex items-center justify-center ${attempt.completedAt
                                                             ? "bg-green-100 dark:bg-green-900/30"
                                                             : "bg-yellow-100 dark:bg-yellow-900/30"
-                                                    }`}
+                                                        }`}
                                                 >
                                                     {attempt.completedAt ? (
                                                         <CheckCircle2 className="h-5 w-5 text-green-600" />
@@ -503,8 +537,8 @@ export default function AdminDashboard() {
                                                             attempt.score >= 8
                                                                 ? "success"
                                                                 : attempt.score >= 5
-                                                                ? "warning"
-                                                                : "error"
+                                                                    ? "warning"
+                                                                    : "error"
                                                         }
                                                     >
                                                         {attempt.score.toFixed(1)}/10

@@ -26,7 +26,6 @@ interface AdminAnalytics {
         subjects: number;
         chapters: number;
         topics: number;
-        flashcardDecks: number;
         flashcards: number;
     };
     engagementMetrics: {
@@ -237,7 +236,6 @@ export default function AdminAnalyticsPage() {
                         <ContentStatRow label="Môn học" value={data.contentMetrics.subjects} />
                         <ContentStatRow label="Chương" value={data.contentMetrics.chapters} />
                         <ContentStatRow label="Chủ đề" value={data.contentMetrics.topics} />
-                        <ContentStatRow label="Bộ flashcard" value={data.contentMetrics.flashcardDecks} />
                         <ContentStatRow label="Thẻ flashcard" value={data.contentMetrics.flashcards} />
                     </div>
                 </Card>
@@ -267,18 +265,18 @@ export default function AdminAnalyticsPage() {
                 <Card className="p-6">
                     <h3 className="font-semibold text-foreground mb-4">💬 Tương tác</h3>
                     <div className="space-y-3">
-                        <ContentStatRow 
-                            label="Bài thi đã làm" 
-                            value={data.engagementMetrics.examAttempts} 
+                        <ContentStatRow
+                            label="Bài thi đã làm"
+                            value={data.engagementMetrics.examAttempts}
                             icon="📝"
                         />
-                        <ContentStatRow 
-                            label="Tin nhắn AI" 
+                        <ContentStatRow
+                            label="Tin nhắn AI"
                             value={data.engagementMetrics.chatMessages}
                             icon="🤖"
                         />
-                        <ContentStatRow 
-                            label="Flashcard đã ôn" 
+                        <ContentStatRow
+                            label="Flashcard đã ôn"
                             value={data.engagementMetrics.flashcardReviews}
                             icon="🃏"
                         />
@@ -302,9 +300,9 @@ export default function AdminAnalyticsPage() {
                                 <span className={cn(
                                     "flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold",
                                     i === 0 ? "bg-yellow-500 text-white" :
-                                    i === 1 ? "bg-gray-400 text-white" :
-                                    i === 2 ? "bg-amber-600 text-white" :
-                                    "bg-secondary text-muted-foreground"
+                                        i === 1 ? "bg-gray-400 text-white" :
+                                            i === 2 ? "bg-amber-600 text-white" :
+                                                "bg-secondary text-muted-foreground"
                                 )}>
                                     {i + 1}
                                 </span>
@@ -421,13 +419,13 @@ function StatCard({
     );
 }
 
-function ContentStatRow({ 
-    label, 
-    value, 
-    icon 
-}: { 
-    label: string; 
-    value: number; 
+function ContentStatRow({
+    label,
+    value,
+    icon
+}: {
+    label: string;
+    value: number;
     icon?: string;
 }) {
     return (

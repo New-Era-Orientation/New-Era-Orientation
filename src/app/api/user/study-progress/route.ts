@@ -2,9 +2,11 @@ import { NextResponse } from "next/server";
 import { auth } from "@/server/auth";
 import { db } from "@/server/db";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
     const session = await auth();
-    
+
     if (!session?.user?.id) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -33,7 +35,7 @@ export async function GET() {
         });
 
         // Create a map for quick lookup
-        const progressMap = new Map(
+        const progressMap = new Map<string, any>(
             userProgress.map(p => [p.topicId, p])
         );
 
@@ -89,8 +91,8 @@ export async function GET() {
                 completedChapters,
                 totalTopics: subjectTotalTopics,
                 completedTopics: subjectCompletedTopics,
-                overallProgress: subjectTotalTopics > 0 
-                    ? Math.round((subjectCompletedTopics / subjectTotalTopics) * 100) 
+                overallProgress: subjectTotalTopics > 0
+                    ? Math.round((subjectCompletedTopics / subjectTotalTopics) * 100)
                     : 0,
                 chapters,
             };

@@ -38,6 +38,16 @@ interface ExamResultClientProps {
 
 export function ExamResultClient({ exam, result }: ExamResultClientProps) {
     const [showDetails, setShowDetails] = useState(false);
+    
+    // Early return if result is undefined/null
+    if (!result) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-background">
+                <p className="text-muted-foreground">Đang tải kết quả...</p>
+            </div>
+        );
+    }
+    
     const parts = exam.parts || [];
     const allQuestions = parts.flatMap((part) => part.questions);
 
@@ -55,7 +65,16 @@ export function ExamResultClient({ exam, result }: ExamResultClientProps) {
         return { label: "Cần cố gắng", color: "text-red-500", bg: "bg-red-500/10" };
     };
 
-    const grade = getGrade(result.percentage);
+    const percentage = result?.percentage ?? 0;
+    const passed = result?.passed ?? false;
+    const correctCount = result?.correctCount ?? 0;
+    const totalQuestions = result?.totalQuestions ?? 0;
+    const timeSpent = result?.timeSpent ?? 0;
+    const answers = result?.answers ?? {};
+    const score = result?.score ?? 0;
+    const maxScore = result?.maxScore ?? 10;
+
+    const grade = getGrade(percentage) || { label: "Đang tải", color: "text-muted-foreground", bg: "bg-muted" };
 
     return (
         <div className="min-h-screen bg-background">
@@ -65,9 +84,9 @@ export function ExamResultClient({ exam, result }: ExamResultClientProps) {
                 <div className="text-center mb-10">
                     <div className={cn(
                         "mx-auto mb-6 inline-flex rounded-full p-8",
-                        result.passed ? "bg-emerald-500/10" : "bg-red-500/10"
+                        passed ? "bg-emerald-500/10" : "bg-red-500/10"
                     )}>
-                        {result.passed ? (
+                        {passed ? (
                             <Trophy className="h-16 w-16 text-emerald-500" />
                         ) : (
                             <Target className="h-16 w-16 text-red-500" />
@@ -75,15 +94,15 @@ export function ExamResultClient({ exam, result }: ExamResultClientProps) {
                     </div>
                     
                     <h1 className="text-3xl font-bold text-foreground mb-2">
-                        {result.passed ? "Chúc mừng!" : "Đừng nản chí!"}
+                        {passed ? "Chúc mừng!" : "Đừng nản chí!"}
                     </h1>
                     <p className="text-muted-foreground mb-4">
-                        {result.passed 
+                        {passed 
                             ? "Bạn đã hoàn thành bài thi thành công" 
                             : "Hãy ôn tập và thử lại lần nữa nhé"}
                     </p>
 
-                    <Badge variant={result.passed ? "success" : "warning"} className="text-lg px-4 py-2">
+                    <Badge variant={passed ? "success" : "warning"} className="text-lg px-4 py-2">
                         {grade.label}
                     </Badge>
                 </div>
@@ -93,10 +112,10 @@ export function ExamResultClient({ exam, result }: ExamResultClientProps) {
                     <Card className="p-8 text-center">
                         <div className="mb-6">
                             <div className="text-6xl font-bold text-primary mb-2">
-                                {result.percentage}%
+                                {percentage}%
                             </div>
                             <p className="text-muted-foreground">
-                                {result.score.toFixed(1)} / {result.maxScore} điểm
+                                {Number(score).toFixed(1)} / {maxScore} điểm
                             </p>
                         </div>
 
@@ -120,14 +139,14 @@ export function ExamResultClient({ exam, result }: ExamResultClientProps) {
                                     strokeWidth="10"
                                     fill="none"
                                     strokeLinecap="round"
-                                    strokeDasharray={`${result.percentage * 4.4} 440`}
-                                    className={result.passed ? "text-emerald-500" : "text-amber-500"}
+                                    strokeDasharray={`${percentage * 4.4} 440`}
+                                    className={passed ? "text-emerald-500" : "text-amber-500"}
                                 />
                             </svg>
                             <div className="absolute inset-0 flex items-center justify-center">
                                 <div className="text-center">
-                                    <div className="text-3xl font-bold text-foreground">{result.correctCount}</div>
-                                    <div className="text-sm text-muted-foreground">/{result.totalQuestions}</div>
+                                    <div className="text-3xl font-bold text-foreground">{correctCount}</div>
+                                    <div className="text-sm text-muted-foreground">/{totalQuestions}</div>
                                 </div>
                             </div>
                         </div>
@@ -136,17 +155,17 @@ export function ExamResultClient({ exam, result }: ExamResultClientProps) {
                         <div className="grid grid-cols-3 gap-4">
                             <div className="rounded-xl bg-emerald-500/10 p-4">
                                 <CheckCircle className="h-6 w-6 text-emerald-500 mx-auto mb-2" />
-                                <div className="text-2xl font-bold text-foreground">{result.correctCount}</div>
+                                <div className="text-2xl font-bold text-foreground">{correctCount}</div>
                                 <div className="text-sm text-muted-foreground">Đúng</div>
                             </div>
                             <div className="rounded-xl bg-red-500/10 p-4">
                                 <XCircle className="h-6 w-6 text-red-500 mx-auto mb-2" />
-                                <div className="text-2xl font-bold text-foreground">{result.totalQuestions - result.correctCount}</div>
+                                <div className="text-2xl font-bold text-foreground">{totalQuestions - correctCount}</div>
                                 <div className="text-sm text-muted-foreground">Sai</div>
                             </div>
                             <div className="rounded-xl bg-blue-500/10 p-4">
                                 <Clock className="h-6 w-6 text-blue-500 mx-auto mb-2" />
-                                <div className="text-lg font-bold text-foreground">{formatTime(result.timeSpent)}</div>
+                                <div className="text-lg font-bold text-foreground">{formatTime(timeSpent)}</div>
                                 <div className="text-sm text-muted-foreground">Thời gian</div>
                             </div>
                         </div>
@@ -179,7 +198,7 @@ export function ExamResultClient({ exam, result }: ExamResultClientProps) {
                         <h2 className="text-xl font-bold text-foreground mb-6">Chi tiết bài làm</h2>
                         <div className="space-y-4">
                             {allQuestions.map((q, index) => {
-                                const userAnswer = result.answers[q.id];
+                                const userAnswer = answers[q.id];
                                 const isCorrect = userAnswer === q.correctAnswer;
                                 
                                 return (

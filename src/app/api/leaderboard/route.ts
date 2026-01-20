@@ -2,9 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/server/auth";
 import { db } from "@/server/db";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(request: NextRequest) {
     const session = await auth();
-    
+
     const { searchParams } = new URL(request.url);
     const range = searchParams.get("range") || "month";
     const category = searchParams.get("category") || "score";
@@ -13,7 +15,7 @@ export async function GET(request: NextRequest) {
     // Calculate date range
     const now = new Date();
     let startDate: Date;
-    
+
     switch (range) {
         case "week":
             startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
@@ -58,14 +60,14 @@ export async function GET(request: NextRequest) {
 
         for (const attempt of attempts) {
             if (!attempt.user) continue;
-            
+
             const existing = userStats.get(attempt.userId) || {
                 userId: attempt.userId,
                 name: attempt.user.name || "Unknown",
                 image: attempt.user.image,
                 totalScore: 0,
                 examsCompleted: 0,
-                scores: [],
+                scores: [] as number[],
                 lastActive: new Date(0),
             };
 
@@ -81,7 +83,7 @@ export async function GET(request: NextRequest) {
 
         // Calculate streak for each user
         const userStreaks = new Map<string, number>();
-        
+
         for (const [userId] of userStats) {
             const userAttempts = await db.examAttempt.findMany({
                 where: {
@@ -105,7 +107,7 @@ export async function GET(request: NextRequest) {
             let streak = 0;
             const today = new Date().toISOString().split("T")[0];
             let checkDate = today;
-            
+
             while (activeDays.has(checkDate)) {
                 streak++;
                 const prevDate = new Date(checkDate);
@@ -123,8 +125,8 @@ export async function GET(request: NextRequest) {
             image: user.image,
             score: Math.round(user.totalScore * 10) / 10,
             examsCompleted: user.examsCompleted,
-            avgScore: user.scores.length > 0 
-                ? Math.round((user.scores.reduce((a, b) => a + b, 0) / user.scores.length) * 10) / 10 
+            avgScore: user.scores.length > 0
+                ? Math.round((user.scores.reduce((a, b) => a + b, 0) / user.scores.length) * 10) / 10
                 : 0,
             streak: userStreaks.get(user.userId) || 0,
         }));
@@ -149,7 +151,7 @@ export async function GET(request: NextRequest) {
         }));
 
         // Find current user's position
-        let currentUser = null;
+        let currentUser: any = null;
         if (session?.user?.id) {
             const userIndex = leaderboard.findIndex(u => u.userId === session.user!.id);
             if (userIndex !== -1) {

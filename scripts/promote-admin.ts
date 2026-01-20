@@ -13,17 +13,17 @@ async function promoteToAdmin(email: string) {
 
     if (!user) {
       console.error(`❌ User with email "${email}" not found`);
-      
+
       // List all users
       const users = await db.user.findMany({
         select: { email: true, name: true, role: true }
       });
-      
+
       console.log('\n📋 Available users:');
-      users.forEach(u => {
+      users.forEach((u: any) => {
         console.log(`  - ${u.email} (${u.name || 'No name'}) - Role: ${u.role}`);
       });
-      
+
       return;
     }
 
@@ -41,7 +41,7 @@ async function promoteToAdmin(email: string) {
     console.log(`✅ Successfully promoted "${updated.email}" to ADMIN!`);
     console.log(`   Name: ${updated.name}`);
     console.log(`   Role: ${updated.role}`);
-    
+
   } catch (error) {
     console.error('Error:', error);
   }
@@ -54,15 +54,15 @@ if (!email) {
   console.log('Usage: npx tsx scripts/promote-admin.ts <email>');
   console.log('');
   console.log('Listing all users...');
-  
+
   db.user.findMany({
     select: { email: true, name: true, role: true }
-  }).then(users => {
+  }).then((users: any) => {
     console.log('\n📋 All users:');
     if (users.length === 0) {
       console.log('  No users found');
     } else {
-      users.forEach(u => {
+      users.forEach((u: any) => {
         const roleIcon = u.role === 'ADMIN' ? '👑' : '👤';
         console.log(`  ${roleIcon} ${u.email} (${u.name || 'No name'}) - ${u.role}`);
       });

@@ -74,13 +74,6 @@
       "description": "Làm bài thi thử",
       "url": "/exam",
       "icons": [{ "src": "/icons/exam.png", "sizes": "96x96" }]
-    },
-    {
-      "name": "Flashcards",
-      "short_name": "Thẻ",
-      "description": "Ôn tập với flashcards",
-      "url": "/flashcards",
-      "icons": [{ "src": "/icons/flashcard.png", "sizes": "96x96" }]
     }
   ],
   "screenshots": [
