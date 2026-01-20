@@ -8,5 +8,7 @@ export default defineConfig({
     schema: path.join(__dirname, "prisma", "schema.prisma"),
     datasource: {
         url: process.env.DATABASE_URL!,
+        // @ts-expect-error - feature available in runtime but key missing in types
+        directUrl: process.env.DIRECT_URL || undefined,
     },
 });
