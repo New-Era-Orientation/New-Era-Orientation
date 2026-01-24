@@ -6,6 +6,13 @@ export async function GET() {
     try {
         const subjects = await db.subject.findMany({
             include: {
+                school: {
+                    select: {
+                        id: true,
+                        name: true,
+                        code: true,
+                    },
+                },
                 chapters: {
                     select: {
                         id: true,
@@ -13,6 +20,15 @@ export async function GET() {
                         slug: true,
                         description: true,
                         order: true,
+                        topics: {
+                            select: {
+                                id: true,
+                                name: true,
+                                slug: true,
+                                order: true,
+                            },
+                            orderBy: { order: "asc" },
+                        },
                         _count: {
                             select: { topics: true },
                         },
@@ -29,12 +45,19 @@ export async function GET() {
             slug: subject.slug,
             description: subject.description,
             icon: subject.icon,
+            school: subject.school,
             chapters: subject.chapters.map((chapter) => ({
                 id: chapter.id,
                 name: chapter.name,
                 slug: chapter.slug,
                 description: chapter.description,
                 topicCount: chapter._count.topics,
+                topics: chapter.topics.map(topic => ({
+                    id: topic.id,
+                    name: topic.name,
+                    slug: topic.slug,
+                    order: topic.order
+                }))
             })),
         }));
 

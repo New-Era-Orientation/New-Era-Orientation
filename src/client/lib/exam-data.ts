@@ -83,22 +83,24 @@ export async function fetchExams(params?: {
     type?: string;
     year?: number;
     search?: string;
+    subjectId?: string;
 }): Promise<ExamListResponse> {
     const searchParams = new URLSearchParams();
-    
+
     if (params?.page) searchParams.set("page", params.page.toString());
     if (params?.pageSize) searchParams.set("pageSize", params.pageSize.toString());
     if (params?.type) searchParams.set("type", params.type);
     if (params?.year) searchParams.set("year", params.year.toString());
     if (params?.search) searchParams.set("search", params.search);
-    
+    if (params?.subjectId) searchParams.set("subjectId", params.subjectId);
+
     const url = `${API_BASE}/exams?${searchParams.toString()}`;
     const response = await fetch(url);
-    
+
     if (!response.ok) {
         throw new Error("Failed to fetch exams");
     }
-    
+
     return response.json();
 }
 
@@ -107,15 +109,15 @@ export async function fetchExams(params?: {
  */
 export async function fetchExamBySlug(slug: string): Promise<Exam | null> {
     const response = await fetch(`${API_BASE}/exams/${slug}`);
-    
+
     if (response.status === 404) {
         return null;
     }
-    
+
     if (!response.ok) {
         throw new Error("Failed to fetch exam");
     }
-    
+
     return response.json();
 }
 
@@ -133,12 +135,12 @@ export async function submitExam(
         },
         body: JSON.stringify(data),
     });
-    
+
     if (!response.ok) {
         const error = await response.json();
         throw new Error(error.error || "Failed to submit exam");
     }
-    
+
     return response.json();
 }
 

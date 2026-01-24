@@ -8,8 +8,10 @@ import { Clock, FileText, Award, Filter, Search, X, ArrowRight, Users, Loader2 }
 import Link from "next/link";
 import { Input } from "@/client/components/ui/Input";
 import { Badge } from "@/client/components/ui/Badge";
+import { useSubject } from "@/client/contexts/SubjectContext";
 
 export default function ExamPage() {
+    const { selectedSubjectId, isLoading: isSubjectLoading } = useSubject();
     const [exams, setExams] = useState<Exam[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -19,6 +21,7 @@ export default function ExamPage() {
 
     useEffect(() => {
         async function loadExams() {
+            if (isSubjectLoading) return;
             try {
                 setLoading(true);
                 console.log("[ExamPage] Fetching exams...");
@@ -26,6 +29,7 @@ export default function ExamPage() {
                     type: selectedType || undefined,
                     year: selectedYear || undefined,
                     search: searchQuery || undefined,
+                    subjectId: selectedSubjectId || undefined,
                 });
                 console.log("[ExamPage] Fetched data:", data);
                 setExams(data.exams || []);
@@ -39,7 +43,7 @@ export default function ExamPage() {
             }
         }
         loadExams();
-    }, [selectedYear, selectedType, searchQuery]);
+    }, [selectedYear, selectedType, searchQuery, selectedSubjectId, isSubjectLoading]);
 
     const years = Array.from(new Set((exams || []).map((e) => e.year))).sort((a, b) => b - a);
     const types = ["HSG", "STANDARD", "MOCK"];
@@ -71,11 +75,11 @@ export default function ExamPage() {
                     <p className="mt-2 text-lg text-muted-foreground">
                         Luyện thi với đề thi thực tế từ các kỳ thi chính thức
                     </p>
-                    
+
                     {/* Quick Stats */}
                     <div className="mt-6 flex flex-wrap gap-4">
                         {stats.map((stat, index) => (
-                            <div 
+                            <div
                                 key={index}
                                 className="flex items-center gap-3 rounded-xl border border-border bg-secondary/50 px-4 py-2"
                             >
@@ -196,51 +200,51 @@ export default function ExamPage() {
 
                 {/* Exam grid */}
                 {!loading && !error && (
-                <section aria-label="Danh sách đề thi">
-                    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                        {exams.map((exam) => (
-                            <Link key={exam.id} href={`/exam/${exam.slug}`}>
-                                <Card 
-                                    hover 
-                                    className="group h-full cursor-pointer p-6"
-                                >
-                                    <div className="mb-4 flex items-start justify-between">
-                                        <div className="rounded-xl bg-primary/10 p-3 text-primary transition-colors duration-200">
-                                            <FileText className="h-6 w-6" aria-hidden="true" />
+                    <section aria-label="Danh sách đề thi">
+                        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                            {exams.map((exam) => (
+                                <Link key={exam.id} href={`/exam/${exam.slug}`}>
+                                    <Card
+                                        hover
+                                        className="group h-full cursor-pointer p-6"
+                                    >
+                                        <div className="mb-4 flex items-start justify-between">
+                                            <div className="rounded-xl bg-primary/10 p-3 text-primary transition-colors duration-200">
+                                                <FileText className="h-6 w-6" aria-hidden="true" />
+                                            </div>
+                                            <div className="flex gap-2">
+                                                {exam.type === "HSG" && (
+                                                    <Badge variant="warning">HSG</Badge>
+                                                )}
+                                            </div>
                                         </div>
-                                        <div className="flex gap-2">
-                                            {exam.type === "HSG" && (
-                                                <Badge variant="warning">HSG</Badge>
-                                            )}
-                                        </div>
-                                    </div>
 
-                                    <h3 className="mb-3 text-xl font-bold text-foreground group-hover:text-primary motion-safe:transition-colors">
-                                        {exam.title}
-                                    </h3>
+                                        <h3 className="mb-3 text-xl font-bold text-foreground group-hover:text-primary motion-safe:transition-colors">
+                                            {exam.title}
+                                        </h3>
 
-                                    <div className="space-y-2 text-sm text-muted-foreground mb-6">
-                                        <div className="flex items-center gap-2">
-                                            <Award className="h-4 w-4" aria-hidden="true" />
-                                            <span>{exam.source}</span>
+                                        <div className="space-y-2 text-sm text-muted-foreground mb-6">
+                                            <div className="flex items-center gap-2">
+                                                <Award className="h-4 w-4" aria-hidden="true" />
+                                                <span>{exam.source}</span>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <Clock className="h-4 w-4" aria-hidden="true" />
+                                                <span>{exam.duration} phút • Năm {exam.year}</span>
+                                            </div>
                                         </div>
-                                        <div className="flex items-center gap-2">
-                                            <Clock className="h-4 w-4" aria-hidden="true" />
-                                            <span>{exam.duration} phút • Năm {exam.year}</span>
-                                        </div>
-                                    </div>
 
-                                    <div className="flex items-center justify-between">
-                                        <span className="inline-flex items-center gap-2 rounded-lg bg-primary px-3 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90">
-                                            Bắt đầu làm bài
-                                            <ArrowRight className="h-4 w-4 motion-safe:transition-transform group-hover:translate-x-1" aria-hidden="true" />
-                                        </span>
-                                    </div>
-                                </Card>
-                            </Link>
-                        ))}
-                    </div>
-                </section>
+                                        <div className="flex items-center justify-between">
+                                            <span className="inline-flex items-center gap-2 rounded-lg bg-primary px-3 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90">
+                                                Bắt đầu làm bài
+                                                <ArrowRight className="h-4 w-4 motion-safe:transition-transform group-hover:translate-x-1" aria-hidden="true" />
+                                            </span>
+                                        </div>
+                                    </Card>
+                                </Link>
+                            ))}
+                        </div>
+                    </section>
                 )}
 
                 {/* Empty state */}

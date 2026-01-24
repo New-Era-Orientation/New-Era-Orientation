@@ -1,7 +1,9 @@
 "use client";
 
 import { DashboardHeader } from "@/client/components/layout/DashboardHeader";
-import { Bell, Palette, Globe, Lock, Save, Shield, Volume2, Eye, Loader2, X, Check } from "lucide-react";
+import { Bell, Palette, Globe, Lock, Save, Shield, Volume2, Eye, Loader2, X, Check, BookOpen, ChevronDown, ChevronRight, Pin } from "lucide-react";
+import { useSubject } from "@/client/contexts/SubjectContext";
+import { useSession } from "next-auth/react";
 import { Card } from "@/client/components/ui/Card";
 import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/client/components/ui/Button";
@@ -14,22 +16,35 @@ interface Settings {
     soundEnabled: boolean;
     theme: string;
     language: string;
+    selectedSubjectId?: string;
+}
+
+interface SubjectData {
+    id: string;
+    name: string;
+    slug: string;
+    description: string | null;
+    icon: string | null;
+    school: { id: string; name: string; code: string | null } | null;
 }
 
 export default function SettingsPage() {
     const { theme: currentTheme, setTheme: setAppTheme } = useTheme();
+    const { selectedSubjectId, setSelectedSubjectId } = useSubject();
+    const { data: session } = useSession();
     const [settings, setSettings] = useState<Settings>({
         notifications: true,
         emailNotifications: false,
         soundEnabled: true,
-        theme: "dark",
+        theme: "system",
         language: "vi",
+        selectedSubjectId: selectedSubjectId || undefined,
     });
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
     const [hasChanges, setHasChanges] = useState(false);
     const [notification, setNotification] = useState<{ type: "success" | "error"; message: string } | null>(null);
-    
+
     // Password change modal
     const [showPasswordModal, setShowPasswordModal] = useState(false);
     const [passwordForm, setPasswordForm] = useState({
@@ -43,16 +58,35 @@ export default function SettingsPage() {
     // Login history modal
     const [showLoginHistory, setShowLoginHistory] = useState(false);
 
+    // Subject selection
+    const [subjects, setSubjects] = useState<SubjectData[]>([]);
+    const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({ "THPT": true });
+
     // Fetch settings on mount
     useEffect(() => {
         fetchSettings();
-    }, []);
+    }, [session]);
 
     const fetchSettings = async () => {
         try {
-            const res = await fetch("/api/settings");
-            if (res.ok) {
-                const data = await res.json();
+            const promises: Promise<Response>[] = [fetch("/api/subjects")];
+
+            // Only fetch settings if user is logged in
+            if (session?.user) {
+                promises.push(fetch("/api/settings"));
+            }
+
+            const responses = await Promise.all(promises);
+            const subjectsRes = responses[0];
+            const settingsRes = session?.user ? responses[1] : null;
+
+            if (subjectsRes.ok) {
+                const data = await subjectsRes.json();
+                setSubjects(data.data || []);
+            }
+
+            if (settingsRes && settingsRes.ok) {
+                const data = await settingsRes.json();
                 setSettings(data.settings);
             }
         } catch (error) {
@@ -69,12 +103,38 @@ export default function SettingsPage() {
         // Apply theme immediately
         if (key === "theme") {
             setAppTheme(value as "dark" | "light");
+            // Save to localStorage for guest
+            if (!session?.user) {
+                localStorage.setItem("theme", value as string);
+            }
         }
-    }, [setAppTheme]);
+
+        // For guest users, apply subject change immediately via context
+        if (key === "selectedSubjectId" && !session?.user) {
+            setSelectedSubjectId(value as string);
+        }
+    }, [setAppTheme, session?.user, setSelectedSubjectId]);
 
     const saveSettings = async () => {
         setIsSaving(true);
         try {
+            // Update subject in context (this handles localStorage for guest)
+            if (settings.selectedSubjectId && settings.selectedSubjectId !== selectedSubjectId) {
+                setSelectedSubjectId(settings.selectedSubjectId);
+            }
+
+            // For guest users, only save to localStorage
+            if (!session?.user) {
+                // Save theme preference to localStorage
+                if (settings.theme) {
+                    localStorage.setItem("theme", settings.theme);
+                }
+                setNotification({ type: "success", message: "Đã lưu cài đặt thành công!" });
+                setHasChanges(false);
+                return;
+            }
+
+            // For logged-in users, save to API
             const res = await fetch("/api/settings", {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
@@ -125,13 +185,13 @@ export default function SettingsPage() {
         }
     };
 
-    const Toggle = ({ 
-        checked, 
-        onChange, 
-        label 
-    }: { 
-        checked: boolean; 
-        onChange: () => void; 
+    const Toggle = ({
+        checked,
+        onChange,
+        label
+    }: {
+        checked: boolean;
+        onChange: () => void;
         label: string;
     }) => (
         <button
@@ -139,14 +199,12 @@ export default function SettingsPage() {
             role="switch"
             aria-checked={checked}
             aria-label={label}
-            className={`relative h-6 w-11 rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background ${
-                checked ? "bg-primary" : "bg-muted"
-            }`}
+            className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background ${checked ? "bg-primary" : "bg-muted"
+                }`}
         >
             <span
-                className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow-md transition-transform duration-200 ${
-                    checked ? "translate-x-5" : "translate-x-0.5"
-                }`}
+                className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-lg ring-0 transition-transform duration-200 ease-in-out ${checked ? "translate-x-5" : "translate-x-0"
+                    }`}
             />
         </button>
     );
@@ -165,14 +223,13 @@ export default function SettingsPage() {
     return (
         <div className="min-h-screen bg-background">
             <DashboardHeader />
-            
+
             {/* Notification Toast */}
             {notification && (
-                <div className={`fixed top-20 right-4 z-50 flex items-center gap-2 px-4 py-3 rounded-lg shadow-lg transition-all ${
-                    notification.type === "success" 
-                        ? "bg-emerald-500 text-white" 
-                        : "bg-destructive text-destructive-foreground"
-                }`}>
+                <div className={`fixed top-20 right-4 z-50 flex items-center gap-2 px-4 py-3 rounded-lg shadow-lg transition-all ${notification.type === "success"
+                    ? "bg-emerald-500 text-white"
+                    : "bg-destructive text-destructive-foreground"
+                    }`}>
                     {notification.type === "success" ? (
                         <Check className="h-5 w-5" />
                     ) : (
@@ -207,20 +264,20 @@ export default function SettingsPage() {
                                     <h3 className="font-semibold text-foreground">Thông báo push</h3>
                                     <p className="text-sm text-muted-foreground">Nhận thông báo về tiến độ học tập</p>
                                 </div>
-                                <Toggle 
-                                    checked={settings.notifications} 
+                                <Toggle
+                                    checked={settings.notifications}
                                     onChange={() => updateSetting("notifications", !settings.notifications)}
                                     label="Bật/tắt thông báo push"
                                 />
                             </div>
-                            
+
                             <div className="flex items-center justify-between py-2 border-t border-border">
                                 <div>
                                     <h3 className="font-semibold text-foreground">Email thông báo</h3>
                                     <p className="text-sm text-muted-foreground">Nhận email về các cập nhật quan trọng</p>
                                 </div>
-                                <Toggle 
-                                    checked={settings.emailNotifications} 
+                                <Toggle
+                                    checked={settings.emailNotifications}
                                     onChange={() => updateSetting("emailNotifications", !settings.emailNotifications)}
                                     label="Bật/tắt email thông báo"
                                 />
@@ -234,8 +291,8 @@ export default function SettingsPage() {
                                         <p className="text-sm text-muted-foreground">Phát âm thanh khi có thông báo</p>
                                     </div>
                                 </div>
-                                <Toggle 
-                                    checked={settings.soundEnabled} 
+                                <Toggle
+                                    checked={settings.soundEnabled}
                                     onChange={() => updateSetting("soundEnabled", !settings.soundEnabled)}
                                     label="Bật/tắt âm thanh thông báo"
                                 />
@@ -260,11 +317,10 @@ export default function SettingsPage() {
                             <div className="grid grid-cols-2 gap-4">
                                 <button
                                     onClick={() => updateSetting("theme", "dark")}
-                                    className={`rounded-xl border-2 p-4 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background ${
-                                        settings.theme === "dark"
-                                            ? "border-primary bg-primary/10"
-                                            : "border-border hover:border-primary/30"
-                                    }`}
+                                    className={`rounded-xl border-2 p-4 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background ${settings.theme === "dark"
+                                        ? "border-primary bg-primary/10"
+                                        : "border-border hover:border-primary/30"
+                                        }`}
                                     aria-pressed={settings.theme === "dark"}
                                 >
                                     <div className="mb-3 h-20 rounded-lg bg-zinc-900 border border-zinc-700 flex items-center justify-center">
@@ -279,11 +335,10 @@ export default function SettingsPage() {
 
                                 <button
                                     onClick={() => updateSetting("theme", "light")}
-                                    className={`rounded-xl border-2 p-4 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background ${
-                                        settings.theme === "light"
-                                            ? "border-primary bg-primary/10"
-                                            : "border-border hover:border-primary/30"
-                                    }`}
+                                    className={`rounded-xl border-2 p-4 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background ${settings.theme === "light"
+                                        ? "border-primary bg-primary/10"
+                                        : "border-border hover:border-primary/30"
+                                        }`}
                                     aria-pressed={settings.theme === "light"}
                                 >
                                     <div className="mb-3 h-20 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center">
@@ -325,47 +380,204 @@ export default function SettingsPage() {
                         </div>
                     </Card>
 
-                    {/* Security */}
+                    {/* Subject Selection */}
                     <Card className="p-6">
                         <div className="mb-6 flex items-center gap-3">
-                            <div className="rounded-xl bg-red-500/10 p-3 text-red-400">
-                                <Shield className="h-6 w-6" aria-hidden="true" />
+                            <div className="rounded-xl bg-cyan-500/10 p-3 text-cyan-400">
+                                <BookOpen className="h-6 w-6" aria-hidden="true" />
                             </div>
                             <div>
-                                <h2 className="text-xl font-bold text-foreground">Bảo mật</h2>
-                                <p className="text-sm text-muted-foreground">Quản lý bảo mật tài khoản</p>
+                                <h2 className="text-xl font-bold text-foreground">Chương trình học</h2>
+                                <p className="text-sm text-muted-foreground">Chọn môn học để hiển thị trên các tab</p>
                             </div>
                         </div>
 
                         <div className="space-y-3">
-                            <button 
-                                onClick={() => setShowPasswordModal(true)}
-                                className="w-full flex items-center justify-between p-4 rounded-xl border border-border hover:bg-secondary transition-colors group"
-                            >
-                                <div className="flex items-center gap-3">
-                                    <Lock className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
-                                    <span className="font-medium text-foreground">Đổi mật khẩu</span>
-                                </div>
-                                <span className="text-muted-foreground group-hover:text-foreground">→</span>
-                            </button>
-                            
-                            <button 
-                                onClick={() => setShowLoginHistory(true)}
-                                className="w-full flex items-center justify-between p-4 rounded-xl border border-border hover:bg-secondary transition-colors group"
-                            >
-                                <div className="flex items-center gap-3">
-                                    <Eye className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
-                                    <span className="font-medium text-foreground">Lịch sử đăng nhập</span>
-                                </div>
-                                <span className="text-muted-foreground group-hover:text-foreground">→</span>
-                            </button>
+                            {/* Pinned: Tin học THPT */}
+                            {subjects.filter(s => s.slug === "tin-hoc-thpt").map(subject => (
+                                <label
+                                    key={subject.id}
+                                    className={`relative flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all group ${settings.selectedSubjectId === subject.id
+                                        ? "border-primary bg-primary/10"
+                                        : "border-primary/30 bg-primary/5 hover:border-primary/50"
+                                        }`}
+                                >
+                                    <div className={`absolute inset-0 rounded-xl border-2 pointer-events-none transition-colors ${settings.selectedSubjectId === subject.id
+                                        ? "border-primary"
+                                        : "border-transparent group-hover:border-primary/50"
+                                        }`} />
+                                    <input
+                                        type="radio"
+                                        name="selectedSubject"
+                                        value={subject.id}
+                                        onChange={() => updateSetting("selectedSubjectId", subject.id)}
+                                        className="sr-only"
+                                    />
+                                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${settings.selectedSubjectId === subject.id
+                                        ? "border-primary"
+                                        : "border-muted-foreground"
+                                        }`}>
+                                        {settings.selectedSubjectId === subject.id && (
+                                            <div className="w-2.5 h-2.5 rounded-full bg-primary" />
+                                        )}
+                                    </div>
+                                    <Pin className="h-4 w-4 text-primary shrink-0" />
+                                    <span className="text-lg">{subject.icon}</span>
+                                    <div className="flex-1">
+                                        <span className="font-semibold text-foreground">{subject.name}</span>
+                                        <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary">Ưu tiên</span>
+                                    </div>
+                                </label>
+                            ))}
+
+                            {/* THPT Group */}
+                            {(() => {
+                                const thptSubjects = subjects.filter(s => !s.school && s.slug !== "tin-hoc-thpt");
+                                if (thptSubjects.length === 0) return null;
+                                return (
+                                    <div className="border border-border rounded-xl overflow-hidden">
+                                        <button
+                                            onClick={() => setExpandedGroups(prev => ({ ...prev, "THPT": !prev["THPT"] }))}
+                                            className="w-full flex items-center justify-between p-4 bg-secondary/50 hover:bg-secondary transition-colors"
+                                        >
+                                            <span className="font-semibold text-foreground">THPT</span>
+                                            {expandedGroups["THPT"] ? <ChevronDown className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
+                                        </button>
+                                        {expandedGroups["THPT"] && (
+                                            <div className="divide-y divide-border">
+                                                {thptSubjects.map(subject => (
+                                                    <label
+                                                        key={subject.id}
+                                                        className={`flex items-center gap-4 p-4 cursor-pointer transition-all ${settings.selectedSubjectId === subject.id
+                                                            ? "bg-primary/10"
+                                                            : "hover:bg-secondary/50"
+                                                            }`}
+                                                    >
+                                                        <input
+                                                            type="radio"
+                                                            name="selectedSubject"
+                                                            value={subject.id}
+                                                            checked={settings.selectedSubjectId === subject.id}
+                                                            onChange={() => updateSetting("selectedSubjectId", subject.id)}
+                                                            className="sr-only"
+                                                        />
+                                                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${settings.selectedSubjectId === subject.id
+                                                            ? "border-primary bg-primary"
+                                                            : "border-muted-foreground"
+                                                            }`}>
+                                                            {settings.selectedSubjectId === subject.id && (
+                                                                <div className="w-2 h-2 rounded-full bg-white" />
+                                                            )}
+                                                        </div>
+                                                        <span className="text-lg">{subject.icon || "📘"}</span>
+                                                        <span className="font-medium text-foreground">{subject.name}</span>
+                                                    </label>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            })()}
+
+                            {/* School Groups */}
+                            {(() => {
+                                const schoolGroups = subjects.filter(s => s.school).reduce((acc, subject) => {
+                                    const schoolName = subject.school!.name;
+                                    if (!acc[schoolName]) acc[schoolName] = [];
+                                    acc[schoolName].push(subject);
+                                    return acc;
+                                }, {} as Record<string, SubjectData[]>);
+
+                                return Object.entries(schoolGroups).map(([schoolName, schoolSubjects]) => (
+                                    <div key={schoolName} className="border border-border rounded-xl overflow-hidden">
+                                        <button
+                                            onClick={() => setExpandedGroups(prev => ({ ...prev, [schoolName]: !prev[schoolName] }))}
+                                            className="w-full flex items-center justify-between p-4 bg-secondary/50 hover:bg-secondary transition-colors"
+                                        >
+                                            <span className="font-semibold text-foreground">{schoolName}</span>
+                                            {expandedGroups[schoolName] ? <ChevronDown className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
+                                        </button>
+                                        {expandedGroups[schoolName] && (
+                                            <div className="divide-y divide-border">
+                                                {schoolSubjects.map(subject => (
+                                                    <label
+                                                        key={subject.id}
+                                                        className={`flex items-center gap-4 p-4 cursor-pointer transition-all ${settings.selectedSubjectId === subject.id
+                                                            ? "bg-primary/10"
+                                                            : "hover:bg-secondary/50"
+                                                            }`}
+                                                    >
+                                                        <input
+                                                            type="radio"
+                                                            name="selectedSubject"
+                                                            value={subject.id}
+                                                            checked={settings.selectedSubjectId === subject.id}
+                                                            onChange={() => updateSetting("selectedSubjectId", subject.id)}
+                                                            className="sr-only"
+                                                        />
+                                                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${settings.selectedSubjectId === subject.id
+                                                            ? "border-primary bg-primary"
+                                                            : "border-muted-foreground"
+                                                            }`}>
+                                                            {settings.selectedSubjectId === subject.id && (
+                                                                <div className="w-2 h-2 rounded-full bg-white" />
+                                                            )}
+                                                        </div>
+                                                        <span className="text-lg">{subject.icon || "📘"}</span>
+                                                        <span className="font-medium text-foreground">{subject.name}</span>
+                                                    </label>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                ));
+                            })()}
                         </div>
                     </Card>
 
+                    {/* Security - Only for logged in users */}
+                    {session?.user && (
+                        <Card className="p-6">
+                            <div className="mb-6 flex items-center gap-3">
+                                <div className="rounded-xl bg-red-500/10 p-3 text-red-400">
+                                    <Shield className="h-6 w-6" aria-hidden="true" />
+                                </div>
+                                <div>
+                                    <h2 className="text-xl font-bold text-foreground">Bảo mật</h2>
+                                    <p className="text-sm text-muted-foreground">Quản lý bảo mật tài khoản</p>
+                                </div>
+                            </div>
+
+                            <div className="space-y-3">
+                                <button
+                                    onClick={() => setShowPasswordModal(true)}
+                                    className="w-full flex items-center justify-between p-4 rounded-xl border border-border hover:bg-secondary transition-colors group"
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <Lock className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
+                                        <span className="font-medium text-foreground">Đổi mật khẩu</span>
+                                    </div>
+                                    <span className="text-muted-foreground group-hover:text-foreground">→</span>
+                                </button>
+
+                                <button
+                                    onClick={() => setShowLoginHistory(true)}
+                                    className="w-full flex items-center justify-between p-4 rounded-xl border border-border hover:bg-secondary transition-colors group"
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <Eye className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
+                                        <span className="font-medium text-foreground">Lịch sử đăng nhập</span>
+                                    </div>
+                                    <span className="text-muted-foreground group-hover:text-foreground">→</span>
+                                </button>
+                            </div>
+                        </Card>
+                    )}
+
                     {/* Save Button */}
                     <div className="flex justify-end pt-4">
-                        <Button 
-                            variant="default" 
+                        <Button
+                            variant="default"
                             className="group"
                             onClick={saveSettings}
                             disabled={isSaving || !hasChanges}
@@ -381,13 +593,13 @@ export default function SettingsPage() {
                 </div>
             </main>
 
-            {/* Password Change Modal */}
-            {showPasswordModal && (
+            {/* Password Change Modal - Only render if session exists */}
+            {session?.user && showPasswordModal && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
                     <Card className="w-full max-w-md p-6">
                         <div className="flex items-center justify-between mb-6">
                             <h2 className="text-xl font-bold text-foreground">Đổi mật khẩu</h2>
-                            <button 
+                            <button
                                 onClick={() => {
                                     setShowPasswordModal(false);
                                     setPasswordError("");
@@ -448,9 +660,9 @@ export default function SettingsPage() {
                             </div>
 
                             <div className="flex gap-3 pt-4">
-                                <Button 
-                                    type="button" 
-                                    variant="secondary" 
+                                <Button
+                                    type="button"
+                                    variant="secondary"
                                     className="flex-1"
                                     onClick={() => {
                                         setShowPasswordModal(false);
@@ -459,8 +671,8 @@ export default function SettingsPage() {
                                 >
                                     Hủy
                                 </Button>
-                                <Button 
-                                    type="submit" 
+                                <Button
+                                    type="submit"
                                     className="flex-1"
                                     disabled={isChangingPassword}
                                 >
@@ -476,13 +688,13 @@ export default function SettingsPage() {
                 </div>
             )}
 
-            {/* Login History Modal */}
-            {showLoginHistory && (
+            {/* Login History Modal - Only render if session exists */}
+            {session?.user && showLoginHistory && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
                     <Card className="w-full max-w-md p-6">
                         <div className="flex items-center justify-between mb-6">
                             <h2 className="text-xl font-bold text-foreground">Lịch sử đăng nhập</h2>
-                            <button 
+                            <button
                                 onClick={() => setShowLoginHistory(false)}
                                 className="p-2 hover:bg-secondary rounded-lg transition-colors"
                             >
@@ -512,8 +724,8 @@ export default function SettingsPage() {
                         </div>
 
                         <div className="mt-6">
-                            <Button 
-                                variant="secondary" 
+                            <Button
+                                variant="secondary"
                                 className="w-full"
                                 onClick={() => setShowLoginHistory(false)}
                             >

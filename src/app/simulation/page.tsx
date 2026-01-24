@@ -6,43 +6,28 @@ import { Play, Clock, Target, BookOpen, Lightbulb, Plus, Filter, Shuffle, ArrowR
 import { Card } from "@/client/components/ui/Card";
 import { Badge } from "@/client/components/ui/Badge";
 import Link from "next/link";
+import { useSubject } from "@/client/contexts/SubjectContext";
 
 export default function SimulationPage() {
     const [selectedDifficulty, setSelectedDifficulty] = useState<string | null>(null);
     const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
 
-    const topics = [
-        {
-            id: "1",
-            title: "Cấu trúc dữ liệu cơ bản",
-            description: "Mảng, danh sách liên kết, ngăn xếp, hàng đợi",
-            questions: 15,
-            difficulty: "easy" as const,
-            color: "from-emerald-500/20 to-green-500/20",
-            iconBg: "bg-emerald-500/10 text-emerald-400",
-            completedQuestions: 8,
-        },
-        {
-            id: "2",
-            title: "Thuật toán sắp xếp",
-            description: "Bubble sort, Quick sort, Merge sort",
-            questions: 20,
-            difficulty: "medium" as const,
-            color: "from-primary/20 to-cyan-500/20",
-            iconBg: "bg-primary/10 text-primary",
-            completedQuestions: 5,
-        },
-        {
-            id: "3",
-            title: "Đồ thị và cây",
-            description: "BFS, DFS, Dijkstra, Cây nhị phân",
-            questions: 25,
-            difficulty: "hard" as const,
-            color: "from-purple-500/20 to-pink-500/20",
-            iconBg: "bg-purple-500/10 text-purple-400",
-            completedQuestions: 0,
-        },
-    ];
+    const { selectedSubject } = useSubject();
+
+    // Map chapters to simulation topics
+    const topics = selectedSubject?.chapters.map((chapter, index) => ({
+        id: chapter.id,
+        title: chapter.name,
+        description: chapter.description || "Luyện tập các câu hỏi thuộc chương này",
+        questions: chapter.topicCount * 10 || 20, // Mock question count based on topics
+        difficulty: (index % 3 === 0 ? "easy" : index % 3 === 1 ? "medium" : "hard") as "easy" | "medium" | "hard",
+        color: index % 3 === 0 ? "from-emerald-500/20 to-green-500/20" : index % 3 === 1 ? "from-primary/20 to-cyan-500/20" : "from-purple-500/20 to-pink-500/20",
+        iconBg: index % 3 === 0 ? "bg-emerald-500/10 text-emerald-400" : index % 3 === 1 ? "bg-primary/10 text-primary" : "bg-purple-500/10 text-purple-400",
+        completedQuestions: 0, // Placeholder
+    })) || [];
+
+    // Fallback if no subject selected or no chapters (optional: could show empty state)
+    // const topics = ... (removed hardcoded)
 
     const features = [
         {
@@ -98,7 +83,7 @@ export default function SimulationPage() {
                                 Luyện tập không giới hạn thời gian với gợi ý và giải thích chi tiết
                             </p>
                         </div>
-                        
+
                         <Link
                             href="/simulation/create"
                             className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 font-medium text-primary-foreground transition-colors hover:bg-primary/90"
@@ -177,15 +162,15 @@ export default function SimulationPage() {
                     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                         {filteredTopics.map((topic) => {
                             const progressPercentage = Math.round((topic.completedQuestions / topic.questions) * 100);
-                            
+
                             return (
-                                <Card 
-                                    key={topic.id} 
+                                <Card
+                                    key={topic.id}
                                     hover
                                     className="group relative overflow-hidden p-6"
                                 >
-                                    <div 
-                                        className={`absolute inset-0 -z-10 bg-gradient-to-br ${topic.color} opacity-0 transition-opacity duration-300 group-hover:opacity-100`} 
+                                    <div
+                                        className={`absolute inset-0 -z-10 bg-gradient-to-br ${topic.color} opacity-0 transition-opacity duration-300 group-hover:opacity-100`}
                                         aria-hidden="true"
                                     />
 
@@ -193,7 +178,7 @@ export default function SimulationPage() {
                                         <div className={`rounded-xl p-3 ${topic.iconBg} transition-colors duration-200`}>
                                             <BookOpen className="h-6 w-6" aria-hidden="true" />
                                         </div>
-                                        <Badge 
+                                        <Badge
                                             variant={topic.difficulty === "easy" ? "success" : topic.difficulty === "medium" ? "warning" : "error"}
                                         >
                                             {getDifficultyLabel(topic.difficulty)}
@@ -217,32 +202,31 @@ export default function SimulationPage() {
                                                 {topic.completedQuestions}/{topic.questions}
                                             </span>
                                         </div>
-                                        <div 
+                                        <div
                                             className="h-2 w-full overflow-hidden rounded-full bg-muted"
                                             role="progressbar"
                                             aria-valuenow={progressPercentage}
                                             aria-valuemin={0}
                                             aria-valuemax={100}
                                         >
-                                            <div 
-                                                className={`h-full rounded-full transition-all duration-500 ${
-                                                    topic.difficulty === "easy" ? "bg-emerald-500" :
+                                            <div
+                                                className={`h-full rounded-full transition-all duration-500 ${topic.difficulty === "easy" ? "bg-emerald-500" :
                                                     topic.difficulty === "medium" ? "bg-amber-500" : "bg-purple-500"
-                                                }`}
+                                                    }`}
                                                 style={{ width: `${progressPercentage}%` }}
                                             />
                                         </div>
                                     </div>
 
                                     <div className="flex gap-2">
-                                        <button 
+                                        <button
                                             className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-primary px-3 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
                                             aria-label={`Luyện tập ${topic.title}`}
                                         >
                                             <Play className="h-4 w-4" aria-hidden="true" />
                                             Luyện tập
                                         </button>
-                                        <button 
+                                        <button
                                             className="rounded-lg border border-border px-3 py-2 text-muted-foreground transition-colors hover:bg-secondary"
                                             aria-label={`Làm ngẫu nhiên ${topic.title}`}
                                         >
@@ -264,8 +248,8 @@ export default function SimulationPage() {
                                 Không tìm thấy chủ đề
                             </h3>
                             <p className="mb-6 text-muted-foreground">Thử thay đổi bộ lọc</p>
-                            <button 
-                                onClick={clearFilters} 
+                            <button
+                                onClick={clearFilters}
                                 className="rounded-lg bg-primary px-4 py-2 font-medium text-primary-foreground transition-colors hover:bg-primary/90"
                             >
                                 Xóa bộ lọc

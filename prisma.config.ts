@@ -7,8 +7,7 @@ dotenv.config();
 export default defineConfig({
     schema: path.join(__dirname, "prisma", "schema.prisma"),
     datasource: {
-        url: process.env.DATABASE_URL!,
-        // @ts-expect-error - feature available in runtime but key missing in types
-        directUrl: process.env.DIRECT_URL || undefined,
+        // Use DIRECT_URL (port 5432) for migrations - pooler doesn't support DDL
+        url: process.env.DIRECT_URL || process.env.DATABASE_URL!,
     },
 });

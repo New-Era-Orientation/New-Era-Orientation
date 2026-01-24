@@ -167,8 +167,9 @@ export default function AdminAnalyticsPage() {
                 <Card className="p-6">
                     <h3 className="font-semibold text-foreground mb-4">Người dùng hoạt động hàng ngày</h3>
                     <div className="h-48 flex items-end gap-2">
-                        {data.engagementMetrics.dailyActiveUsers.map((day, i) => {
-                            const maxCount = Math.max(...data.engagementMetrics.dailyActiveUsers.map(d => d.count));
+                        {(data.engagementMetrics?.dailyActiveUsers ?? []).map((day, i) => {
+                            const dau = data.engagementMetrics?.dailyActiveUsers ?? [];
+                            const maxCount = Math.max(...dau.map(d => d.count), 1);
                             const height = maxCount > 0 ? (day.count / maxCount) * 100 : 0;
                             return (
                                 <div key={i} className="flex-1 flex flex-col items-center gap-2">
@@ -190,6 +191,9 @@ export default function AdminAnalyticsPage() {
                                 </div>
                             );
                         })}
+                        {(!data.engagementMetrics?.dailyActiveUsers || data.engagementMetrics.dailyActiveUsers.length === 0) && (
+                            <p className="text-center text-muted-foreground w-full py-12">Chưa có dữ liệu</p>
+                        )}
                     </div>
                 </Card>
 
@@ -197,8 +201,8 @@ export default function AdminAnalyticsPage() {
                 <Card className="p-6">
                     <h3 className="font-semibold text-foreground mb-4">Phân bố điểm số</h3>
                     <div className="space-y-3">
-                        {data.performanceMetrics.scoreDistribution.map((item) => {
-                            const total = data.performanceMetrics.totalAttempts;
+                        {(data.performanceMetrics?.scoreDistribution ?? []).map((item) => {
+                            const total = data.performanceMetrics?.totalAttempts ?? 0;
                             const percentage = total > 0 ? Math.round((item.count / total) * 100) : 0;
                             const colors: Record<string, string> = {
                                 "0-4": "bg-red-500",
@@ -221,6 +225,9 @@ export default function AdminAnalyticsPage() {
                                 </div>
                             );
                         })}
+                        {(!data.performanceMetrics?.scoreDistribution || data.performanceMetrics.scoreDistribution.length === 0) && (
+                            <p className="text-center text-muted-foreground py-4">Chưa có dữ liệu</p>
+                        )}
                     </div>
                 </Card>
             </div>
@@ -295,7 +302,7 @@ export default function AdminAnalyticsPage() {
                 <Card className="p-6">
                     <h3 className="font-semibold text-foreground mb-4">🏆 Top học sinh xuất sắc</h3>
                     <div className="space-y-3">
-                        {data.topPerformers.slice(0, 5).map((performer, i) => (
+                        {(data.topPerformers ?? []).slice(0, 5).map((performer, i) => (
                             <div key={performer.userId} className="flex items-center gap-3">
                                 <span className={cn(
                                     "flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold",
@@ -313,6 +320,9 @@ export default function AdminAnalyticsPage() {
                                 <Badge variant="success">{performer.avgScore} điểm</Badge>
                             </div>
                         ))}
+                        {(!data.topPerformers || data.topPerformers.length === 0) && (
+                            <p className="text-center text-muted-foreground py-4">Chưa có dữ liệu</p>
+                        )}
                     </div>
                 </Card>
 
@@ -320,7 +330,7 @@ export default function AdminAnalyticsPage() {
                 <Card className="p-6">
                     <h3 className="font-semibold text-foreground mb-4">🔥 Đề thi phổ biến</h3>
                     <div className="space-y-3">
-                        {data.popularContent.slice(0, 5).map((exam, i) => (
+                        {(data.popularContent ?? []).slice(0, 5).map((exam, i) => (
                             <div key={exam.examId} className="flex items-center gap-3">
                                 <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary">
                                     {i + 1}
@@ -335,6 +345,9 @@ export default function AdminAnalyticsPage() {
                                 </div>
                             </div>
                         ))}
+                        {(!data.popularContent || data.popularContent.length === 0) && (
+                            <p className="text-center text-muted-foreground py-4">Chưa có dữ liệu</p>
+                        )}
                     </div>
                 </Card>
             </div>
@@ -343,8 +356,9 @@ export default function AdminAnalyticsPage() {
             <Card className="p-6">
                 <h3 className="font-semibold text-foreground mb-4">📈 Xu hướng tăng trưởng</h3>
                 <div className="h-64 flex items-end gap-1">
-                    {data.growthTrends.slice(-30).map((day, i) => {
-                        const maxAttempts = Math.max(...data.growthTrends.map(d => d.attempts));
+                    {(data.growthTrends ?? []).slice(-30).map((day, i) => {
+                        const trends = data.growthTrends ?? [];
+                        const maxAttempts = Math.max(...trends.map(d => d.attempts), 1);
                         const height = maxAttempts > 0 ? (day.attempts / maxAttempts) * 100 : 0;
                         return (
                             <div key={i} className="flex-1 flex flex-col items-center gap-1 group">
@@ -359,10 +373,13 @@ export default function AdminAnalyticsPage() {
                             </div>
                         );
                     })}
+                    {(!data.growthTrends || data.growthTrends.length === 0) && (
+                        <p className="text-center text-muted-foreground w-full py-12">Chưa có dữ liệu</p>
+                    )}
                 </div>
                 <div className="flex justify-between mt-2 text-xs text-muted-foreground">
-                    <span>{data.growthTrends[0]?.date}</span>
-                    <span>{data.growthTrends[data.growthTrends.length - 1]?.date}</span>
+                    <span>{data.growthTrends?.[0]?.date ?? ''}</span>
+                    <span>{data.growthTrends?.[data.growthTrends.length - 1]?.date ?? ''}</span>
                 </div>
             </Card>
         </div>

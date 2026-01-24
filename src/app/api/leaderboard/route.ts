@@ -11,6 +11,7 @@ export async function GET(request: NextRequest) {
     const range = searchParams.get("range") || "month";
     const category = searchParams.get("category") || "score";
     const limit = parseInt(searchParams.get("limit") || "50");
+    const subjectId = searchParams.get("subjectId");
 
     // Calculate date range
     const now = new Date();
@@ -28,14 +29,23 @@ export async function GET(request: NextRequest) {
     }
 
     try {
+        // Base filter conditions
+        const baseWhere: any = {
+            completedAt: {
+                gte: startDate,
+                not: null,
+            },
+        };
+
+        if (subjectId) {
+            baseWhere.exam = {
+                subjectId: subjectId,
+            };
+        }
+
         // Get all attempts in the date range grouped by user
         const attempts = await db.examAttempt.findMany({
-            where: {
-                completedAt: {
-                    gte: startDate,
-                    not: null,
-                },
-            },
+            where: baseWhere,
             include: {
                 user: {
                     select: {
@@ -85,13 +95,21 @@ export async function GET(request: NextRequest) {
         const userStreaks = new Map<string, number>();
 
         for (const [userId] of userStats) {
-            const userAttempts = await db.examAttempt.findMany({
-                where: {
-                    userId,
-                    completedAt: {
-                        not: null,
-                    },
+            const streakWhere: any = {
+                userId,
+                completedAt: {
+                    not: null,
                 },
+            };
+
+            if (subjectId) {
+                streakWhere.exam = {
+                    subjectId: subjectId,
+                };
+            }
+
+            const userAttempts = await db.examAttempt.findMany({
+                where: streakWhere,
                 select: {
                     completedAt: true,
                 },
