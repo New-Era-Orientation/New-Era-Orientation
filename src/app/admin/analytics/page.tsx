@@ -434,7 +434,7 @@ function ContentStatRow({
                 {icon && <span className="mr-2">{icon}</span>}
                 {label}
             </span>
-            <span className="font-semibold text-foreground">{value.toLocaleString()}</span>
+            <span className="font-semibold text-foreground">{(value ?? 0).toLocaleString()}</span>
         </div>
     );
 }

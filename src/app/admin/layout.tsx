@@ -23,6 +23,8 @@ const sidebarItems = [
   { href: '/admin/users', label: 'Người dùng', icon: Users },
   { href: '/admin/import-export', label: 'Import/Export', icon: Upload },
   { href: '/admin/analytics', label: 'Thống kê', icon: BarChart3 },
+  { href: '/admin/reports', label: 'Báo cáo', icon: FileText },
+  { href: '/admin/logs', label: 'Activity Logs', icon: BarChart3 },
   { href: '/admin/settings', label: 'Cài đặt', icon: Settings },
 ];
 
@@ -80,18 +82,17 @@ export default function AdminLayout({
         {/* Nav */}
         <nav className="flex-1 p-4 space-y-1">
           {sidebarItems.map((item) => {
-            const isActive = pathname === item.href || 
+            const isActive = pathname === item.href ||
               (item.href !== '/admin' && pathname.startsWith(item.href));
-            
+
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  isActive
+                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive
                     ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'
                     : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
-                }`}
+                  }`}
               >
                 <item.icon className="w-5 h-5" />
                 {item.label}
