@@ -1,13 +1,18 @@
 import type { CapacitorConfig } from "@capacitor/cli";
 
+// Set to true to bundle app locally, false to load from server
+const useLocalBundle = false;
+
 const config: CapacitorConfig = {
   appId: "vn.neoedu.app",
   appName: "NEO-EDU",
-  webDir: "out",
+  webDir: useLocalBundle ? "out" : undefined,
   server: {
-    // Production: comment out for standalone app
-    // url: "https://neo-edu.vercel.app",
-    // cleartext: true,
+    // Load from remote server (recommended for dynamic content)
+    ...(!useLocalBundle && {
+      url: "https://neo-edu.vercel.app",
+      cleartext: false,
+    }),
     androidScheme: "https",
   },
   plugins: {
