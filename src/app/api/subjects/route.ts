@@ -5,7 +5,13 @@ import { db } from "@/server/db";
 export async function GET() {
     try {
         const subjects = await db.subject.findMany({
-            include: {
+            select: {
+                id: true,
+                name: true,
+                slug: true,
+                description: true,
+                icon: true,
+                practiceMode: true,
                 school: {
                     select: {
                         id: true,
@@ -26,11 +32,15 @@ export async function GET() {
                                 name: true,
                                 slug: true,
                                 order: true,
+                                metadata: true,
+                                _count: {
+                                    select: { questions: true }
+                                }
                             },
                             orderBy: { order: "asc" },
                         },
                         _count: {
-                            select: { topics: true },
+                            select: { topics: true, questions: true },
                         },
                     },
                     orderBy: { order: "asc" },
@@ -45,6 +55,7 @@ export async function GET() {
             slug: subject.slug,
             description: subject.description,
             icon: subject.icon,
+            practiceMode: subject.practiceMode,
             school: subject.school,
             chapters: subject.chapters.map((chapter) => ({
                 id: chapter.id,
@@ -52,11 +63,14 @@ export async function GET() {
                 slug: chapter.slug,
                 description: chapter.description,
                 topicCount: chapter._count.topics,
+                questionCount: chapter._count.questions,
                 topics: chapter.topics.map(topic => ({
                     id: topic.id,
                     name: topic.name,
                     slug: topic.slug,
-                    order: topic.order
+                    order: topic.order,
+                    questionCount: topic._count.questions,
+                    metadata: topic.metadata as Record<string, unknown> | null,
                 }))
             })),
         }));

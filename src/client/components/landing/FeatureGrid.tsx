@@ -7,7 +7,7 @@ import { BookOpen, PenTool, Target, ArrowRight } from "lucide-react";
 const features = [
     {
         title: "Học tập thông minh",
-        description: "Ôn luyện kiến thức với sự hỗ trợ của AI, Video bài giảng và Flashcard.",
+        description: "Ôn luyện kiến thức với sự hỗ trợ của AI và Video bài giảng.",
         icon: BookOpen,
         color: "from-primary/20 to-cyan-500/20",
         iconColor: "text-primary bg-primary/10",
@@ -36,8 +36,8 @@ const features = [
 
 export function FeatureGrid() {
     return (
-        <section 
-            className="container mx-auto px-4 py-20" 
+        <section
+            className="container mx-auto px-4 py-20"
             aria-labelledby="features-section-title"
         >
             <h2 id="features-section-title" className="sr-only">Các tính năng chính</h2>
@@ -56,13 +56,13 @@ export function FeatureGrid() {
                             className="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-border bg-secondary/50 p-8 transition-all duration-300 hover:border-primary/30 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background"
                             aria-label={`${feature.title} - ${feature.description}`}
                         >
-                            <div 
-                                className={`absolute inset-0 bg-gradient-to-br ${feature.color} opacity-0 transition-opacity duration-300 group-hover:opacity-100`} 
-                                aria-hidden="true" 
+                            <div
+                                className={`absolute inset-0 bg-gradient-to-br ${feature.color} opacity-0 transition-opacity duration-300 group-hover:opacity-100`}
+                                aria-hidden="true"
                             />
 
                             <div className="relative z-10 flex-1">
-                                <div 
+                                <div
                                     className={`mb-4 inline-flex rounded-2xl p-3 transition-colors duration-200 ${feature.iconColor}`}
                                 >
                                     <feature.icon className="h-8 w-8" aria-hidden="true" />

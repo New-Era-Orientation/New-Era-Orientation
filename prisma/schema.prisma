@@ -214,6 +214,13 @@ model School {
 // STUDY CONTENT
 // ============================================
 
+// Practice mode for subjects
+enum PracticeMode {
+  CHAPTER      // Practice all questions in a chapter (Logistics, PLDC)
+  TOPIC        // Practice by topicId (Tin học THPT)
+  QUESTION_IDS // Practice by specific questionIds from topic metadata (Triết, Kinh tế...)
+}
+
 model Subject {
   id          String    @id @default(cuid())
   name        String
@@ -222,6 +229,9 @@ model Subject {
   description String?
   icon        String?
   order       Int       @default(0)
+  
+  // Practice configuration
+  practiceMode PracticeMode @default(QUESTION_IDS)
 
   // Optional: Link to School (null = General/THPT subject)
   schoolId  String?

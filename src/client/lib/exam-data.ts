@@ -53,8 +53,10 @@ export interface ExamListResponse {
 }
 
 export interface ExamSubmitRequest {
-    answers: Record<string, string>;
-    timeSpent: number;
+    answers: Record<string, string | Record<string, boolean>>;
+    duration: number;
+    track?: "COMMON" | "COMPUTER_SCIENCE" | "APPLIED_INFORMATICS";
+    startedAt?: string;
 }
 
 export interface ExamSubmitResponse {

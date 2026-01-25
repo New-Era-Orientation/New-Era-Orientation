@@ -44,10 +44,23 @@ const examSchema = z.object({
   parts: z.array(partSchema),
 });
 
+// Resolved mappings from the analyze step
+const resolvedMappingsSchema = z.object({
+  provinceId: z.number().optional(),
+  schoolId: z.string().optional(),
+  subjectId: z.string().optional(),
+  createSchool: z.object({
+    name: z.string(),
+    provinceId: z.number(),
+  }).optional(),
+}).optional();
+
 const importSchema = z.object({
   exam: examSchema.optional(),
   examId: z.string().optional(), // For adding to existing exam's JSON parts
+  resolvedMappings: resolvedMappingsSchema,
 });
+
 
 // Helper to generate unique IDs for JSON structure
 function generateId(): string {
@@ -71,7 +84,7 @@ export async function POST(request: NextRequest) {
 
     if (!validation.success) {
       return NextResponse.json(
-        { 
+        {
           error: 'Invalid import format',
           details: validation.error.issues,
         },
@@ -79,7 +92,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { exam, examId } = validation.data;
+    const { exam, examId, resolvedMappings } = validation.data;
     const errors: string[] = [];
     let importedCount = 0;
 
@@ -98,7 +111,7 @@ export async function POST(request: NextRequest) {
       const processedParts = exam.parts.map((part, partIndex) => {
         const questions = part.questions.map((q, qIndex) => {
           importedCount++;
-          
+
           // Validate question has proper data
           if (q.type === 'MULTIPLE_CHOICE' && (!q.choices || q.choices.length === 0)) {
             errors.push(`Câu hỏi "${q.content.substring(0, 30)}..." thiếu choices`);
@@ -134,6 +147,18 @@ export async function POST(request: NextRequest) {
         };
       });
 
+      // Handle school creation if needed
+      let finalSchoolId = resolvedMappings?.schoolId;
+      if (resolvedMappings?.createSchool) {
+        const newSchool = await db.school.create({
+          data: {
+            name: resolvedMappings.createSchool.name,
+            provinceId: resolvedMappings.createSchool.provinceId,
+          },
+        });
+        finalSchoolId = newSchool.id;
+      }
+
       // Create exam with parts stored as JSON
       const createdExam = await db.exam.create({
         data: {
@@ -143,10 +168,13 @@ export async function POST(request: NextRequest) {
           duration: exam.duration,
           year: exam.year || new Date().getFullYear(),
           source: exam.source || 'Imported',
-          subject: exam.subject || null,
+          subjectId: resolvedMappings?.subjectId || '',
+          provinceId: resolvedMappings?.provinceId,
+          schoolId: finalSchoolId,
           type: (exam.type as ExamType) || ExamType.STANDARD,
           published: false,
           parts: processedParts,
+          createdBy: session.user.id,
         },
       });
 
@@ -217,7 +245,7 @@ export async function POST(request: NextRequest) {
 
       // Merge and update
       const updatedParts = [...existingParts, ...newParts] as Prisma.InputJsonValue;
-      
+
       await db.exam.update({
         where: { id: examId },
         data: { parts: updatedParts },

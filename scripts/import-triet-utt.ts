@@ -4,10 +4,24 @@
  */
 
 import { PrismaClient, DifficultyLevel } from "@prisma/client";
+import { Pool } from "pg";
+import { PrismaPg } from "@prisma/adapter-pg";
 import * as fs from "fs";
 import * as path from "path";
+import "dotenv/config";
 
-const prisma = new PrismaClient();
+// Create Prisma client with pg adapter (same as db.ts)
+function createPrismaClient() {
+    const connectionString = process.env.DATABASE_URL;
+    const pool = new Pool({
+        connectionString,
+        ssl: { rejectUnauthorized: false }
+    });
+    const adapter = new PrismaPg(pool);
+    return new PrismaClient({ adapter });
+}
+
+const prisma = createPrismaClient();
 
 // Path to triet-utt project
 const TRIET_UTT_PATH = "C:/Users/eleven/triet-utt";
@@ -247,7 +261,6 @@ async function importChapterQuestions(filePath: string, subjectId: string, chapt
                     isShuffleable: !q.noShuffle,
                     options: {
                         create: q.options.map((opt, idx) => ({
-                            label: opt.id,
                             content: opt.content,
                             isCorrect: idx === correctIndex,
                             order: idx,

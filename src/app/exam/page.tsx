@@ -9,6 +9,7 @@ import Link from "next/link";
 import { Input } from "@/client/components/ui/Input";
 import { Badge } from "@/client/components/ui/Badge";
 import { useSubject } from "@/client/contexts/SubjectContext";
+import { SubjectPicker } from "@/client/components/ui/SubjectPicker";
 
 export default function ExamPage() {
     const { selectedSubjectId, isLoading: isSubjectLoading } = useSubject();
@@ -69,10 +70,13 @@ export default function ExamPage() {
             <main className="container mx-auto p-6 lg:p-10">
                 {/* Header */}
                 <section className="mb-10" aria-labelledby="exam-heading">
-                    <h1 id="exam-heading" className="text-4xl font-bold text-foreground">
-                        Kho đề thi
-                    </h1>
-                    <p className="mt-2 text-lg text-muted-foreground">
+                    <div className="flex items-center justify-between mb-4">
+                        <h1 id="exam-heading" className="text-4xl font-bold text-foreground">
+                            📝 Kho đề thi
+                        </h1>
+                        <SubjectPicker />
+                    </div>
+                    <p className="text-lg text-muted-foreground">
                         Luyện thi với đề thi thực tế từ các kỳ thi chính thức
                     </p>
 

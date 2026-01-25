@@ -18,12 +18,12 @@ export default function OfflinePage() {
                     Không có kết nối mạng
                 </h1>
                 <p className="text-muted-foreground mb-6">
-                    Vui lòng kiểm tra kết nối internet và thử lại. 
+                    Vui lòng kiểm tra kết nối internet và thử lại.
                     Một số nội dung đã được lưu offline có thể vẫn truy cập được.
                 </p>
 
-                <Button 
-                    onClick={() => window.location.reload()} 
+                <Button
+                    onClick={() => window.location.reload()}
                     className="w-full"
                 >
                     <RefreshCw className="h-4 w-4 mr-2" />
@@ -39,7 +39,7 @@ export default function OfflinePage() {
                         </li>
                         <li className="flex items-center gap-2">
                             <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                            Ôn tập flashcards đã lưu
+                            Ôn tập câu hỏi đã lưu
                         </li>
                         <li className="flex items-center gap-2">
                             <span className="w-1.5 h-1.5 rounded-full bg-green-500" />

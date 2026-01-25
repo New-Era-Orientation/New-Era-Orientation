@@ -145,14 +145,14 @@ export function QuickActions() {
     if (loading) {
         return (
             <section aria-labelledby="quick-actions-heading">
-                <h2 id="quick-actions-heading" className="mb-6 text-2xl font-bold text-foreground">
+                <h2 id="quick-actions-heading" className="mb-4 md:mb-6 text-lg md:text-2xl font-bold text-foreground">
                     Hành động nhanh
                 </h2>
-                <div className="grid gap-6 md:grid-cols-3">
+                <div className="grid grid-cols-3 gap-2 md:gap-6">
                     {[1, 2, 3].map((i) => (
                         <Card key={i} className="h-full">
-                            <CardContent className="p-6 flex items-center justify-center min-h-[150px]">
-                                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                            <CardContent className="p-3 md:p-6 flex items-center justify-center min-h-[100px] md:min-h-[150px]">
+                                <Loader2 className="h-5 w-5 md:h-6 md:w-6 animate-spin text-muted-foreground" />
                             </CardContent>
                         </Card>
                     ))}
@@ -165,10 +165,10 @@ export function QuickActions() {
 
     return (
         <section aria-labelledby="quick-actions-heading">
-            <h2 id="quick-actions-heading" className="mb-6 text-2xl font-bold text-foreground">
+            <h2 id="quick-actions-heading" className="mb-4 md:mb-6 text-lg md:text-2xl font-bold text-foreground">
                 Hành động nhanh
             </h2>
-            <div className="grid gap-6 md:grid-cols-3">
+            <div className="grid grid-cols-3 gap-2 md:gap-6">
                 {quickActions.map((action, index) => (
                     <Link
                         key={index}
@@ -176,24 +176,24 @@ export function QuickActions() {
                         className="group block"
                     >
                         <Card className="h-full cursor-pointer hover:shadow-lg transition-all duration-200 hover:border-primary/50">
-                            <CardContent className="p-6">
-                                <div className="flex items-start justify-between mb-4">
-                                    <div className={cn("rounded-xl p-3 transition-colors", action.bg, action.color)}>
-                                        <action.icon className="h-6 w-6" aria-hidden="true" />
+                            <CardContent className="p-3 md:p-6">
+                                <div className="flex flex-col md:flex-row items-center md:items-start md:justify-between mb-2 md:mb-4">
+                                    <div className={cn("rounded-lg md:rounded-xl p-2 md:p-3 transition-colors", action.bg, action.color)}>
+                                        <action.icon className="h-5 w-5 md:h-6 md:w-6" aria-hidden="true" />
                                     </div>
                                     {action.badge && (
-                                        <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-primary/10 text-primary">
+                                        <span className="mt-1 md:mt-0 inline-flex items-center rounded-full border px-1.5 md:px-2.5 py-0.5 text-[10px] md:text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-primary/10 text-primary">
                                             {action.badge}
                                         </span>
                                     )}
                                 </div>
 
-                                <h3 className="mb-2 text-xl font-bold text-foreground group-hover:text-primary transition-colors">
+                                <h3 className="mb-1 md:mb-2 text-sm md:text-xl font-bold text-foreground group-hover:text-primary transition-colors text-center md:text-left">
                                     {action.title}
                                 </h3>
-                                <p className="text-sm text-muted-foreground mb-4 line-clamp-1">{action.description}</p>
+                                <p className="text-[10px] md:text-sm text-muted-foreground mb-2 md:mb-4 line-clamp-1 text-center md:text-left hidden md:block">{action.description}</p>
 
-                                <div className="flex items-center gap-1 text-sm font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity translate-y-2 group-hover:translate-y-0 duration-200">
+                                <div className="hidden md:flex items-center gap-1 text-sm font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity translate-y-2 group-hover:translate-y-0 duration-200">
                                     <span>Bắt đầu</span>
                                     <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
                                 </div>

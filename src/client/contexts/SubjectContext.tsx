@@ -1,28 +1,43 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from "react";
+import { createContext, useContext, useState, useEffect, ReactNode, useMemo } from "react";
 import { useSession } from "next-auth/react";
 
-interface SubjectInfo {
+// --- Types ---
+export type PracticeMode = "CHAPTER" | "TOPIC" | "QUESTION_IDS";
+
+export interface TopicInfo {
+    id: string;
+    name: string;
+    slug: string;
+    order: number;
+    description?: string | null;
+    questionCount?: number;
+    metadata?: {
+        questionIds?: Record<string, number[]>;
+        [key: string]: unknown;
+    } | null;
+}
+
+export interface ChapterInfo {
+    id: string;
+    name: string;
+    slug: string;
+    description: string | null;
+    topicCount: number;
+    questionCount?: number;
+    topics: TopicInfo[];
+}
+
+export interface SubjectInfo {
     id: string;
     name: string;
     slug: string;
     description: string | null;
     icon: string | null;
+    practiceMode: PracticeMode;
     school: { id: string; name: string; code: string | null } | null;
-    chapters: {
-        id: string;
-        name: string;
-        slug: string;
-        description: string | null;
-        topicCount: number;
-        topics: {
-            id: string;
-            name: string;
-            slug: string;
-            order: number;
-        }[];
-    }[];
+    chapters: ChapterInfo[];
 }
 
 interface SubjectContextType {
@@ -31,106 +46,71 @@ interface SubjectContextType {
     subjects: SubjectInfo[];
     setSelectedSubjectId: (id: string) => void;
     isLoading: boolean;
+    error: string | null;
 }
 
+// --- Context ---
 const SubjectContext = createContext<SubjectContextType | undefined>(undefined);
 
 export function SubjectProvider({ children }: { children: ReactNode }) {
     const { data: session } = useSession();
-    const [selectedSubjectId, setSelectedSubjectIdState] = useState<string | null>(null);
     const [subjects, setSubjects] = useState<SubjectInfo[]>([]);
+    const [selectedSubjectId, setSelectedSubjectId] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
+    // Fetch subjects on mount
     useEffect(() => {
-        const fetchData = async () => {
+        const fetchSubjects = async () => {
             try {
-                // Fetch subjects
-                const subjectsRes = await fetch("/api/subjects");
-                let fetchedSubjects: SubjectInfo[] = [];
-                if (subjectsRes.ok) {
-                    const data = await subjectsRes.json();
-                    fetchedSubjects = data.data || [];
-                    setSubjects(fetchedSubjects);
-                }
+                setIsLoading(true);
+                const res = await fetch("/api/subjects");
+                if (!res.ok) throw new Error("Failed to fetch subjects");
+                const json = await res.json();
 
-                // Determine selected subject
-                let subjectIdToSet: string | null = null;
+                if (json.success) {
+                    setSubjects(json.data);
 
-                // 1. Try URL param (if any - though usually handled by page)
-
-                // 2. Try API settings (Logged in user)
-                try {
-                    const settingsRes = await fetch("/api/settings");
-                    if (settingsRes.ok) {
-                        const data = await settingsRes.json();
-                        if (data.settings?.selectedSubjectId) {
-                            subjectIdToSet = data.settings.selectedSubjectId;
-                        }
+                    // Restore selection from localStorage or default to first
+                    const savedId = localStorage.getItem("neo_selected_subject_id");
+                    if (savedId && json.data.some((s: SubjectInfo) => s.id === savedId)) {
+                        setSelectedSubjectId(savedId);
+                    } else if (json.data.length > 0) {
+                        setSelectedSubjectId(json.data[0].id);
                     }
-                } catch (e) {
-                    // Ignore API error (guest)
+                } else {
+                    setError("Invalid response format");
                 }
-
-                // 3. Try LocalStorage (Guest / Fallback)
-                if (!subjectIdToSet) {
-                    const localId = localStorage.getItem("selectedSubjectId");
-                    if (localId) {
-                        // Verify it exists in fetched subjects
-                        if (fetchedSubjects.some(s => s.id === localId)) {
-                            subjectIdToSet = localId;
-                        }
-                    }
-                }
-
-                // 4. Default to "tin-hoc-thpt"
-                if (!subjectIdToSet) {
-                    const defaultSubject = fetchedSubjects.find((s: SubjectInfo) => s.slug === "tin-hoc-thpt");
-                    if (defaultSubject) {
-                        subjectIdToSet = defaultSubject.id;
-                    }
-                }
-
-                if (subjectIdToSet) {
-                    setSelectedSubjectIdState(subjectIdToSet);
-                }
-            } catch (error) {
-                console.error("SubjectContext: Failed to fetch data", error);
+            } catch (err) {
+                console.error("Subject fetch error:", err);
+                setError("Có lỗi khi tải danh sách môn học");
             } finally {
                 setIsLoading(false);
             }
         };
-        fetchData();
+
+        fetchSubjects();
     }, []);
 
-    const setSelectedSubjectId = useCallback(async (id: string) => {
-        setSelectedSubjectIdState(id);
+    // Save selection
+    const handleSetSubjectId = (id: string) => {
+        setSelectedSubjectId(id);
+        localStorage.setItem("neo_selected_subject_id", id);
+    };
 
-        // Persist to LocalStorage (Always)
-        localStorage.setItem("selectedSubjectId", id);
-
-        // Persist to API (Only if logged in)
-        if (session?.user) {
-            try {
-                await fetch("/api/settings", {
-                    method: "PUT",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ selectedSubjectId: id }),
-                });
-            } catch (error) {
-                // Network error - acceptable
-            }
-        }
-    }, [session]);
-
-    const selectedSubject = subjects.find(s => s.id === selectedSubjectId) || null;
+    // Derived state
+    const selectedSubject = useMemo(() =>
+        subjects.find(s => s.id === selectedSubjectId) || null,
+        [subjects, selectedSubjectId]);
 
     return (
         <SubjectContext.Provider value={{
+            subjects,
             selectedSubjectId,
             selectedSubject,
-            subjects,
-            setSelectedSubjectId,
+            setSelectedSubjectId: handleSetSubjectId,
             isLoading,
+            error
         }}>
             {children}
         </SubjectContext.Provider>
@@ -139,8 +119,8 @@ export function SubjectProvider({ children }: { children: ReactNode }) {
 
 export function useSubject() {
     const context = useContext(SubjectContext);
-    if (!context) {
-        throw new Error("useSubject must be used within SubjectProvider");
+    if (context === undefined) {
+        throw new Error("useSubject must be used within a SubjectProvider");
     }
     return context;
 }

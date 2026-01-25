@@ -26,12 +26,10 @@ interface AdminAnalytics {
         subjects: number;
         chapters: number;
         topics: number;
-        flashcards: number;
     };
     engagementMetrics: {
         examAttempts: number;
         chatMessages: number;
-        flashcardReviews: number;
         avgAttemptsPerUser: number;
         dailyActiveUsers: { date: string; count: number }[];
     };
@@ -243,7 +241,6 @@ export default function AdminAnalyticsPage() {
                         <ContentStatRow label="Môn học" value={data.contentMetrics.subjects} />
                         <ContentStatRow label="Chương" value={data.contentMetrics.chapters} />
                         <ContentStatRow label="Chủ đề" value={data.contentMetrics.topics} />
-                        <ContentStatRow label="Thẻ flashcard" value={data.contentMetrics.flashcards} />
                     </div>
                 </Card>
 
@@ -280,12 +277,6 @@ export default function AdminAnalyticsPage() {
                         <ContentStatRow
                             label="Tin nhắn AI"
                             value={data.engagementMetrics.chatMessages}
-                            icon="🤖"
-                        />
-                        <ContentStatRow
-                            label="Flashcard đã ôn"
-                            value={data.engagementMetrics.flashcardReviews}
-                            icon="🃏"
                         />
                         <div className="pt-2 border-t border-border">
                             <p className="text-sm text-muted-foreground">

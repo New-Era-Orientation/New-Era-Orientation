@@ -20,6 +20,7 @@ import {
 import { cn } from "@/client/lib/utils";
 import Image from "next/image";
 import { useSubject } from "@/client/contexts/SubjectContext";
+import { SubjectPicker } from "@/client/components/ui/SubjectPicker";
 
 interface LeaderboardUser {
     rank: number;
@@ -119,49 +120,53 @@ export default function LeaderboardPage() {
                             <Trophy className="h-8 w-8 text-yellow-500" />
                         </div>
                         <div>
-                            <h1 className="text-3xl font-bold text-foreground">Bảng xếp hạng</h1>
+                            <h1 className="text-3xl font-bold text-foreground">🏆 Bảng xếp hạng</h1>
                             <p className="text-muted-foreground mt-1">
                                 Thi đua cùng {data?.totalParticipants || 0} học viên khác
                             </p>
                         </div>
                     </div>
 
-                    {/* Filters */}
-                    <div className="flex flex-col sm:flex-row gap-3 mt-4 md:mt-0">
-                        {/* Category Filter */}
-                        <div className="flex gap-1 p-1 rounded-lg bg-secondary">
-                            {(["score", "exams", "streak"] as const).map((cat) => (
-                                <button
-                                    key={cat}
-                                    onClick={() => setCategory(cat)}
-                                    className={cn(
-                                        "px-3 py-1.5 rounded-md text-sm font-medium transition-colors",
-                                        category === cat
-                                            ? "bg-background text-foreground shadow-sm"
-                                            : "text-muted-foreground hover:text-foreground"
-                                    )}
-                                >
-                                    {cat === "score" ? "Điểm" : cat === "exams" ? "Đề thi" : "Streak"}
-                                </button>
-                            ))}
-                        </div>
+                    <div className="flex items-center gap-3 mt-4 md:mt-0">
+                        <SubjectPicker />
 
-                        {/* Time Range Filter */}
-                        <div className="flex gap-1 p-1 rounded-lg bg-secondary">
-                            {(["week", "month", "all"] as const).map((range) => (
-                                <button
-                                    key={range}
-                                    onClick={() => setTimeRange(range)}
-                                    className={cn(
-                                        "px-3 py-1.5 rounded-md text-sm font-medium transition-colors",
-                                        timeRange === range
-                                            ? "bg-background text-foreground shadow-sm"
-                                            : "text-muted-foreground hover:text-foreground"
-                                    )}
-                                >
-                                    {range === "week" ? "Tuần" : range === "month" ? "Tháng" : "Tất cả"}
-                                </button>
-                            ))}
+                        {/* Filters */}
+                        <div className="flex flex-col sm:flex-row gap-3 mt-4 md:mt-0">
+                            {/* Category Filter */}
+                            <div className="flex gap-1 p-1 rounded-lg bg-secondary">
+                                {(["score", "exams", "streak"] as const).map((cat) => (
+                                    <button
+                                        key={cat}
+                                        onClick={() => setCategory(cat)}
+                                        className={cn(
+                                            "px-3 py-1.5 rounded-md text-sm font-medium transition-colors",
+                                            category === cat
+                                                ? "bg-background text-foreground shadow-sm"
+                                                : "text-muted-foreground hover:text-foreground"
+                                        )}
+                                    >
+                                        {cat === "score" ? "Điểm" : cat === "exams" ? "Đề thi" : "Streak"}
+                                    </button>
+                                ))}
+                            </div>
+
+                            {/* Time Range Filter */}
+                            <div className="flex gap-1 p-1 rounded-lg bg-secondary">
+                                {(["week", "month", "all"] as const).map((range) => (
+                                    <button
+                                        key={range}
+                                        onClick={() => setTimeRange(range)}
+                                        className={cn(
+                                            "px-3 py-1.5 rounded-md text-sm font-medium transition-colors",
+                                            timeRange === range
+                                                ? "bg-background text-foreground shadow-sm"
+                                                : "text-muted-foreground hover:text-foreground"
+                                        )}
+                                    >
+                                        {range === "week" ? "Tuần" : range === "month" ? "Tháng" : "Tất cả"}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
                     </div>
                 </div>
