@@ -79,11 +79,11 @@ export function StatsGrid() {
 
     if (loading) {
         return (
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            <div className="grid grid-cols-2 gap-3 md:gap-6 lg:grid-cols-4">
                 {[1, 2, 3, 4].map((i) => (
-                    <Card key={i} className="p-6">
-                        <div className="flex items-center justify-center h-20">
-                            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                    <Card key={i} className="p-3 md:p-6">
+                        <div className="flex items-center justify-center h-14 md:h-20">
+                            <Loader2 className="h-5 w-5 md:h-6 md:w-6 animate-spin text-muted-foreground" />
                         </div>
                     </Card>
                 ))}
@@ -92,34 +92,34 @@ export function StatsGrid() {
     }
 
     return (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4" role="list" aria-label="Thống kê học tập">
+        <div className="grid grid-cols-2 gap-3 md:gap-6 lg:grid-cols-4" role="list" aria-label="Thống kê học tập">
             {displayStats.map((stat, index) => (
                 <Card
                     key={index}
                     className="group cursor-pointer transition-all duration-200 hover:shadow-md hover:border-primary/20"
                     role="listitem"
                 >
-                    <div className="flex items-start justify-between p-6">
-                        <div className="flex-1">
-                            <p className="text-sm font-medium text-muted-foreground">{stat.label}</p>
-                            <p className="mt-2 text-3xl font-bold text-foreground">{stat.value}</p>
-                            <div className="mt-2 flex items-center gap-1">
+                    <div className="flex items-start justify-between p-3 md:p-6">
+                        <div className="flex-1 min-w-0">
+                            <p className="text-xs md:text-sm font-medium text-muted-foreground truncate">{stat.label}</p>
+                            <p className="mt-1 md:mt-2 text-xl md:text-3xl font-bold text-foreground">{stat.value}</p>
+                            <div className="mt-1 md:mt-2 flex items-center gap-1 flex-wrap">
                                 {stat.trend === "up" ? (
                                     <ArrowUp className="h-3 w-3 text-emerald-500" aria-hidden="true" />
                                 ) : (
                                     <ArrowDown className="h-3 w-3 text-destructive" aria-hidden="true" />
                                 )}
-                                <span className={`text-xs font-medium ${stat.trend === "up" ? "text-emerald-500" : "text-destructive"}`}>
+                                <span className={`text-[10px] md:text-xs font-medium ${stat.trend === "up" ? "text-emerald-500" : "text-destructive"}`}>
                                     {stat.change}
                                 </span>
-                                <span className="text-xs text-muted-foreground">{stat.changeLabel}</span>
+                                <span className="text-[10px] md:text-xs text-muted-foreground hidden sm:inline">{stat.changeLabel}</span>
                             </div>
                         </div>
                         <div
-                            className={`rounded-xl ${stat.bgColor} p-3 ${stat.color} transition-colors group-hover:brightness-110`}
+                            className={`rounded-lg md:rounded-xl ${stat.bgColor} p-2 md:p-3 ${stat.color} transition-colors group-hover:brightness-110`}
                             aria-hidden="true"
                         >
-                            <stat.icon className="h-6 w-6" />
+                            <stat.icon className="h-4 w-4 md:h-6 md:w-6" />
                         </div>
                     </div>
                 </Card>

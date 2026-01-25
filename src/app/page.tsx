@@ -1,9 +1,73 @@
+"use client";
+
 import Link from "next/link";
-import { ArrowRight, BookOpen, Target, Zap, Award, Users, TrendingUp, CheckCircle, Star, Quote } from "lucide-react";
+import { ArrowRight, BookOpen, Target, Award, Users, TrendingUp, CheckCircle, Quote, GraduationCap, Building2 } from "lucide-react";
 import { buttonVariants } from "@/client/lib/button-variants";
 import { cn } from "@/client/lib/utils";
+import { useEffect, useState } from "react";
+
+interface StatsData {
+    totalUsers: number;
+    totalExams: number;
+    totalAttempts: number;
+    passRate: number;
+}
+
+interface SubjectData {
+    id: string;
+    name: string;
+    slug: string;
+    description: string | null;
+    icon: string | null;
+    school: { id: string; name: string; code: string | null } | null;
+    chapters: { id: string; name: string }[];
+}
+
+function formatNumber(num: number): string {
+    if (num >= 1000) {
+        return `${(num / 1000).toFixed(num >= 10000 ? 0 : 1)}k+`;
+    }
+    return `${num}+`;
+}
 
 export default function HomePage() {
+    const [stats, setStats] = useState<StatsData | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [universitySubjects, setUniversitySubjects] = useState<SubjectData[]>([]);
+
+    useEffect(() => {
+        async function fetchStats() {
+            try {
+                const res = await fetch("/api/stats");
+                const json = await res.json();
+                if (json.success) {
+                    setStats(json.data);
+                }
+            } catch (error) {
+                console.error("Failed to fetch stats:", error);
+            } finally {
+                setLoading(false);
+            }
+        }
+        
+        async function fetchSubjects() {
+            try {
+                const res = await fetch("/api/subjects");
+                const json = await res.json();
+                if (json.success && json.data) {
+                    // Filter subjects that belong to a school (university subjects)
+                    const uniSubjects = json.data.filter((s: SubjectData) => s.school !== null);
+                    setUniversitySubjects(uniSubjects);
+                }
+            } catch (error) {
+                console.error("Failed to fetch subjects:", error);
+            }
+        }
+        
+        fetchStats();
+        fetchSubjects();
+    }, []);
+
     const features = [
         {
             icon: BookOpen,
@@ -28,24 +92,35 @@ export default function HomePage() {
         },
     ];
 
-    const stats = [
-        { value: "10,000+", label: "Học viên", icon: Users },
-        { value: "500+", label: "Đề thi", icon: BookOpen },
-        { value: "95%", label: "Hài lòng", icon: Star },
-        { value: "24/7", label: "Hỗ trợ", icon: Zap },
+    const displayStats = [
+        {
+            value: loading ? "..." : formatNumber(stats?.totalUsers || 0),
+            label: "Học viên",
+            icon: Users
+        },
+        {
+            value: loading ? "..." : formatNumber(stats?.totalExams || 0),
+            label: "Đề thi",
+            icon: BookOpen
+        },
+        {
+            value: loading ? "..." : `${stats?.passRate || 0}%`,
+            label: "Đạt yêu cầu",
+            icon: TrendingUp
+        },
     ];
 
     const testimonials = [
         {
             name: "Nguyễn Văn A",
             role: "Học sinh THPT",
-            content: "NEO Edu đã giúp tôi đạt điểm cao trong kỳ thi HSG. Hệ thống đề thi rất sát với thực tế!",
+            content: "NEO Education đã giúp tôi đạt điểm cao trong kỳ thi HSG. Hệ thống đề thi rất sát với thực tế!",
             avatar: "A",
         },
         {
             name: "Trần Thị B",
             role: "Sinh viên Đại học",
-            content: "Giao diện đẹp, dễ sử dụng. Tôi có thể học bất cứ lúc nào, ở đâu với NEO Edu.",
+            content: "Giao diện đẹp, dễ sử dụng. Tôi có thể học bất cứ lúc nào, ở đâu với NEO Education.",
             avatar: "B",
         },
         {
@@ -80,11 +155,6 @@ export default function HomePage() {
                 </div>
 
                 <div className="mx-auto max-w-4xl text-center fade-in-up" id="main-content">
-                    {/* Badge */}
-                    <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-sm font-medium text-primary backdrop-blur-sm animate-accordion-down">
-                        <Zap className="h-4 w-4" aria-hidden="true" />
-                        <span>Nền tảng học tập thông minh #1 Việt Nam</span>
-                    </div>
 
                     {/* Heading */}
                     <h1 id="hero-heading" className="mb-6 text-5xl font-bold tracking-tight text-foreground lg:text-7xl">
@@ -93,7 +163,7 @@ export default function HomePage() {
                             Tri thức
                         </span>
                         <br />
-                        cùng NEO Edu
+                        cùng NEO Education
                     </h1>
 
                     {/* Description */}
@@ -141,10 +211,10 @@ export default function HomePage() {
 
             {/* Stats Section */}
             <section className="border-y border-border bg-secondary/30 px-6 py-16 backdrop-blur-sm" aria-labelledby="stats-heading">
-                <h2 id="stats-heading" className="sr-only">Thống kê NEO Edu</h2>
+                <h2 id="stats-heading" className="sr-only">Thống kê NEO Education</h2>
                 <div className="mx-auto max-w-6xl">
                     <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
-                        {stats.map((stat, index) => (
+                        {displayStats.map((stat, index) => (
                             <div
                                 key={index}
                                 className="group text-center cursor-pointer transition-colors duration-200"
@@ -152,7 +222,12 @@ export default function HomePage() {
                                 <div className="mx-auto mb-3 inline-flex rounded-xl bg-primary/10 p-3 text-primary group-hover:bg-primary/20 transition-colors">
                                     <stat.icon className="h-6 w-6" aria-hidden="true" />
                                 </div>
-                                <div className="mb-1 text-4xl font-bold text-foreground">{stat.value}</div>
+                                <div className={cn(
+                                    "mb-1 text-4xl font-bold text-foreground transition-opacity",
+                                    loading && "animate-pulse"
+                                )}>
+                                    {stat.value}
+                                </div>
                                 <div className="text-sm text-muted-foreground">{stat.label}</div>
                             </div>
                         ))}
@@ -229,6 +304,87 @@ export default function HomePage() {
                 </div>
             </section>
 
+            {/* University Subjects Section */}
+            {universitySubjects.length > 0 && (
+                <section className="px-6 py-20 lg:px-8 lg:py-28" aria-labelledby="university-heading">
+                    <div className="mx-auto max-w-6xl">
+                        <div className="mb-16 text-center">
+                            <div className="mx-auto mb-4 inline-flex rounded-xl bg-purple-500/10 p-3 text-purple-400">
+                                <GraduationCap className="h-8 w-8" aria-hidden="true" />
+                            </div>
+                            <h2 id="university-heading" className="mb-4 text-4xl font-bold text-foreground">
+                                Môn học Đại học
+                            </h2>
+                            <p className="text-xl text-muted-foreground">
+                                Ôn tập các môn đại cương tại các trường Đại học
+                            </p>
+                        </div>
+
+                        {/* Group by school */}
+                        {(() => {
+                            const schoolGroups = universitySubjects.reduce((acc, subject) => {
+                                const schoolName = subject.school?.name || "Khác";
+                                const schoolCode = subject.school?.code || "";
+                                const key = `${schoolName}|||${schoolCode}`;
+                                if (!acc[key]) acc[key] = [];
+                                acc[key].push(subject);
+                                return acc;
+                            }, {} as Record<string, SubjectData[]>);
+
+                            return Object.entries(schoolGroups).map(([key, subjects]) => {
+                                const [schoolName, schoolCode] = key.split("|||");
+                                return (
+                                    <div key={key} className="mb-12">
+                                        <div className="flex items-center gap-3 mb-6">
+                                            <Building2 className="h-6 w-6 text-primary" aria-hidden="true" />
+                                            <h3 className="text-2xl font-bold text-foreground">
+                                                {schoolName}
+                                                {schoolCode && (
+                                                    <span className="ml-2 text-sm font-normal text-muted-foreground">
+                                                        ({schoolCode})
+                                                    </span>
+                                                )}
+                                            </h3>
+                                        </div>
+                                        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                                            {subjects.map((subject) => (
+                                                <Link
+                                                    key={subject.id}
+                                                    href={`/study?subject=${subject.slug}`}
+                                                    className="glass-panel group relative overflow-hidden rounded-2xl p-6 cursor-pointer hover:shadow-xl hover:border-primary/30 transition-all duration-200"
+                                                >
+                                                    <div className="flex items-start gap-4">
+                                                        <div className="text-4xl">{subject.icon || "📚"}</div>
+                                                        <div className="flex-1">
+                                                            <h4 className="text-lg font-bold text-foreground group-hover:text-primary transition-colors">
+                                                                {subject.name}
+                                                            </h4>
+                                                            <p className="text-sm text-muted-foreground mt-1">
+                                                                {subject.chapters.length} chương
+                                                            </p>
+                                                        </div>
+                                                        <ArrowRight className="h-5 w-5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true" />
+                                                    </div>
+                                                </Link>
+                                            ))}
+                                        </div>
+                                    </div>
+                                );
+                            });
+                        })()}
+
+                        <div className="text-center mt-8">
+                            <Link
+                                href="/settings"
+                                className={cn(buttonVariants({ variant: "outline", size: "lg" }))}
+                            >
+                                Xem tất cả môn học
+                            </Link>
+                        </div>
+                    </div>
+                </section>
+            )}
+
             {/* Testimonials Section */}
             <section className="px-6 py-20 lg:px-8 lg:py-28" aria-labelledby="testimonials-heading">
                 <div className="mx-auto max-w-6xl">
@@ -237,7 +393,7 @@ export default function HomePage() {
                             Học viên nói gì về chúng tôi
                         </h2>
                         <p className="text-xl text-muted-foreground">
-                            Hàng ngàn học viên đã thành công cùng NEO Edu
+                            Hàng ngàn học viên đã tin tưởng NEO Education
                         </p>
                     </div>
 
@@ -305,10 +461,10 @@ export default function HomePage() {
             <footer className="border-t border-border bg-card/50 px-6 py-12">
                 <div className="mx-auto max-w-6xl text-center">
                     <div className="mb-4 text-2xl font-bold text-foreground">
-                        NEO <span className="text-primary">Edu</span>
+                        NEO <span className="text-primary">Education</span>
                     </div>
                     <p className="text-muted-foreground">
-                        © 2026 NEO Edu. Nền tảng học tập thông minh.
+                        © 2026 NEO Education. Nền tảng học tập thông minh.
                     </p>
                 </div>
             </footer>

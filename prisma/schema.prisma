@@ -1,4 +1,4 @@
-// Prisma Schema for NEO-EDU Production
+// Prisma Schema for NEO-EDU Production (Remade)
 generator client {
   provider = "prisma-client-js"
 }
@@ -21,32 +21,40 @@ model User {
   role          Role      @default(STUDENT)
   bio           String?
   settings      Json?
-  
+
   accounts      Account[]
   sessions      Session[]
   progress      UserProgress[]
   examAttempts  ExamAttempt[]
   bookmarks     Bookmark[]
-  
+
   // Gamification
   achievements  UserAchievement[]
   streak        UserStreak?
   notifications Notification[]
-  
+
   // AI Chat
   chatConversations ChatConversation[]
   aiUsage           AIUsage[]
-  
+
   // Push Notifications
   pushSubscriptions PushSubscription[]
-  
+
   // Analytics
-  analytics         UserAnalytics?
-  dailyStats        DailyStats[]
-  
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  
+  analytics    UserAnalytics?
+  dailyStats   DailyStats[]
+
+  // Content Ownership
+  createdQuestions Question[]      @relation("QuestionCreator")
+  updatedQuestions Question[]      @relation("QuestionUpdater")
+  createdExams     Exam[]          @relation("ExamCreator")
+  updatedExams     Exam[]          @relation("ExamUpdater")
+  createdGroups    QuestionGroup[] @relation("GroupCreator")
+  importBatches    ImportBatch[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@map("users")
 }
 
@@ -121,18 +129,17 @@ model EmailVerificationToken {
   @@map("email_verification_tokens")
 }
 
-// AI Usage Tracking
 model AIUsage {
   id        String   @id @default(cuid())
   userId    String
-  provider  String   // gemini, openai
-  model     String   // gemini-1.5-flash, gpt-4o-mini
-  feature   String   // chat, question_generation, recommendations
-  tokens    Int      // estimated tokens used
-  cost      Float    @default(0) // estimated cost in USD
+  provider  String
+  model     String
+  feature   String
+  tokens    Int
+  cost      Float    @default(0)
   createdAt DateTime @default(now())
 
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([createdAt])
@@ -140,99 +147,294 @@ model AIUsage {
 }
 
 // ============================================
+// SYSTEM & META
+// ============================================
+
+model SystemLog {
+  id        String   @id @default(cuid())
+  level     String   // INFO, WARN, ERROR
+  action    String   // LOGIN, SUBMIT_EXAM, IMPORT_QUESTIONS
+  message   String
+  metadata  Json?
+  userId    String?
+  createdAt DateTime @default(now())
+
+  @@index([level])
+  @@index([action])
+  @@map("system_logs")
+}
+
+model ImportBatch {
+  id        String   @id @default(cuid())
+  filename  String
+  status    String   // COMPLETED, FAILED, PENDING
+  itemCount Int      @default(0)
+
+  creatorId String
+  creator   User   @relation(fields: [creatorId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@map("import_batches")
+}
+
+// ============================================
+// GEOGRAPHIC DATA
+// ============================================
+
+model Province {
+  id    Int    @id
+  name  String
+
+  schools School[]
+  exams   Exam[]
+
+  @@map("provinces")
+}
+
+model School {
+  id         String   @id @default(cuid())
+  name       String
+  code       String?  // Mã trường (nếu có)
+  provinceId Int
+  province   Province @relation(fields: [provinceId], references: [id])
+
+  exams    Exam[]
+  subjects Subject[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([provinceId, name])
+  @@index([provinceId])
+  @@map("schools")
+}
+
+// ============================================
 // STUDY CONTENT
 // ============================================
+
+// Practice mode for subjects
+enum PracticeMode {
+  CHAPTER      // Practice all questions in a chapter (Logistics, PLDC)
+  TOPIC        // Practice by topicId (Tin học THPT)
+  QUESTION_IDS // Practice by specific questionIds from topic metadata (Triết, Kinh tế...)
+}
 
 model Subject {
   id          String    @id @default(cuid())
   name        String
   slug        String    @unique
+  code        String?   @unique
   description String?
   icon        String?
   order       Int       @default(0)
   
-  chapters    Chapter[]
-  
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  
+  // Practice configuration
+  practiceMode PracticeMode @default(QUESTION_IDS)
+
+  // Optional: Link to School (null = General/THPT subject)
+  schoolId  String?
+  school    School?   @relation(fields: [schoolId], references: [id])
+
+  chapters  Chapter[]
+  questions Question[]
+  exams     Exam[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([schoolId])
   @@map("subjects")
 }
 
 model Chapter {
-  id          String    @id @default(cuid())
+  id          String  @id @default(cuid())
   subjectId   String
-  subject     Subject   @relation(fields: [subjectId], references: [id], onDelete: Cascade)
-  
+  subject     Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
   name        String
   slug        String
   description String?
-  order       Int       @default(0)
-  
-  topics      Topic[]
-  
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  
+  order       Int     @default(0)
+
+  topics Topic[]
+  questions Question[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@unique([subjectId, slug])
   @@map("chapters")
 }
 
 model Topic {
-  id          String    @id @default(cuid())
-  chapterId   String
-  chapter     Chapter   @relation(fields: [chapterId], references: [id], onDelete: Cascade)
-  
-  name        String
-  slug        String
-  content     String
-  videoUrl    String?
-  duration    Int?
-  order       Int       @default(0)
-  
-  progress    UserProgress[]
-  bookmarks   Bookmark[]
-  
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  
+  id        String  @id @default(cuid())
+  chapterId String
+  chapter   Chapter @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+
+  name     String
+  slug     String
+  content  String
+  metadata Json?
+  videoUrl String?
+  duration Int?
+  order    Int     @default(0)
+
+  progress  UserProgress[]
+  bookmarks Bookmark[]
+  questions Question[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@unique([chapterId, slug])
   @@map("topics")
 }
 
 model UserProgress {
-  id          String    @id @default(cuid())
-  userId      String
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  topicId     String
-  topic       Topic     @relation(fields: [topicId], references: [id], onDelete: Cascade)
-  
-  completed   Boolean   @default(false)
-  timeSpent   Int       @default(0)
-  lastAccess  DateTime  @default(now())
-  
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  topicId    String
+  topic      Topic    @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  completed  Boolean  @default(false)
+  timeSpent  Int      @default(0)
+  lastAccess DateTime @default(now())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
   @@unique([userId, topicId])
+  @@index([userId, completed])
   @@map("user_progress")
 }
 
 model Bookmark {
-  id          String    @id @default(cuid())
-  userId      String
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  topicId     String
-  topic       Topic     @relation(fields: [topicId], references: [id], onDelete: Cascade)
-  
-  note        String?
-  
-  createdAt   DateTime  @default(now())
-  
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  topicId   String
+  topic     Topic    @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  note      String?
+  createdAt DateTime @default(now())
+
   @@unique([userId, topicId])
   @@map("bookmarks")
+}
+
+// ============================================
+// QUESTION BANK SYSTEM
+// ============================================
+
+model QuestionType {
+  id            String  @id // MULTIPLE_CHOICE, TRUE_FALSE, SHORT_ANSWER
+  name          String  // "Trắc nghiệm", "Đúng/Sai", "Trả lời ngắn"
+  description   String?
+  scoringConfig Json? // { "1": 0.1, "2": 0.25, "3": 0.5, "4": 1.0 }
+
+  questions Question[]
+
+  @@map("question_types")
+}
+
+model QuestionGroup {
+  id      String   @id @default(cuid())
+  content String   @db.Text
+  images  String[]
+
+  questions Question[]
+
+  createdBy String?
+  creator   User?   @relation(name: "GroupCreator", fields: [createdBy], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("question_groups")
+}
+
+model Question {
+  id          String   @id @default(cuid())
+  content     String   @db.Text
+  images      String[]
+  explanation String?  @db.Text
+
+  // Classification
+  typeId     String
+  type       QuestionType    @relation(fields: [typeId], references: [id])
+  difficulty DifficultyLevel @default(MEDIUM)
+
+  // Grouping (for Reading Passages)
+  groupId String?
+  group   QuestionGroup? @relation(fields: [groupId], references: [id])
+
+  // Organization
+  subjectId    String
+  subject      Subject @relation(fields: [subjectId], references: [id])
+  chapterId    String?
+  chapter      Chapter? @relation(fields: [chapterId], references: [id])
+  topicId      String?
+  topic        Topic?   @relation(fields: [topicId], references: [id])
+  sourceExamId String?
+  sourceExam   Exam?   @relation(name: "SourceQuestions", fields: [sourceExamId], references: [id])
+
+  // Settings
+  isShuffleable Boolean @default(true)
+
+  // Statistics
+  stats QuestionStats?
+
+  // Relations
+  options QuestionOption[]
+  inExams ExamQuestion[]
+  tags    String[]
+
+  // Ownership
+  createdBy     String?
+  creator       User?   @relation(name: "QuestionCreator", fields: [createdBy], references: [id])
+  updatedBy     String?
+  lastUpdatedBy User?   @relation(name: "QuestionUpdater", fields: [updatedBy], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([subjectId])
+  @@index([typeId])
+  @@index([difficulty])
+  @@map("questions")
+}
+
+enum DifficultyLevel {
+  EASY
+  MEDIUM
+  HARD
+  EXPERT
+}
+
+model QuestionOption {
+  id          String   @id @default(cuid())
+  questionId  String
+  question    Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  content     String   @db.Text
+  image       String?
+  isCorrect   Boolean  @default(false)
+  explanation String?  @db.Text
+  order       Int      @default(0)
+
+  @@index([questionId])
+  @@map("question_options")
+}
+
+model QuestionStats {
+  id         String   @id @default(cuid())
+  questionId String   @unique
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  attempts   Int      @default(0)
+  correct    Int      @default(0)
+  wrong      Int      @default(0)
+  accuracy   Float    @default(0)
+  updatedAt  DateTime @updatedAt
+
+  @@map("question_stats")
 }
 
 // ============================================
@@ -244,22 +446,38 @@ model Exam {
   title       String
   slug        String    @unique
   description String?
-  subject     String?
-  
-  year        Int
-  source      String
+  year        Int?
+  source      String?
   type        ExamType  @default(STANDARD)
-  duration    Int
-  
-  parts       Json?     // Store exam parts with questions
-  questions   ExamQuestion[]
-  attempts    ExamAttempt[]
-  
+  duration    Int?
   published   Boolean   @default(false)
-  
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  
+
+  // Linkage
+  subjectId  String
+  subject    Subject   @relation(fields: [subjectId], references: [id])
+  provinceId Int?
+  province   Province? @relation(fields: [provinceId], references: [id])
+  schoolId   String?
+  school     School?   @relation(fields: [schoolId], references: [id])
+
+  // Structure
+  parts           Json?
+  sourceQuestions Question[] @relation("SourceQuestions")
+  questions       ExamQuestion[]
+  attempts        ExamAttempt[]
+
+  // Statistics
+  stats ExamStats?
+
+  // Ownership
+  createdBy     String?
+  creator       User?   @relation(name: "ExamCreator", fields: [createdBy], references: [id])
+  updatedBy     String?
+  lastUpdatedBy User?   @relation(name: "ExamUpdater", fields: [updatedBy], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@map("exams")
 }
 
@@ -269,59 +487,28 @@ enum ExamType {
   MOCK
 }
 
-model Question {
-  id            String        @id @default(cuid())
-  content       String
-  type          QuestionType
-  track         QuestionTrack @default(COMMON)
-  
-  choices       String[]
-  correctAnswer String?
-  
-  subQuestions  SubQuestion[]
-  
-  exams         ExamQuestion[]
-  
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-  
-  @@map("questions")
-}
+model ExamStats {
+  id                String   @id @default(cuid())
+  examId            String   @unique
+  exam              Exam     @relation(fields: [examId], references: [id], onDelete: Cascade)
+  attempts          Int      @default(0)
+  averageScore      Float    @default(0)
+  difficulty        Float    @default(0)
+  gradeDistribution Json?
+  updatedAt         DateTime @updatedAt
 
-enum QuestionType {
-  MULTIPLE_CHOICE
-  TRUE_FALSE_GROUP
-}
-
-enum QuestionTrack {
-  COMMON
-  COMPUTER_SCIENCE
-  APPLIED_INFORMATICS
-}
-
-model SubQuestion {
-  id          String    @id @default(cuid())
-  questionId  String
-  question    Question  @relation(fields: [questionId], references: [id], onDelete: Cascade)
-  
-  content     String
-  isCorrect   Boolean
-  order       Int       @default(0)
-  
-  @@map("sub_questions")
+  @@map("exam_stats")
 }
 
 model ExamQuestion {
-  examId      String
-  exam        Exam      @relation(fields: [examId], references: [id], onDelete: Cascade)
-  
-  questionId  String
-  question    Question  @relation(fields: [questionId], references: [id], onDelete: Cascade)
-  
-  partNumber  Int
-  order       Int
-  points      Float
-  
+  examId     String
+  exam       Exam     @relation(fields: [examId], references: [id], onDelete: Cascade)
+  questionId String
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  partNumber Int      @default(1)
+  order      Int
+  points     Float
+
   @@id([examId, questionId])
   @@map("exam_questions")
 }
@@ -330,19 +517,15 @@ model ExamAttempt {
   id          String    @id @default(cuid())
   userId      String
   user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
   examId      String
   exam        Exam      @relation(fields: [examId], references: [id], onDelete: Cascade)
-  
-  track       QuestionTrack
   answers     Json
   score       Float?
   maxScore    Float     @default(10)
-  
   startedAt   DateTime  @default(now())
   completedAt DateTime?
-  timeSpent   Int?      // in minutes
-  
+  timeSpent   Int?
+
   @@map("exam_attempts")
 }
 
@@ -351,34 +534,30 @@ model ExamAttempt {
 // ============================================
 
 model Achievement {
-  id          String    @id @default(cuid())
+  id          String              @id @default(cuid())
   name        String
-  slug        String    @unique
+  slug        String              @unique
   description String
-  icon        String    // emoji or icon name
+  icon        String
   category    AchievementCategory
-  
-  // Requirements to unlock
-  requirement Json      // { type: "exams_completed", value: 10 }
-  points      Int       @default(10)
-  rarity      AchievementRarity @default(COMMON)
-  
-  // Secret achievements are hidden until unlocked
-  secret      Boolean   @default(false)
-  
-  users       UserAchievement[]
-  
-  createdAt   DateTime  @default(now())
-  
+  requirement Json
+  points      Int                 @default(10)
+  rarity      AchievementRarity   @default(COMMON)
+  secret      Boolean             @default(false)
+
+  users UserAchievement[]
+
+  createdAt DateTime @default(now())
+
   @@map("achievements")
 }
 
 enum AchievementCategory {
-  LEARNING     // Study-related achievements
-  EXAM         // Exam-related achievements
-  STREAK       // Consistency achievements
-  SOCIAL       // Community achievements
-  SPECIAL      // Special/event achievements
+  LEARNING
+  EXAM
+  STREAK
+  SOCIAL
+  SPECIAL
 }
 
 enum AchievementRarity {
@@ -393,51 +572,42 @@ model UserAchievement {
   id            String      @id @default(cuid())
   userId        String
   user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
   achievementId String
   achievement   Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
-  
   unlockedAt    DateTime    @default(now())
-  progress      Int         @default(100) // Progress percentage when unlocked
+  progress      Int         @default(100)
   notified      Boolean     @default(false)
-  
+
   @@unique([userId, achievementId])
   @@map("user_achievements")
 }
 
 model UserStreak {
-  id            String    @id @default(cuid())
-  userId        String    @unique
-  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  currentStreak Int       @default(0)
-  longestStreak Int       @default(0)
-  lastActiveAt  DateTime  @default(now())
-  
-  // Track weekly activity (bit flags for each day)
+  id             String   @id @default(cuid())
+  userId         String   @unique
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  currentStreak  Int      @default(0)
+  longestStreak  Int      @default(0)
+  lastActiveAt   DateTime @default(now())
   weeklyActivity Int      @default(0)
-  
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
   @@map("user_streaks")
 }
 
 model Notification {
-  id          String           @id @default(cuid())
-  userId      String
-  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  type        NotificationType
-  title       String
-  message     String
-  link        String?
-  data        Json?
-  
-  read        Boolean          @default(false)
-  
-  createdAt   DateTime         @default(now())
-  
+  id        String           @id @default(cuid())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      NotificationType
+  title     String
+  message   String
+  link      String?
+  data      Json?
+  read      Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
   @@index([userId, read])
   @@map("notifications")
 }
@@ -455,34 +625,27 @@ enum NotificationType {
 // ============================================
 
 model ChatConversation {
-  id          String        @id @default(cuid())
-  userId      String
-  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  title       String?
-  context     String?       // Subject/topic context
-  
-  messages    ChatMessage[]
-  
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  
+  id        String        @id @default(cuid())
+  userId    String
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String?
+  context   String?
+  messages  ChatMessage[]
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
   @@map("chat_conversations")
 }
 
 model ChatMessage {
-  id              String           @id @default(cuid())
-  conversationId  String
-  conversation    ChatConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  
-  role            MessageRole
-  content         String
-  
-  // For AI responses with code/explanations
-  metadata        Json?
-  
-  createdAt       DateTime         @default(now())
-  
+  id             String           @id @default(cuid())
+  conversationId String
+  conversation   ChatConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  role           MessageRole
+  content        String
+  metadata       Json?
+  createdAt      DateTime         @default(now())
+
   @@map("chat_messages")
 }
 
@@ -497,44 +660,33 @@ enum MessageRole {
 // ============================================
 
 model UserAnalytics {
-  id              String    @id @default(cuid())
-  userId          String    @unique
-  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  // Study stats
-  totalStudyTime  Int       @default(0)     // in minutes
-  topicsCompleted Int       @default(0)
-  
-  // Exam stats  
-  examsCompleted  Int       @default(0)
-  averageScore    Float     @default(0)
-  highestScore    Float     @default(0)
-  
-  // Flashcard stats
-  cardsReviewed   Int       @default(0)
-  cardsMastered   Int       @default(0)
-  
-  // Engagement
-  loginDays       Int       @default(0)
-  lastLoginAt     DateTime  @default(now())
-  
-  updatedAt       DateTime  @updatedAt
-  
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  totalStudyTime  Int      @default(0)
+  topicsCompleted Int      @default(0)
+  examsCompleted  Int      @default(0)
+  averageScore    Float    @default(0)
+  highestScore    Float    @default(0)
+  cardsReviewed   Int      @default(0)
+  cardsMastered   Int      @default(0)
+  loginDays       Int      @default(0)
+  lastLoginAt     DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
   @@map("user_analytics")
 }
 
 model DailyStats {
-  id              String    @id @default(cuid())
+  id              String   @id @default(cuid())
   userId          String
-  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  date            DateTime  @db.Date
-  
-  studyTime       Int       @default(0)
-  topicsCompleted Int       @default(0)
-  examsCompleted  Int       @default(0)
-  cardsReviewed   Int       @default(0)
-  
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date            DateTime @db.Date
+  studyTime       Int      @default(0)
+  topicsCompleted Int      @default(0)
+  examsCompleted  Int      @default(0)
+  cardsReviewed   Int      @default(0)
+
   @@unique([userId, date])
   @@map("daily_stats")
 }
@@ -544,20 +696,16 @@ model DailyStats {
 // ============================================
 
 model PushSubscription {
-  id          String    @id @default(cuid())
+  id          String   @id @default(cuid())
   userId      String
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   endpoint    String
   p256dh      String
   auth        String
-  
-  // Notification preferences
-  preferences Json      @default("{}")
-  
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  
+  preferences Json     @default("{}")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
   @@unique([userId, endpoint])
   @@index([userId])
   @@map("push_subscriptions")

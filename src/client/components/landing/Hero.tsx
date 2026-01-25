@@ -6,13 +6,13 @@ import { ArrowRight, Sparkles } from "lucide-react";
 
 export function Hero() {
     return (
-        <section 
-            className="relative overflow-hidden pt-32 pb-20 lg:pt-48 lg:pb-32" 
+        <section
+            className="relative overflow-hidden pt-32 pb-20 lg:pt-48 lg:pb-32"
             aria-labelledby="hero-title"
         >
             {/* Background Gradients */}
-            <div 
-                className="absolute top-0 left-1/2 -z-10 h-[50rem] w-[90rem] -translate-x-1/2 bg-gradient-to-b from-primary/20 to-transparent blur-3xl" 
+            <div
+                className="absolute top-0 left-1/2 -z-10 h-[50rem] w-[90rem] -translate-x-1/2 bg-gradient-to-b from-primary/20 to-transparent blur-3xl"
                 aria-hidden="true"
             />
 
@@ -47,7 +47,7 @@ export function Hero() {
                     className="mx-auto mb-10 max-w-2xl text-lg text-muted-foreground md:text-xl"
                 >
                     Nền tảng ôn thi trắc nghiệm thông minh với sự hỗ trợ của AI.
-                    Học tập hiệu quả hơn với Flashcard, Đề thi thử và Phòng thi giả lập.
+                    Học tập hiệu quả hơn với Đề thi thử và Phòng thi giả lập.
                 </motion.p>
 
                 <motion.div

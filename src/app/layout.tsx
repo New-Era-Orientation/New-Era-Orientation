@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/client/contexts/ThemeContext";
 import { SessionProvider } from "@/client/contexts/SessionProvider";
 import { UserProvider } from "@/client/contexts/UserContext";
+import { SubjectProvider } from "@/client/contexts/SubjectContext";
 import { PWARegistration } from "@/client/components/pwa/PWARegistration";
 import { MobileBottomNav } from "@/client/components/layout/MobileBottomNav";
 
@@ -105,11 +106,13 @@ export default function RootLayout({
                 <SessionProvider>
                     <ThemeProvider>
                         <UserProvider>
-                            <div className="pb-16 md:pb-0">
-                                {children}
-                            </div>
-                            <MobileBottomNav />
-                            <PWARegistration />
+                            <SubjectProvider>
+                                <div className="pb-16 md:pb-0">
+                                    {children}
+                                </div>
+                                <MobileBottomNav />
+                                <PWARegistration />
+                            </SubjectProvider>
                         </UserProvider>
                     </ThemeProvider>
                 </SessionProvider>

@@ -1,6 +1,18 @@
 import type { NextConfig } from "next";
 
+// Check if building for mobile/desktop (static export)
+const isStaticBuild = process.env.BUILD_TARGET === "static";
+
 const nextConfig: NextConfig = {
+  // Enable static export for Capacitor/Tauri builds
+  ...(isStaticBuild && {
+    output: "export",
+    distDir: "out",
+    images: {
+      unoptimized: true, // Required for static export
+    },
+  }),
+
   typescript: {
     ignoreBuildErrors: true,
   },
@@ -17,6 +29,8 @@ const nextConfig: NextConfig = {
         pathname: "/**",
       },
     ],
+    // For static export, use unoptimized
+    ...(isStaticBuild && { unoptimized: true }),
   },
 
   // Performance optimizations
@@ -28,29 +42,31 @@ const nextConfig: NextConfig = {
   // Compression
   compress: true,
 
-  // Headers for caching
-  async headers() {
-    return [
-      {
-        source: "/:all*(svg|jpg|png|webp|avif|ico)",
-        headers: [
-          {
-            key: "Cache-Control",
-            value: "public, max-age=31536000, immutable",
-          },
-        ],
-      },
-      {
-        source: "/_next/static/:path*",
-        headers: [
-          {
-            key: "Cache-Control",
-            value: "public, max-age=31536000, immutable",
-          },
-        ],
-      },
-    ];
-  },
+  // Headers for caching (only for server mode)
+  ...(!isStaticBuild && {
+    async headers() {
+      return [
+        {
+          source: "/:all*(svg|jpg|png|webp|avif|ico)",
+          headers: [
+            {
+              key: "Cache-Control",
+              value: "public, max-age=31536000, immutable",
+            },
+          ],
+        },
+        {
+          source: "/_next/static/:path*",
+          headers: [
+            {
+              key: "Cache-Control",
+              value: "public, max-age=31536000, immutable",
+            },
+          ],
+        },
+      ];
+    },
+  }),
 };
 
 export default nextConfig;

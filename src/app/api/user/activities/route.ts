@@ -7,7 +7,8 @@ export async function GET() {
         const session = await auth();
         
         if (!session?.user?.id) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+            // Return empty array for guest users
+            return NextResponse.json([]);
         }
 
         const userId = session.user.id;

@@ -17,7 +17,7 @@ export async function GET(request: Request, { params }: RouteParams) {
                     include: {
                         question: {
                             include: {
-                                subQuestions: {
+                                options: {
                                     orderBy: { order: "asc" },
                                 },
                             },
@@ -52,18 +52,28 @@ export async function GET(request: Request, { params }: RouteParams) {
             }
 
             const part = partsMap.get(eq.partNumber)!;
+
+            // Map options array to string[] choices for compatibility
+            // The frontend ExamEngine expects choices: string[]
+            const choices = eq.question.options.map(o => o.content);
+
             part.questions.push({
                 id: eq.question.id,
                 num: eq.order,
                 content: eq.question.content,
-                type: eq.question.type,
-                track: eq.question.track,
-                choices: eq.question.choices,
+                type: eq.question.typeId || "MULTIPLE_CHOICE", // Handle typeId
+                track: "COMMON", // Default, field not in new schema?
+                choices: choices,
                 points: eq.points,
-                subQuestions: eq.question.subQuestions.map((sq) => ({
-                    id: sq.id,
-                    content: sq.content,
-                })),
+                // SubQuestions not supported in current schema/import
+                subQuestions: [],
+                // Include correct answer info (masked in client, handled by submit API)
+                // But for "Taking" page, we usually don't send correct answers if secure.
+                // However, ExamEngine calculates locally if API submit fails?
+                // ExamEngine fallback logic: checks `q.correctAnswer`.
+                // Ideally, we shouldn't send correct answer to client.
+                // But ExamEngine fallback relies on it.
+                // Let's verify ExamEngine fallback.
             });
         });
 

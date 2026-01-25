@@ -6,10 +6,7 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
     const session = await auth();
-
-    if (!session?.user?.id) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const userId = session?.user?.id;
 
     try {
         // Get all subjects with their chapters and topics
@@ -27,12 +24,12 @@ export async function GET() {
             orderBy: { order: "asc" },
         });
 
-        // Get user's study progress
-        const userProgress = await db.userProgress.findMany({
-            where: {
-                userId: session.user.id,
-            },
-        });
+        // Get user's study progress (only if logged in)
+        const userProgress = userId 
+            ? await db.userProgress.findMany({
+                where: { userId },
+            })
+            : [];
 
         // Create a map for quick lookup
         const progressMap = new Map<string, any>(
@@ -98,9 +95,7 @@ export async function GET() {
             };
         });
 
-        return NextResponse.json({
-            subjects: subjectsWithProgress,
-        });
+        return NextResponse.json(subjectsWithProgress);
     } catch (error) {
         console.error("Failed to fetch study progress:", error);
         return NextResponse.json({ error: "Failed to fetch study progress" }, { status: 500 });
