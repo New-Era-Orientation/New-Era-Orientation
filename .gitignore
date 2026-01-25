@@ -61,3 +61,15 @@ __pycache__/
 .shared/
 
 certificates
+
+# Mobile/Desktop build outputs
+/android/
+/ios/
+/src-tauri/target/
+*.apk
+*.aab
+*.ipa
+*.msi
+*.dmg
+*.deb
+*.AppImage
