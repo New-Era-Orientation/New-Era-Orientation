@@ -24,8 +24,8 @@ NEO-EDU là nền tảng giáo dục trực tuyến hiện đại, được xây
 
 ```bash
 # Clone repo
-git clone https://github.com/your-org/neo-next.git
-cd neo-next
+git clone https://github.com/New-Era-Orientation/New-Era-Orientation.git
+cd New-Era-Orientation
 
 # Cài đặt dependencies
 npm install
