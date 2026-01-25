@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/server/auth/auth";
-import { prisma } from "@/server/db/db";
+import { auth } from "@/server/auth";
+import { prisma } from "@/server/db";
 
 /**
  * Combined Dashboard API
