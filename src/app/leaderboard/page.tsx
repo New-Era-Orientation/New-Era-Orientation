@@ -4,10 +4,10 @@ import { useEffect, useState } from "react";
 import { DashboardHeader } from "@/client/components/layout/DashboardHeader";
 import { Card } from "@/client/components/ui/Card";
 import { Badge } from "@/client/components/ui/Badge";
-import { 
-    Trophy, 
-    Medal, 
-    Crown, 
+import {
+    Trophy,
+    Medal,
+    Crown,
     Star,
     TrendingUp,
     Users,
@@ -19,6 +19,8 @@ import {
 } from "lucide-react";
 import { cn } from "@/client/lib/utils";
 import Image from "next/image";
+import { useSubject } from "@/client/contexts/SubjectContext";
+import { SubjectPicker } from "@/client/components/ui/SubjectPicker";
 
 interface LeaderboardUser {
     rank: number;
@@ -39,6 +41,7 @@ interface LeaderboardData {
 }
 
 export default function LeaderboardPage() {
+    const { selectedSubjectId, isLoading: isSubjectLoading } = useSubject();
     const [data, setData] = useState<LeaderboardData | null>(null);
     const [loading, setLoading] = useState(true);
     const [timeRange, setTimeRange] = useState<"week" | "month" | "all">("month");
@@ -46,9 +49,17 @@ export default function LeaderboardPage() {
 
     useEffect(() => {
         async function fetchLeaderboard() {
+            if (isSubjectLoading) return;
+
             setLoading(true);
             try {
-                const res = await fetch(`/api/leaderboard?range=${timeRange}&category=${category}`);
+                const query = new URLSearchParams({
+                    range: timeRange,
+                    category: category,
+                    ...(selectedSubjectId ? { subjectId: selectedSubjectId } : {})
+                });
+
+                const res = await fetch(`/api/leaderboard?${query.toString()}`);
                 if (res.ok) {
                     setData(await res.json());
                 }
@@ -59,7 +70,7 @@ export default function LeaderboardPage() {
             }
         }
         fetchLeaderboard();
-    }, [timeRange, category]);
+    }, [timeRange, category, selectedSubjectId, isSubjectLoading]);
 
     const getRankIcon = (rank: number) => {
         switch (rank) {
@@ -109,49 +120,53 @@ export default function LeaderboardPage() {
                             <Trophy className="h-8 w-8 text-yellow-500" />
                         </div>
                         <div>
-                            <h1 className="text-3xl font-bold text-foreground">Bảng xếp hạng</h1>
+                            <h1 className="text-3xl font-bold text-foreground">🏆 Bảng xếp hạng</h1>
                             <p className="text-muted-foreground mt-1">
                                 Thi đua cùng {data?.totalParticipants || 0} học viên khác
                             </p>
                         </div>
                     </div>
-                    
-                    {/* Filters */}
-                    <div className="flex flex-col sm:flex-row gap-3 mt-4 md:mt-0">
-                        {/* Category Filter */}
-                        <div className="flex gap-1 p-1 rounded-lg bg-secondary">
-                            {(["score", "exams", "streak"] as const).map((cat) => (
-                                <button
-                                    key={cat}
-                                    onClick={() => setCategory(cat)}
-                                    className={cn(
-                                        "px-3 py-1.5 rounded-md text-sm font-medium transition-colors",
-                                        category === cat
-                                            ? "bg-background text-foreground shadow-sm"
-                                            : "text-muted-foreground hover:text-foreground"
-                                    )}
-                                >
-                                    {cat === "score" ? "Điểm" : cat === "exams" ? "Đề thi" : "Streak"}
-                                </button>
-                            ))}
-                        </div>
 
-                        {/* Time Range Filter */}
-                        <div className="flex gap-1 p-1 rounded-lg bg-secondary">
-                            {(["week", "month", "all"] as const).map((range) => (
-                                <button
-                                    key={range}
-                                    onClick={() => setTimeRange(range)}
-                                    className={cn(
-                                        "px-3 py-1.5 rounded-md text-sm font-medium transition-colors",
-                                        timeRange === range
-                                            ? "bg-background text-foreground shadow-sm"
-                                            : "text-muted-foreground hover:text-foreground"
-                                    )}
-                                >
-                                    {range === "week" ? "Tuần" : range === "month" ? "Tháng" : "Tất cả"}
-                                </button>
-                            ))}
+                    <div className="flex items-center gap-3 mt-4 md:mt-0">
+                        <SubjectPicker />
+
+                        {/* Filters */}
+                        <div className="flex flex-col sm:flex-row gap-3 mt-4 md:mt-0">
+                            {/* Category Filter */}
+                            <div className="flex gap-1 p-1 rounded-lg bg-secondary">
+                                {(["score", "exams", "streak"] as const).map((cat) => (
+                                    <button
+                                        key={cat}
+                                        onClick={() => setCategory(cat)}
+                                        className={cn(
+                                            "px-3 py-1.5 rounded-md text-sm font-medium transition-colors",
+                                            category === cat
+                                                ? "bg-background text-foreground shadow-sm"
+                                                : "text-muted-foreground hover:text-foreground"
+                                        )}
+                                    >
+                                        {cat === "score" ? "Điểm" : cat === "exams" ? "Đề thi" : "Streak"}
+                                    </button>
+                                ))}
+                            </div>
+
+                            {/* Time Range Filter */}
+                            <div className="flex gap-1 p-1 rounded-lg bg-secondary">
+                                {(["week", "month", "all"] as const).map((range) => (
+                                    <button
+                                        key={range}
+                                        onClick={() => setTimeRange(range)}
+                                        className={cn(
+                                            "px-3 py-1.5 rounded-md text-sm font-medium transition-colors",
+                                            timeRange === range
+                                                ? "bg-background text-foreground shadow-sm"
+                                                : "text-muted-foreground hover:text-foreground"
+                                        )}
+                                    >
+                                        {range === "week" ? "Tuần" : range === "month" ? "Tháng" : "Tất cả"}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -251,15 +266,15 @@ export default function LeaderboardPage() {
                             <div className="p-4 border-b border-border">
                                 <h2 className="font-semibold text-foreground">Xếp hạng theo {getCategoryLabel()}</h2>
                             </div>
-                            
+
                             {data && data.topUsers.length > 0 ? (
                                 <div className="divide-y divide-border">
                                     {data.topUsers.map((user, index) => {
                                         const rankChange = getRankChange(user.rank, user.previousRank);
                                         const isCurrentUser = data.currentUser?.userId === user.userId;
-                                        
+
                                         return (
-                                            <div 
+                                            <div
                                                 key={user.userId}
                                                 className={cn(
                                                     "flex items-center gap-4 p-4 hover:bg-secondary/50 transition-colors",
@@ -346,7 +361,7 @@ export default function LeaderboardPage() {
                                     <div className="w-12 flex items-center justify-center">
                                         <span className="text-lg font-bold text-primary">#{data.currentUser.rank}</span>
                                     </div>
-                                    
+
                                     {data.currentUser.image ? (
                                         <Image
                                             src={data.currentUser.image}

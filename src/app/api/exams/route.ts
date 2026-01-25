@@ -25,6 +25,11 @@ export async function GET(request: Request) {
             where.type = type;
         }
 
+        const subjectId = searchParams.get("subjectId");
+        if (subjectId) {
+            where.subjectId = subjectId;
+        }
+
         if (search) {
             where.OR = [
                 { title: { contains: search, mode: "insensitive" } },
