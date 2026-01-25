@@ -82,14 +82,122 @@ npm run db:generate  # Generate Prisma Client
 npm run db:studio    # Mở Prisma Studio
 ```
 
-## 📥 Cập nhật Nội dung Học tập & Ngân hàng Đề
+## 📥 Import/Export Dữ liệu
 
-Hệ thống nội dung được tổ chức theo cấu trúc: **School → Subject → Chapter → Topic → Question**
+### 🎯 Tổng quan cấu trúc dữ liệu
 
-### 📚 1. Thêm Môn học (Subject)
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                     CẤU TRÚC NỘI DUNG                           │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  🏫 SCHOOL (Trường)                                            │
+│     └── 📚 SUBJECT (Môn học)                                   │
+│            └── 📑 CHAPTER (Chương)                             │
+│                   └── 📝 TOPIC (Bài học)                       │
+│                          └── ❓ QUESTION (Câu hỏi)             │
+│                                                                 │
+│  📋 EXAM (Đề thi) ─────────────────┐                           │
+│     └── 🔗 EXAM_QUESTIONS ─────────┴── ❓ QUESTION             │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### 🚀 Cách nhanh nhất: Admin Panel
+
+1. Truy cập **Admin Panel** → **Import/Export**
+2. **Upload file** JSON hoặc Excel
+3. Hệ thống **tự động phân tích** và mapping
+4. **Xác nhận** → Hoàn tất!
+
+> 📖 Xem hướng dẫn chi tiết: [Admin Panel → Import/Export → Hướng dẫn]
+
+---
+
+### 📄 Import từ JSON
+
+#### Template cơ bản
+
+```json
+{
+  "exam": {
+    "title": "Đề thi Toán 12 - Giữa kỳ 1",
+    "duration": 90,
+    "subject": "Toán",
+    "parts": [
+      {
+        "name": "Phần 1: Trắc nghiệm",
+        "questions": [
+          {
+            "type": "MULTIPLE_CHOICE",
+            "content": "Giải: 2x + 5 = 11",
+            "choices": [
+              { "content": "A. x = 2", "isCorrect": false },
+              { "content": "B. x = 3", "isCorrect": true },
+              { "content": "C. x = 4", "isCorrect": false },
+              { "content": "D. x = 5", "isCorrect": false }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+#### Các trường metadata
+
+| Trường | Bắt buộc | Mô tả |
+|--------|:--------:|-------|
+| `title` | ✅ | Tên đề thi |
+| `duration` | ✅ | Thời gian (phút) |
+| `subject` | ❌ | Tên môn học |
+| `province` | ❌ | Tỉnh/TP |
+| `school` | ❌ | Tên trường |
+| `year` | ❌ | Năm thi |
+
+---
+
+### 📊 Import từ Excel
+
+**Sheet 1: Metadata**
+| Key | Value |
+|-----|-------|
+| title | Đề thi Toán 12 |
+| duration | 90 |
+| subject | Toán |
+
+**Sheet 2: Questions**
+| Part | Question | Type | Option | IsCorrect |
+|------|----------|------|--------|-----------|
+| Phần 1 | Giải 2x+5=11 | MULTIPLE_CHOICE | A. x=2 | false |
+| | | | B. x=3 | true |
+| | | | C. x=4 | false |
+
+---
+
+### 🔧 Import bằng Terminal (Nâng cao)
+
+```bash
+# Cách 1: Chạy file SQL trực tiếp
+npx prisma db execute --file ./data/ten-file.sql
+
+# Cách 2: Chạy script TypeScript
+npx tsx scripts/import-exams.ts
+
+# Cách 3: Convert JSON → SQL → Execute
+npx tsx scripts/json-to-sql.ts
+npx prisma db execute --file ./data/output.sql
+```
+
+---
+
+### 📋 Thêm dữ liệu bằng SQL
+
+<details>
+<summary>📚 Thêm Môn học (Subject)</summary>
 
 ```sql
--- Thêm môn học mới
 INSERT INTO "subjects" (id, name, slug, code, description, icon, "order", "practiceMode", "schoolId")
 VALUES (
   'subj_xxxx',           -- ID unique
@@ -103,208 +211,111 @@ VALUES (
   'school_utt'           -- ID trường (null = môn THPT chung)
 );
 ```
+</details>
 
-### 📑 2. Thêm Chương (Chapter)
+<details>
+<summary>📑 Thêm Chương (Chapter)</summary>
 
 ```sql
 INSERT INTO "chapters" (id, "subjectId", name, slug, description, "order")
 VALUES (
   'chap_xxxx',
-  'subj_triet_mac_lenin',  -- ID môn học
+  'subj_triet_mac_lenin',
   'Chương 1: Triết học và vai trò của nó',
   'chuong-1',
   'Mô tả chương',
   1
 );
 ```
+</details>
 
-### 📝 3. Thêm Chủ đề/Bài học (Topic)
+<details>
+<summary>📝 Thêm Bài học (Topic)</summary>
 
 ```sql
-INSERT INTO "topics" (id, "chapterId", name, slug, content, metadata, "videoUrl", duration, "order")
+INSERT INTO "topics" (id, "chapterId", name, slug, content, "videoUrl", duration, "order")
 VALUES (
   'topic_xxxx',
-  'chap_xxxx',              -- ID chương
+  'chap_xxxx',
   'Bài 1: Khái niệm triết học',
   'bai-1',
   'Nội dung bài học (Markdown)',
-  '{"keywords": ["triết học", "thế giới quan"]}',
-  'https://youtube.com/...', -- Video (optional)
-  30,                        -- Thời lượng phút
+  'https://youtube.com/...',
+  30,
   1
 );
 ```
+</details>
 
-### ❓ 4. Thêm Câu hỏi vào Ngân hàng đề
-
-#### 4.1. Câu hỏi trắc nghiệm (Multiple Choice)
+<details>
+<summary>❓ Thêm Câu hỏi (Question)</summary>
 
 ```sql
 -- Bước 1: Thêm câu hỏi
-INSERT INTO "questions" (id, content, explanation, "typeId", difficulty, "subjectId", "chapterId", "topicId", tags)
+INSERT INTO "questions" (id, content, explanation, "typeId", difficulty, "subjectId")
 VALUES (
   'q_xxxx',
   'Triết học là gì?',
   'Giải thích đáp án...',
   'MULTIPLE_CHOICE',
-  'MEDIUM',              -- EASY, MEDIUM, HARD, EXPERT
-  'subj_triet',
-  'chap_1',              -- Optional
-  'topic_1',             -- Optional
-  ARRAY['triết học', 'khái niệm']
+  'MEDIUM',
+  'subj_triet'
 );
 
 -- Bước 2: Thêm các đáp án
 INSERT INTO "question_options" (id, "questionId", content, "isCorrect", "order")
 VALUES
   ('opt_1', 'q_xxxx', 'A. Khoa học về tự nhiên', false, 0),
-  ('opt_2', 'q_xxxx', 'B. Hệ thống tri thức lý luận chung nhất về thế giới', true, 1),
+  ('opt_2', 'q_xxxx', 'B. Hệ thống tri thức lý luận chung nhất', true, 1),
   ('opt_3', 'q_xxxx', 'C. Môn học về đạo đức', false, 2),
   ('opt_4', 'q_xxxx', 'D. Nghiên cứu về con người', false, 3);
 ```
+</details>
 
-#### 4.2. Câu hỏi đúng/sai (True/False)
-
-```sql
-INSERT INTO "questions" (id, content, "typeId", difficulty, "subjectId")
-VALUES ('q_tf_xxx', 'Triết học là khoa học của mọi khoa học', 'TRUE_FALSE', 'EASY', 'subj_triet');
-
-INSERT INTO "question_options" (id, "questionId", content, "isCorrect", "order")
-VALUES
-  ('opt_tf_1', 'q_tf_xxx', 'Đúng', false, 0),
-  ('opt_tf_2', 'q_tf_xxx', 'Sai', true, 1);
-```
-
-### 📋 5. Tạo Đề thi (Exam)
+<details>
+<summary>📋 Tạo Đề thi (Exam)</summary>
 
 ```sql
 -- Bước 1: Tạo đề thi
-INSERT INTO "exams" (id, title, slug, description, "subjectId", type, duration, "totalPoints", "passingScore", published)
+INSERT INTO "exams" (id, title, slug, description, "subjectId", type, duration, "totalPoints", published)
 VALUES (
   'exam_xxxx',
   'Đề thi giữa kỳ Triết học 2025',
   'de-thi-giua-ky-triet-2025',
   'Đề thi giữa kỳ môn Triết học Mác-Lênin',
   'subj_triet',
-  'MIDTERM',             -- PRACTICE, MIDTERM, FINAL, MOCK
-  60,                    -- Thời gian (phút)
-  10,                    -- Tổng điểm
-  5,                     -- Điểm đạt
-  true                   -- Xuất bản
+  'MIDTERM',
+  60,
+  10,
+  true
 );
 
--- Bước 2: Thêm câu hỏi vào đề thi
+-- Bước 2: Gắn câu hỏi vào đề
 INSERT INTO "exam_questions" (id, "examId", "questionId", "order", points)
 VALUES
   ('eq_1', 'exam_xxxx', 'q_001', 1, 0.5),
-  ('eq_2', 'exam_xxxx', 'q_002', 2, 0.5),
-  ('eq_3', 'exam_xxxx', 'q_003', 3, 1.0);
+  ('eq_2', 'exam_xxxx', 'q_002', 2, 0.5);
 ```
+</details>
 
-### 🔄 6. Import hàng loạt từ JSON
-
-#### Template JSON cho đề thi
-Xem file mẫu: [data/exam-tin-hoc-template.json](data/exam-tin-hoc-template.json)
-
-```json
-{
-  "exam": {
-    "id": "exam_xxx",
-    "title": "Tên đề thi",
-    "subject": "Tên môn",
-    "duration": 60,
-    "parts": [...]
-  },
-  "questions": {
-    "part1": [
-      {
-        "id": "q01",
-        "content": "Nội dung câu hỏi",
-        "choices": ["A. ...", "B. ...", "C. ...", "D. ..."],
-        "correctAnswer": "A",
-        "points": 0.25
-      }
-    ]
-  }
-}
-```
-
-#### Chạy import
-
-```bash
-# Import đề thi từ JSON
-npx tsx scripts/import-exams.ts
-
-# Hoặc chuyển JSON sang SQL rồi execute
-npx tsx scripts/json-to-sql.ts
-npx prisma db execute --file ./data/output.sql
-```
-
-### 🏫 7. Thêm Trường học (School)
-
-```sql
-INSERT INTO "schools" (id, name, slug, code, domain, logo, "provinceId")
-VALUES (
-  'school_utt',
-  'Đại học Giao thông Vận tải',
-  'utt',
-  'UTT',
-  'utt.edu.vn',
-  '/logos/utt.png',
-  'province_hanoi'       -- Tỉnh/TP
-);
-```
-
-### ⚡ Phương pháp Import
-
-| Phương pháp | Khi nào dùng | Lệnh |
-|-------------|--------------|------|
-| **SQL trực tiếp** | Import < 100 records | `npx prisma db execute --file ./data/file.sql` |
-| **Script TS** | Logic phức tạp, cần validate | `npx tsx scripts/import-xxx.ts` |
-| **JSON → SQL** | Dữ liệu có sẵn dạng JSON | `npx tsx scripts/json-to-sql.ts` |
+---
 
 ### ⚠️ Lưu ý quan trọng
 
-1. **Backup trước khi import**: Luôn backup database trước khi thực hiện import lớn
-   ```bash
-   pg_dump -h HOST -U USER -d DATABASE > backup.sql
-   ```
+| Tip | Mô tả |
+|-----|-------|
+| 💾 **Backup trước** | `pg_dump -h HOST -U USER -d DB > backup.sql` |
+| 🔄 **Dùng Transaction** | Wrap SQL trong `BEGIN; ... COMMIT;` |
+| ✅ **Validate JSON** | Dùng [jsonlint.com](https://jsonlint.com) |
+| 📝 **Xem template** | `data/exam-tin-hoc-template.json` |
 
-2. **Kiểm tra dữ liệu**: Chạy script kiểm tra sau khi import
-   ```bash
-   npx tsx scripts/check-data.ts
-   npx tsx scripts/check-questions.ts
-   ```
+### 📊 Scripts kiểm tra
 
-3. **Transaction**: Các file SQL nên wrap trong transaction để rollback nếu có lỗi
-   ```sql
-   BEGIN;
-   -- INSERT statements
-   COMMIT;
-   ```
-
-4. **Kết nối Supabase**: Nếu dùng Supabase, đảm bảo:
-   - Sử dụng connection string với `?pgbouncer=true` cho pooled connection
-   - Hoặc dùng direct connection cho bulk operations
-   - Set `statement_timeout` nếu cần cho queries lớn
-
-5. **Conflict handling**: Sử dụng `ON CONFLICT` để xử lý duplicate
-   ```sql
-   INSERT INTO "questions" (id, content, ...)
-   VALUES (...)
-   ON CONFLICT (id) DO UPDATE SET content = EXCLUDED.content;
-   ```
-
-### 📊 Scripts hữu ích
-
-| Script | Mô tả |
-|--------|-------|
-| `check-data.ts` | Kiểm tra tổng quan dữ liệu |
-| `check-questions.ts` | Kiểm tra số lượng câu hỏi |
-| `check-subjects.ts` | Kiểm tra môn học |
-| `check-topics.ts` | Kiểm tra chủ đề |
-| `list-subjects.ts` | Liệt kê tất cả môn học |
-| `assign-questions-to-topics.ts` | Gán câu hỏi vào chủ đề |
+```bash
+npx tsx scripts/check-data.ts       # Kiểm tra tổng quan
+npx tsx scripts/check-questions.ts  # Đếm câu hỏi
+npx tsx scripts/list-subjects.ts    # Liệt kê môn học
+```
 
 ## 🐳 Docker
 
