@@ -1,0 +1,588 @@
+{
+  "scannedAt": "2026-01-27T08:33:08.414Z",
+  "folderPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025",
+  "summary": {
+    "total": 96,
+    "withAnswer": 44,
+    "withoutAnswer": 52,
+    "provinces": 10
+  },
+  "exams": [
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\An Giang\\SỞ AN GIANG.docx",
+      "answerPath": null,
+      "province": "An Giang",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Bắc Giang\\BẮC GIANG LẦN 1.docx",
+      "answerPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Bắc Giang\\BẮC GIANG-ĐA.docx",
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Bắc Giang\\BẮC GIANG.docx",
+      "answerPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Bắc Giang\\BẮC GIANG-ĐA.docx",
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Bắc Ninh\\BẮC NINH LẦN 1.docx",
+      "answerPath": null,
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Bắc Ninh\\BẮC NINH LẦN 2.docx",
+      "answerPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Bắc Ninh\\BẮC NINH LẦN 2 - ĐÁP ÁN.docx",
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Bắc Ninh\\BẮC NINH LẦN 3.docx",
+      "answerPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Bắc Ninh\\BẮC NINH LẦN 3-ĐA.docx",
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Bắc Ninh\\LIÊN TRƯỜNG BẮC NINH .docx",
+      "answerPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Bắc Ninh\\LIÊN TRƯỜNG BẮC NINH - ĐA.docx",
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Bạc Liêu\\BẠC LIÊU.docx",
+      "answerPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Bạc Liêu\\BẠC LIÊU - ĐÁP ÁN.docx",
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Bến Tre\\BẾN TRE LẦN 2.docx",
+      "answerPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Bến Tre\\BẾN TRE LẦN 2-ĐA.docx",
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Bến Tre\\BẾN TRE.docx",
+      "answerPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Bến Tre\\BẾN TRE - ĐÁP ÁN.docx",
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Bình Thuận\\Bình Thuận - MĐỀ 0501.doc",
+      "answerPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Bình Thuận\\Bình Thuận - MĐỀ 0501 - ĐÁP ÁN.doc",
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Bình Thuận\\Bình Thuận - MĐỀ 0507.doc",
+      "answerPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Bình Thuận\\Bình Thuận - MĐỀ 0507 - ĐÁP ÁN.doc",
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Bình Dương\\BÌNH DƯƠNG.docx",
+      "answerPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Bình Dương\\BÌNH DƯƠNG-ĐA.docx",
+      "province": "Bình Dương",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Cần Thơ\\CẦN THƠ LẦN 1 - MĐỀ 5426.docx",
+      "answerPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Cần Thơ\\CẦN THƠ LẦN 1 - MĐỀ 5426 - ĐÁP ÁN.docx",
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Cần Thơ\\CẦN THƠ LẦN 1- MĐỀ 5425.docx",
+      "answerPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Cần Thơ\\CẦN THƠ LẦN 1- MĐỀ 5425 - ĐÁP ÁN.docx",
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Gia Lai\\GIA LAI.docx",
+      "answerPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Gia Lai\\GIA LAI - ĐÁP ÁN.docx",
+      "province": "Gia Lai",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Hà Nội\\SỞ HÀ NỘI.docx",
+      "answerPath": null,
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Hà Tĩnh\\SỞ HÀ TĨNH L1.docx",
+      "answerPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Hà Tĩnh\\SỞ HÀ TĨNH L1 - ĐÁP ÁN.docx",
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Hậu Giang\\HẬU GIANG .docx",
+      "answerPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Hậu Giang\\HẬU GIANG - ĐÁP ÁN.docx",
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Hòa Bình\\HOÀ BÌNH - LẦN 2.docx",
+      "answerPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Hòa Bình\\HOÀ BÌNH - LẦN 2 - ĐÁP ÁN.docx",
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Hòa Bình\\HOÀ BÌNH - LẦN 3.docx",
+      "answerPath": null,
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Hòa Bình\\HOÀ BÌNH - MĐỀ 125.doc",
+      "answerPath": null,
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Huế\\HUẾ.docx",
+      "answerPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Huế\\Huế - ĐÁP ÁN.docx",
+      "province": "Huế",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Huế\\Đề 1.docx",
+      "answerPath": null,
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Huế\\Đề 10.docx",
+      "answerPath": null,
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Huế\\Đề 11.docx",
+      "answerPath": null,
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Huế\\Đề 2.docx",
+      "answerPath": null,
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Huế\\Đề 3.docx",
+      "answerPath": null,
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Huế\\Đề 4.docx",
+      "answerPath": null,
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Huế\\Đề 5.docx",
+      "answerPath": null,
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Huế\\Đề 6.docx",
+      "answerPath": null,
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Huế\\Đề 7.docx",
+      "answerPath": null,
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Huế\\Đề 8.docx",
+      "answerPath": null,
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Huế\\Đề 9.docx",
+      "answerPath": null,
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Kiên Giang\\KIÊN GIANG.docx",
+      "answerPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Kiên Giang\\KIÊN GIANG-ĐA.docx",
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Long An\\LONG AN - KHÁNH HOÀ.docx",
+      "answerPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Long An\\LONG AN - KHÁNH HOÀ - ĐÁP ÁN.docx",
+      "province": "Long An",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Lào Cai\\LÀO CAI.docx",
+      "answerPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Lào Cai\\LÀO CAI - ĐA.docx",
+      "province": "Lào Cai",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Nghệ An\\NGHỆ AN 4.docx",
+      "answerPath": null,
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Quảng Bình\\QUẢNG BÌNH - LẦN 2.docx",
+      "answerPath": null,
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Quảng Nam\\QUẢNG NAM LẦN 1.docx",
+      "answerPath": null,
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Quảng Ninh\\QUẢNG NINH - LẦN 1.docx",
+      "answerPath": null,
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Quảng Ninh\\QUẢNG NINH LẦN 4.docx",
+      "answerPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Quảng Ninh\\QUẢNG NINH LẦN 4 - ĐA.docx",
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Thanh Hóa\\THANH HÓA LẦN 2.docx",
+      "answerPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Thanh Hóa\\THANH HÓA LẦN 2 - ĐÁP ÁN.docx",
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Thái Nguyên\\THÁI NGUYÊN LẦN 1.docx",
+      "answerPath": null,
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Thái Bình\\THÁI BÌNH.docx",
+      "answerPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Thái Bình\\THÁI BÌNH - ĐA.docx",
+      "province": "Thái Bình",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Tiền Giang\\TIỀN GIANG.docx",
+      "answerPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Tiền Giang\\TIỀN GIANG-ĐA.docx",
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Trà Vinh\\TRÀ VINH.docx",
+      "answerPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Trà Vinh\\TRÀ VINH - ĐÁP ÁN.docx",
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Tuyên Quang\\TUYÊN QUANG LẦN 3.docx",
+      "answerPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Tuyên Quang\\TUYÊN QUANG LẦN 3 - ĐÁP ÁN.docx",
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Vũng Tàu\\VŨNG TÀU  2.docx",
+      "answerPath": null,
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Vũng Tàu\\VŨNG TÀU 1.docx",
+      "answerPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Vũng Tàu\\VŨNG TÀU 1 - ĐÁP ÁN.docx",
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Vũng Tàu\\VŨNG TÀU 3.docx",
+      "answerPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Vũng Tàu\\VŨNG TÀU 3 - ĐÁP ÁN.docx",
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Vĩnh Long\\VĨNH LONG.docx",
+      "answerPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Vĩnh Long\\VĨNH LONG -ĐA.docx",
+      "province": "Vĩnh Long",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Đồng Nai\\NHON TRẠCH\\ĐỀ THI CÁC MÔN\\hóa\\ĐỀ THAM KHẢO MÔN HÓA THPT NHƠN TRẠCH\\ĐỀ 1- THPT NHƠN TRẠCH.docx",
+      "answerPath": null,
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Đồng Nai\\NHON TRẠCH\\ĐỀ THI CÁC MÔN\\hóa\\ĐỀ THAM KHẢO MÔN HÓA THPT NHƠN TRẠCH\\ĐỀ 2-THPT NHƠN TRẠCH.docx",
+      "answerPath": null,
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Đồng Nai\\NHON TRẠCH\\ĐỀ THI CÁC MÔN\\Tin hoc\\Đề thi minh họa 1\\THPT Nhơn Trạch_ Ma trận đề thi minh họa 1.docx",
+      "answerPath": null,
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Đồng Nai\\NHON TRẠCH\\ĐỀ THI CÁC MÔN\\Tin hoc\\Đề thi minh họa 1\\THPT Nhơn Trạch_ Mẫu đề thi minh họa 1.docx",
+      "answerPath": null,
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Đồng Nai\\NHON TRẠCH\\ĐỀ THI CÁC MÔN\\Tin hoc\\Đề thi minh họa 2\\THPT Nhơn Trạch_ Ma trận đề thi minh họa 2.docx",
+      "answerPath": null,
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Đồng Nai\\NHON TRẠCH\\ĐỀ THI CÁC MÔN\\Tin hoc\\Đề thi minh họa 2\\THPT Nhơn Trạch_ Mẫu đề thi minh họa 2.docx",
+      "answerPath": null,
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Đồng Nai\\NHON TRẠCH\\ĐỀ THI CÁC MÔN\\toán\\MA TRẬN GỢI Ý ĐỀ MINH HỌA TN 2025.docx",
+      "answerPath": null,
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Đồng Nai\\NHON TRẠCH\\ĐỀ THI CÁC MÔN\\toán\\PHÁT TRIỂN ĐỀ MINH HỌA SỐ 1.docx",
+      "answerPath": null,
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Đồng Nai\\NHON TRẠCH\\ĐỀ THI CÁC MÔN\\toán\\PHÁT TRIỂN ĐỀ MINH HỌA SỐ 2 NĂM 2025.docx",
+      "answerPath": null,
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Đồng Nai\\NHON TRẠCH\\ĐỀ THI CÁC MÔN\\văn\\ĐỀ 1 MINH HỌA NGỮ VĂN THPT NHƠN TRẠCH M.docx",
+      "answerPath": null,
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Đồng Nai\\NHON TRẠCH\\ĐỀ THI CÁC MÔN\\văn\\ĐỀ 2 MINH HỌA NGỮ VĂN THPT NHƠN TRẠCH M.docx",
+      "answerPath": null,
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Đồng Nai\\NHON TRẠCH\\ĐỀ THI CÁC MÔN\\Tin hoc\\Đề thi minh họa 1\\THPT Nhơn Trạch_ Mẫu đề thi minh họa 1.docx",
+      "answerPath": null,
+      "province": "Đồng Nai",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Đồng Nai\\NHON TRẠCH\\ĐỀ THI CÁC MÔN\\Tin hoc\\Đề thi minh họa 2\\THPT Nhơn Trạch_ Mẫu đề thi minh họa 2.docx",
+      "answerPath": null,
+      "province": "Đồng Nai",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Đồng Nai\\ĐỒNG NAI.docx",
+      "answerPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Đồng Nai\\ĐỒNG NAI - ĐÁP ÁN.docx",
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Đồng Tháp\\ĐỒNG THÁP.docx",
+      "answerPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC SỞ\\Đồng Tháp\\ĐỒNG THÁP - ĐÁP ÁN.docx",
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC TRƯỜNG\\Bình Dương\\THPT NGUYỄN KHUYẾN.docx",
+      "answerPath": null,
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC TRƯỜNG\\Bình ĐỊnh\\THPT CHUYÊN LÊ QUÝ ĐÔN - BÌNH ĐỊNH.docx",
+      "answerPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC TRƯỜNG\\Bình ĐỊnh\\THPT CHUYÊN LÊ QUÝ ĐÔN - BÌNH ĐỊNH - ĐÁP ÁN.docx",
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC TRƯỜNG\\Bình ĐỊnh\\THPT SỐ 1 PHÙ CÁT - BÌNH ĐỊNH.docx",
+      "answerPath": null,
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC TRƯỜNG\\Hồ Chí Minh\\THPT PHAN ĐÌNH PHÙNG - HN.docx",
+      "answerPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC TRƯỜNG\\Hồ Chí Minh\\THPT PHAN ĐÌNH PHÙNG - HN-ĐA.docx",
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC TRƯỜNG\\Hồ Chí Minh\\TRƯỜNG THPT BÌNH KHÁNH.docx",
+      "answerPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC TRƯỜNG\\Hồ Chí Minh\\TRƯỜNG THPT BÌNH KHÁNH-ĐA.docx",
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC TRƯỜNG\\Khánh Hoà\\THPT NGUYỄN CHÍ THANH - KHÁNH HOÀ.docx",
+      "answerPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC TRƯỜNG\\Khánh Hoà\\THPT NGUYỄN CHÍ THANH - KHÁNH HOÀ - ĐÁP ÁN.docx",
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC TRƯỜNG\\Nghệ An\\THPT DIỄN CHÂU 5 - NGHỆ AN.docx",
+      "answerPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC TRƯỜNG\\Nghệ An\\THPT DIỄN CHÂU 5 - NGHỆ AN - ĐA.docx",
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC TRƯỜNG\\Phú Thọ\\THPT Chuyên Hùng Vương.docx",
+      "answerPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC TRƯỜNG\\Phú Thọ\\THPT Chuyên Hùng Vương - Đáp án.docx",
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC TRƯỜNG\\Phú Yên\\CHUYÊN LƯƠNG VĂN CHÁNH - PHÚ YÊN .docx",
+      "answerPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC TRƯỜNG\\Phú Yên\\CHUYÊN LƯƠNG VĂN CHÁNH - PHÚ YÊN - ĐÁP ÁN.docx",
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC TRƯỜNG\\Phú Yên\\PHAN BỘI CHÂU - PHÚ YÊN (MÃ ĐỀ 6601).docx",
+      "answerPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC TRƯỜNG\\Phú Yên\\PHAN BỘI CHÂU - PHÚ YÊN (MÃ ĐỀ 6601) - ĐÁP ÁN.docx",
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC TRƯỜNG\\Phú Yên\\PHAN BỘI CHÂU - PHÚ YÊN (MÃ ĐỀ 6602).docx",
+      "answerPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC TRƯỜNG\\Phú Yên\\PHAN BỘI CHÂU - PHÚ YÊN (MÃ ĐỀ 6602) - ĐÁP ÁN.docx",
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC TRƯỜNG\\Phú Yên\\THPT LÊ THÀNH PHƯƠNG - PHÚ YÊN.docx",
+      "answerPath": null,
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC TRƯỜNG\\Quảng Nam\\CHUYÊN LÊ THÁNH TÔNG - QUẢNG NAM.docx",
+      "answerPath": null,
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC TRƯỜNG\\Quảng Ngãi\\THPT LÝ SƠN - QUẢNG NGÃI.docx",
+      "answerPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC TRƯỜNG\\Quảng Ngãi\\THPT LÝ SƠN - QUẢNG NGÃI - ĐÁP ÁN.docx",
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC TRƯỜNG\\Quảng Ngãi\\THPT SỐ 2 ĐỨC PHỔ - QUẢNG NGÃI.docx",
+      "answerPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC TRƯỜNG\\Quảng Ngãi\\THPT SỐ 2 ĐỨC PHỔ - QUẢNG NGÃI -ĐA.docx",
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC TRƯỜNG\\Vĩnh Phúc\\THPT LIỄN SƠN - VĨNH PHÚC.docx",
+      "answerPath": null,
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC TRƯỜNG\\Vũng Tàu\\THPT LONG HẢI – PHƯỚC TỈNH - VŨNG TÀU.docx",
+      "answerPath": null,
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC TRƯỜNG\\Vũng Tàu\\THPT NGUYỄN DU - VŨNG TÀU.docx",
+      "answerPath": null,
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC TRƯỜNG\\Vũng Tàu\\THPT NGUYỄN VĂN CỪ - VŨNG TÀU.docx",
+      "answerPath": null,
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC TRƯỜNG\\Vũng Tàu\\THPT TRẦN VĂN QUAN - VŨNG TÀU.docx",
+      "answerPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC TRƯỜNG\\Vũng Tàu\\THPT TRẦN VĂN QUAN - VŨNG TÀU - ĐÁP ÁN.docx",
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC TRƯỜNG\\Đà Nẵng\\THPT CHU VĂN ĂN - ĐỒNG NAI.docx",
+      "answerPath": null,
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC TRƯỜNG\\Đồng Nai\\CHU VĂN AN - ĐỒNG NAI 2.docx",
+      "answerPath": null,
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC TRƯỜNG\\Đồng Tháp\\DE TN-THPT LAP VO 1.docx",
+      "answerPath": null,
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC TRƯỜNG\\Đồng Tháp\\MA TRAN-ĐỀ MINH HỌA THI TỐT NGHIỆP TIN HỌC-2025 THPT TAM NÔNG.docx",
+      "answerPath": null,
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC TRƯỜNG\\Đồng Tháp\\THPT CHÂU THÀNH 2.docx",
+      "answerPath": null,
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC TRƯỜNG\\Đồng Tháp\\THPT LONG KHÁNH A.docx",
+      "answerPath": null,
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC TRƯỜNG\\Đồng Tháp\\THPT PHÚ THÀNH A.docx",
+      "answerPath": null,
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC TRƯỜNG\\Đồng Tháp\\THPT TQT-ĐỀ THI TỐT NGHIỆP THPT.docx",
+      "answerPath": null,
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    },
+    {
+      "examPath": "c:\\Users\\YAYSOOSWhite\\Documents\\GitHub\\De-tin-2025\\2025\\ĐỀ CÁC TRƯỜNG\\Đồng Tháp\\THPT_TPSADEC_DEMINHHOA_TN2025.docx",
+      "answerPath": null,
+      "province": "Unknown",
+      "type": "TRƯỜNG"
+    }
+  ]
+}

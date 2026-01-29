@@ -55,6 +55,126 @@ export async function GET(request: NextRequest) {
     // Parse parts from JSON
     const parts: Part[] = exam.parts ? (exam.parts as unknown as Part[]) : [];
 
+    if (format === 'docx') {
+      // Generate DOCX using docx library
+      const { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } = await import('docx');
+
+      const docChildren: (typeof Paragraph.prototype)[] = [];
+
+      // Title
+      docChildren.push(
+        new Paragraph({
+          text: exam.title,
+          heading: HeadingLevel.HEADING_1,
+          alignment: AlignmentType.CENTER,
+        })
+      );
+
+      // Metadata
+      docChildren.push(
+        new Paragraph({
+          children: [
+            new TextRun({ text: `Thời gian: ${exam.duration} phút`, size: 24 }),
+          ],
+          alignment: AlignmentType.CENTER,
+        })
+      );
+
+      if (exam.year) {
+        docChildren.push(
+          new Paragraph({
+            children: [
+              new TextRun({ text: `Năm: ${exam.year}`, size: 24 }),
+            ],
+            alignment: AlignmentType.CENTER,
+          })
+        );
+      }
+
+      docChildren.push(new Paragraph({ text: '' })); // Blank line
+
+      // Questions
+      let questionNumber = 1;
+      parts.forEach((part) => {
+        // Part header
+        docChildren.push(
+          new Paragraph({
+            text: part.name,
+            heading: HeadingLevel.HEADING_2,
+          })
+        );
+
+        part.questions?.forEach((question) => {
+          // Question content
+          docChildren.push(
+            new Paragraph({
+              children: [
+                new TextRun({ text: `Câu ${questionNumber}: `, bold: true }),
+                new TextRun({ text: question.content }),
+              ],
+            })
+          );
+
+          // Choices
+          if (question.type === 'MULTIPLE_CHOICE' && question.choices) {
+            question.choices.forEach((choice, cIndex) => {
+              const letter = String.fromCharCode(65 + cIndex);
+              docChildren.push(
+                new Paragraph({
+                  children: [
+                    new TextRun({ text: `${letter}. ` }),
+                    new TextRun({ 
+                      text: choice.content,
+                      bold: choice.isCorrect,
+                      color: choice.isCorrect ? '008000' : undefined,
+                    }),
+                  ],
+                  indent: { left: 720 }, // 0.5 inch
+                })
+              );
+            });
+          } else if (question.type === 'TRUE_FALSE_GROUP' && question.statements) {
+            question.statements.forEach((statement, sIndex) => {
+              docChildren.push(
+                new Paragraph({
+                  children: [
+                    new TextRun({ text: `${sIndex + 1}. ` }),
+                    new TextRun({ text: statement.content }),
+                    new TextRun({ 
+                      text: ` (${statement.isCorrect ? 'Đúng' : 'Sai'})`,
+                      bold: true,
+                      color: statement.isCorrect ? '008000' : 'FF0000',
+                    }),
+                  ],
+                  indent: { left: 720 },
+                })
+              );
+            });
+          }
+
+          docChildren.push(new Paragraph({ text: '' })); // Blank line between questions
+          questionNumber++;
+        });
+      });
+
+      const doc = new Document({
+        sections: [
+          {
+            children: docChildren,
+          },
+        ],
+      });
+
+      const buffer = await Packer.toBuffer(doc);
+
+      return new NextResponse(buffer, {
+        headers: {
+          'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+          'Content-Disposition': `attachment; filename="exam-${examId}.docx"`,
+        },
+      });
+    }
+
     if (format === 'xlsx') {
       // Import xlsx dynamically
       const XLSX = await import('xlsx');

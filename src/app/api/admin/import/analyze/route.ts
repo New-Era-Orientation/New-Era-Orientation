@@ -3,6 +3,7 @@ import { auth } from '@/server/auth';
 import { db } from '@/server/db';
 import { z } from 'zod';
 import * as XLSX from 'xlsx';
+import mammoth from 'mammoth';
 
 // ============================================
 // Types
@@ -155,6 +156,162 @@ function parseExcelContent(buffer: ArrayBuffer): ParsedExam | null {
 }
 
 // ============================================
+// DOCX Parser
+// ============================================
+
+const DOCX_PATTERNS = {
+    // Question patterns like "Câu 1:", "Câu 1.", "Câu 1)"
+    questionStart: /^(?:Câu|Question)\s*(\d+)\s*[:.)\]]/i,
+    // Choice patterns like "A.", "A)", "a."
+    choiceOption: /^([A-Da-d])\s*[.)]\s*(.+)/,
+    // Correct answer marker: "Đáp án: A" or "Đáp án đúng: B"
+    correctAnswer: /(?:Đáp án|Answer|Correct)[:\s]*([A-Da-d])/i,
+    // Metadata patterns
+    examTitle: /(?:ĐỀ|Đề|Title)[:\s]*(.+)/i,
+    province: /(?:Tỉnh|Province|Sở)[:\s]*(.+)/i,
+    school: /(?:Trường|School)[:\s]*(.+)/i,
+    subject: /(?:Môn|Subject)[:\s]*(.+)/i,
+    duration: /(?:Thời gian|Duration|Time)[:\s]*(\d+)/i,
+    year: /(?:Năm|Year)[:\s]*(\d{4})/i,
+};
+
+async function parseDocxContent(buffer: ArrayBuffer): Promise<ParsedExam | null> {
+    try {
+        const result = await mammoth.extractRawText({ arrayBuffer: buffer });
+        const text = result.value;
+        const lines = text.split('\n').map(l => l.trim()).filter(l => l);
+
+        // Extract metadata from first ~20 lines
+        const metadata: Record<string, string> = {};
+        let metadataEndIndex = 0;
+
+        for (let i = 0; i < Math.min(lines.length, 30); i++) {
+            const line = lines[i];
+
+            // Check if it's the start of questions
+            if (DOCX_PATTERNS.questionStart.test(line)) {
+                metadataEndIndex = i;
+                break;
+            }
+
+            // Extract metadata
+            const titleMatch = line.match(DOCX_PATTERNS.examTitle);
+            if (titleMatch) metadata.title = titleMatch[1].trim();
+
+            const provinceMatch = line.match(DOCX_PATTERNS.province);
+            if (provinceMatch) metadata.province = provinceMatch[1].trim();
+
+            const schoolMatch = line.match(DOCX_PATTERNS.school);
+            if (schoolMatch) metadata.school = schoolMatch[1].trim();
+
+            const subjectMatch = line.match(DOCX_PATTERNS.subject);
+            if (subjectMatch) metadata.subject = subjectMatch[1].trim();
+
+            const durationMatch = line.match(DOCX_PATTERNS.duration);
+            if (durationMatch) metadata.duration = durationMatch[1];
+
+            const yearMatch = line.match(DOCX_PATTERNS.year);
+            if (yearMatch) metadata.year = yearMatch[1];
+        }
+
+        // Parse questions
+        const questions: ParsedQuestion[] = [];
+        let currentQuestion: ParsedQuestion | null = null;
+        let currentChoices: { content: string; isCorrect: boolean }[] = [];
+        let correctAnswer: string | null = null;
+
+        for (let i = metadataEndIndex; i < lines.length; i++) {
+            const line = lines[i];
+
+            // Check for new question
+            const questionMatch = line.match(DOCX_PATTERNS.questionStart);
+            if (questionMatch) {
+                // Save previous question
+                if (currentQuestion) {
+                    // Apply correct answer
+                    if (correctAnswer) {
+                        const upperAnswer = correctAnswer.toUpperCase();
+                        currentChoices = currentChoices.map((c, idx) => ({
+                            ...c,
+                            isCorrect: String.fromCharCode(65 + idx) === upperAnswer,
+                        }));
+                    }
+                    currentQuestion.choices = currentChoices;
+                    questions.push(currentQuestion);
+                }
+
+                // Extract question content (rest of line after "Câu N:")
+                const questionContent = line.replace(DOCX_PATTERNS.questionStart, '').trim();
+                currentQuestion = {
+                    type: 'MULTIPLE_CHOICE',
+                    content: questionContent || '',
+                    order: parseInt(questionMatch[1]),
+                };
+                currentChoices = [];
+                correctAnswer = null;
+                continue;
+            }
+
+            // Check for choice
+            const choiceMatch = line.match(DOCX_PATTERNS.choiceOption);
+            if (choiceMatch && currentQuestion) {
+                currentChoices.push({
+                    content: choiceMatch[2].trim(),
+                    isCorrect: false,
+                });
+                continue;
+            }
+
+            // Check for correct answer indicator
+            const answerMatch = line.match(DOCX_PATTERNS.correctAnswer);
+            if (answerMatch) {
+                correctAnswer = answerMatch[1];
+                continue;
+            }
+
+            // Continue question content if no choices yet
+            if (currentQuestion && currentChoices.length === 0 && line) {
+                currentQuestion.content += ' ' + line;
+            }
+        }
+
+        // Don't forget last question
+        if (currentQuestion) {
+            if (correctAnswer) {
+                const upperAnswer = correctAnswer.toUpperCase();
+                currentChoices = currentChoices.map((c, idx) => ({
+                    ...c,
+                    isCorrect: String.fromCharCode(65 + idx) === upperAnswer,
+                }));
+            }
+            currentQuestion.choices = currentChoices;
+            questions.push(currentQuestion);
+        }
+
+        return {
+            title: metadata.title || 'Đề thi nhập từ DOCX',
+            description: undefined,
+            duration: parseInt(metadata.duration || '90', 10),
+            year: parseInt(metadata.year || String(new Date().getFullYear()), 10),
+            province: metadata.province,
+            school: metadata.school,
+            subject: metadata.subject,
+            type: 'STANDARD',
+            parts: [
+                {
+                    name: 'Phần 1',
+                    order: 1,
+                    questions,
+                },
+            ],
+        };
+    } catch (e) {
+        console.error('DOCX parse error:', e);
+        return null;
+    }
+}
+
+// ============================================
 // Matching Logic
 // ============================================
 
@@ -289,8 +446,8 @@ async function findSubjectMatch(name: string): Promise<EntityMapping> {
 // ============================================
 
 const analyzeSchema = z.object({
-    fileType: z.enum(['json', 'xlsx']),
-    content: z.string(), // Base64 for xlsx, raw string for json
+    fileType: z.enum(['json', 'xlsx', 'docx']),
+    content: z.string(), // Base64 for xlsx/docx, raw string for json
 });
 
 export async function POST(request: NextRequest) {
@@ -331,7 +488,12 @@ export async function POST(request: NextRequest) {
             for (let i = 0; i < binaryString.length; i++) {
                 bytes[i] = binaryString.charCodeAt(i);
             }
-            result.exam = parseExcelContent(bytes.buffer);
+            
+            if (fileType === 'xlsx') {
+                result.exam = parseExcelContent(bytes.buffer);
+            } else if (fileType === 'docx') {
+                result.exam = await parseDocxContent(bytes.buffer);
+            }
         }
 
         if (!result.exam) {

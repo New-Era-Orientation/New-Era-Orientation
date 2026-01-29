@@ -8,6 +8,8 @@ import {
   Download,
   FileJson,
   FileSpreadsheet,
+  FileText,
+  FileType,
   AlertCircle,
   CheckCircle,
   ArrowLeft,
@@ -82,7 +84,7 @@ export default function ImportExportPage() {
   // Analysis state
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
   const [fileContent, setFileContent] = useState<string>('');
-  const [fileType, setFileType] = useState<'json' | 'xlsx'>('json');
+  const [fileType, setFileType] = useState<'json' | 'xlsx' | 'docx'>('json');
   const [userMappings, setUserMappings] = useState<Record<string, string | number | 'CREATE_NEW'>>({});
 
   // Import result
@@ -129,10 +131,11 @@ export default function ImportExportPage() {
 
     try {
       const isExcel = file.name.endsWith('.xlsx') || file.name.endsWith('.xls');
-      setFileType(isExcel ? 'xlsx' : 'json');
+      const isDocx = file.name.endsWith('.docx') || file.name.endsWith('.doc');
+      setFileType(isExcel ? 'xlsx' : isDocx ? 'docx' : 'json');
 
       let content: string;
-      if (isExcel) {
+      if (isExcel || isDocx) {
         // Convert to base64
         const buffer = await file.arrayBuffer();
         const bytes = new Uint8Array(buffer);
@@ -151,7 +154,7 @@ export default function ImportExportPage() {
       const res = await fetch('/api/admin/import/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ fileType: isExcel ? 'xlsx' : 'json', content }),
+        body: JSON.stringify({ fileType: isExcel ? 'xlsx' : isDocx ? 'docx' : 'json', content }),
       });
 
       const result: AnalysisResult = await res.json();
@@ -269,7 +272,7 @@ export default function ImportExportPage() {
     }
   };
 
-  const handleExport = async (format: 'json' | 'xlsx') => {
+  const handleExport = async (format: 'json' | 'xlsx' | 'docx') => {
     if (!selectedExamId) {
       alert('Vui lòng chọn đề thi để export');
       return;
@@ -402,12 +405,12 @@ export default function ImportExportPage() {
               {step === 'upload' && (
                 <>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Hỗ trợ file <strong>JSON</strong> hoặc <strong>Excel (.xlsx)</strong>
+                    Hỗ trợ file <strong>JSON</strong>, <strong>Excel (.xlsx)</strong> hoặc <strong>Word (.docx)</strong>
                   </p>
                   <input
                     ref={fileInputRef}
                     type="file"
-                    accept=".json,.xlsx,.xls"
+                    accept=".json,.xlsx,.xls,.docx,.doc"
                     onChange={handleFileChange}
                     className="hidden"
                   />
@@ -423,6 +426,19 @@ export default function ImportExportPage() {
                     )}
                     Chọn file để import
                   </Button>
+
+                  {/* Exam Editor Link */}
+                  <div className="pt-4 border-t dark:border-gray-700">
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                      Hoặc sử dụng <strong>Exam Editor</strong> để nhập/chỉnh sửa đề thi trực tiếp
+                    </p>
+                    <Link href="/admin/import-export/editor">
+                      <Button variant="outline" className="w-full gap-2">
+                        <FileText className="w-4 h-4" />
+                        Mở Exam Editor
+                      </Button>
+                    </Link>
+                  </div>
                 </>
               )}
 
@@ -604,7 +620,7 @@ export default function ImportExportPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                Xuất đề thi ra file JSON hoặc Excel.
+                Xuất đề thi ra file JSON, Excel hoặc Word.
               </p>
 
               <div>
@@ -628,7 +644,7 @@ export default function ImportExportPage() {
                 </select>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-3 gap-3">
                 <Button
                   variant="outline"
                   onClick={() => handleExport('json')}
@@ -640,7 +656,7 @@ export default function ImportExportPage() {
                   ) : (
                     <FileJson className="w-4 h-4" />
                   )}
-                  Export JSON
+                  JSON
                 </Button>
                 <Button
                   variant="outline"
@@ -653,7 +669,20 @@ export default function ImportExportPage() {
                   ) : (
                     <FileSpreadsheet className="w-4 h-4" />
                   )}
-                  Export Excel
+                  Excel
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => handleExport('docx')}
+                  disabled={exporting || !selectedExamId}
+                  className="gap-2"
+                >
+                  {exporting ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <FileType className="w-4 h-4" />
+                  )}
+                  Word
                 </Button>
               </div>
             </CardContent>
