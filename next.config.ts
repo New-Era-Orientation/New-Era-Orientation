@@ -4,14 +4,20 @@ import type { NextConfig } from "next";
 const isStaticBuild = process.env.BUILD_TARGET === "static";
 
 const nextConfig: NextConfig = {
-  // Enable static export for Capacitor/Tauri builds
-  ...(isStaticBuild && {
-    output: "export",
-    distDir: "out",
-    images: {
-      unoptimized: true, // Required for static export
-    },
-  }),
+  // Output mode:
+  // - "export" for Capacitor/Tauri static builds
+  // - "standalone" for Docker/server deployments (so .next/standalone exists)
+  ...(isStaticBuild
+    ? {
+        output: "export",
+        distDir: "out",
+        images: {
+          unoptimized: true, // Required for static export
+        },
+      }
+    : {
+        output: "standalone",
+      }),
 
   typescript: {
     ignoreBuildErrors: true,
