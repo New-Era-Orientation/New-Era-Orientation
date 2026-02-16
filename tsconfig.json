@@ -31,7 +31,9 @@
       "vitest/globals",
       "@testing-library/jest-dom"
     ],
-    "noImplicitAny": false
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true
   },
   "include": [
     "next-env.d.ts",
