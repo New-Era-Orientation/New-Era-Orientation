@@ -4,20 +4,19 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-    - 3000:3000
+      - "3000:3000"
     environment:
-    - DATABASE_URL=${DATABASE_URL}
-    - AUTH_SECRET=${AUTH_SECRET}
-    - AUTH_GOOGLE_ID=${AUTH_GOOGLE_ID}
-    - AUTH_GOOGLE_SECRET=${AUTH_GOOGLE_SECRET}
-    - OPENAI_API_KEY=${OPENAI_API_KEY}
-    - AUTH_URL=https://neo.desithedev.id.vn
-    - AUTH_TRUST_HOST=true
+      - DATABASE_URL=${DATABASE_URL}
+      - AUTH_SECRET=${AUTH_SECRET}
+      - AUTH_GOOGLE_ID=${AUTH_GOOGLE_ID}
+      - AUTH_GOOGLE_SECRET=${AUTH_GOOGLE_SECRET}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
     depends_on:
-    - db
+      - db
     networks:
-    - neo-network
+      - neo-network
     restart: unless-stopped
+
   db:
     image: postgres:16-alpine
     environment:
@@ -25,19 +24,21 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
       POSTGRES_DB: ${POSTGRES_DB:-neoedu}
     volumes:
-    - postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
     networks:
-    - neo-network
+      - neo-network
     restart: unless-stopped
     healthcheck:
-      test:
-      - CMD-SHELL
-      - pg_isready -U postgres
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
       timeout: 5s
       retries: 5
+
 networks:
   neo-network:
     driver: bridge
+
 volumes:
-  postgres_data: null
+  postgres_data:
